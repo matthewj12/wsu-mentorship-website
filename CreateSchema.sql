@@ -1,6 +1,6 @@
-drop database mp;
+drop database if exists mp;
 create database mp;
-use `mp`;
+use mp;
 
 
 
@@ -183,7 +183,7 @@ CREATE TABLE `has hobby` (
 	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
 	FOREIGN KEY(hobby)  REFERENCES hobby(hobby)        on delete cascade,
 
-	PRIMARY KEY(starid)
+	PRIMARY KEY(starid, hobby)
 );
 
 
