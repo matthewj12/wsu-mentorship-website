@@ -57,11 +57,13 @@ for p in participants:
 
 # ________________________________ DEBUGGING ________________________________
 if debugging_on:
+	# Determine participants index where starid == debug_participant_starid
 	for i in range(len(participants)):
 		if participants[i].data_points['starid'] == debug_participant_id:
 			debug_participant_index = i
 
-	print("{}'s rankings:".format(participants[debug_participant_index].data_points['starid']))
+	# Print out debug participant's ranking
+	print("\n{}'s rankings:".format(participants[debug_participant_index].data_points['starid']))
 	rank = 1
 	for starid in participants[debug_participant_index].ranking:
 		print('{}: {}'.format(rank, starid))
