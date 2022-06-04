@@ -19,12 +19,13 @@ CREATE TABLE `important quality` (
 INSERT INTO `important quality`
 (`important quality`)
 VALUES
-	('major and pre-professional program (if applicable)'),
+	('major'),
+	('gender'),
 	('race'),
-	('language(s) in common'),
-	('hobbies in common'),
+	('second language(s)'),
+	('religious affiliation'),
 	('interested in diversity groups'),
-	('religious affiliation')
+	('hobbies')
 ;
 
 -- We DON'T need a table pairing `important quality` to `participant` because `participant` always has a fixed number of important qualities represented as atomic columns within the `participant` table
@@ -102,13 +103,6 @@ CREATE TABLE `participant` (
 		'other',
 		'prefer not to answer'
 	)                                             NOT NULL,
-	`preferred gender`                enum(
-		'male',
-		'female',
-		'non-binary',
-		'other',
-		'prefers not to answer'
-	)                                             NOT NULL,
 	`religious affiliation`           enum(
 		'christianity',
 		'judaism',
@@ -117,23 +111,60 @@ CREATE TABLE `participant` (
 		'hinduism',
 		'taoism',
 		'spiritual but not religious',
+		'agnostic',
 		'atheist',
 		'pastafarian',
+		'other',
+		'prefer not to answer',
+		'doesn\'t matter'
+	)                                             NOT NULL,
+	`international student`           boolean     NOT NULL,
+	`lgbtq+`                          boolean     NOT NULL,
+	`student athlete`                 boolean     NOT NULL,
+	`multilingual`                    boolean     NOT NULL,
+	`not born in this country`        boolean     NOT NULL,
+	`transfer student`                boolean     NOT NULL,
+	`first gen college student`       boolean     NOT NULL,
+	`unsure or undecided about major` boolean     NOT NULL,
+	`interested in diversity groups`  boolean     NOT NULL,
+	`preferred gender`                enum(
+		'male',
+		'female',
+		'non-binary',
+		'other',
+		'prefers not to answer',
+		'doesn\'t matter'
+	)                                             NOT NULL,
+	`preferred race`                            enum(
+		'white',
+		'black',
+		'asian',
+		'hispanic',
+		'aboriginal',
+		'native american',
+		'native hawaiian or pacific islander',
+		'mixed',
+		'prefers not to answer',
+		'doesn\'t matter'
+	)                                             NOT NULL,
+	`preferred religious affiliation`           enum(
+		'christianity',
+		'judaism',
+		'islam',
+		'buddhism',
+		'hinduism',
+		'taoism',
+		'spiritual but not religious',
 		'agnostic',
-		'other'
+		'atheist',
+		'pastafarian',
+		'other',
+		'prefers not to answer',
+		'doesn\'t matter'
 	)                                              NOT NULL,
 	`1st most important quality`      varchar(50)  NOT NULL,
 	`2nd most important quality`      varchar(50)  NOT NULL,
 	`3rd most important quality`      varchar(50)  NOT NULL,
-	`international student`           boolean      NOT NULL,
-	`lgbtq+`                          boolean      NOT NULL,
-	`student athlete`                 boolean      NOT NULL,
-	`multilingual`                    boolean      NOT NULL,
-	`not born in this country`        boolean      NOT NULL,
-	`transfer student`                boolean      NOT NULL,
-	`first gen college student`       boolean      NOT NULL,
-	`unsure or undecided about major` boolean      NOT NULL,
-	`interested in diversity groups`  boolean      NOT NULL,
 	`misc info`                       varchar(200) NOT NULL,
 
 	PRIMARY KEY (starid),
