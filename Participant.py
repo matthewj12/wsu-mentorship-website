@@ -2,6 +2,7 @@ from Rankings import rankings
 
 class Participant():
 	columns = [
+		'is mentor',
 		'first name',
 		'last name',
 		'starid',
@@ -27,28 +28,32 @@ class Participant():
 		'2nd most important quality',
 		'3rd most important quality',
 		'misc info'
-		# hobbbies is an aggregate data point. A seperate `hobbies` table references the `participant` table
-		# Currently, we determine matching hobbies via query without storing them. Ideally, this would/will also be the case for the rest of the fields
-		# 'hobbies'
+		#'hobbies'
 	]
-
-
+		
+	'''
+	hobbbies is an aggregate data point. A seperate `hobbies` table references the `participant` table
+	Currently, we get a participant's list of hobbies via query without storing them. This eliminates any chance of using out-of-date data. We could 
+	handle all data points this way, but it seems excessively strict and slow to re-query the participant being processed every time we need another 
+	data point; we can easily update all records all records are up-to-date in linear time by calling 'getParticipantsListFromQuery()'.
+	'''
+		
 	def __init__(self, row):
 		# atomized data points within `participant` table
 		self.data_points = {}
-
 		self.ranking = []
 
 		i = 0
-		for data_point_val in row.split(',', 24):
+		for data_point_val in row:
 			self.data_points[Participant.columns[i]] = data_point_val
 			i += 1
 
 
 	# mapping of Important Quality Specifier to Participant Data Point Key
 	iqs_to_pdpk = {
-		'prefers not to answer' : 'prefer not to answer'
+		# 'second language(s)' : 'second language'
 	}
+
 	@staticmethod
 	def iqsToPdpk(iqs):
 		if iqs in Participant.iqs_to_pdpk.keys():
@@ -57,6 +62,21 @@ class Participant():
 			# If an entry for an iqs doesn't exist, just use iqs as the key.
 			return iqs
 
+	
+	# thing that p chose as one of their important qualities : column name to get p's value used in comparison with candidates
+	iqs_to_col_name = {
+		'gender'   : 'preferred gender',
+		'religion' : 'preferred religion',
+		'race'     : 'preferred race'
+	}
+
+	@staticmethod
+	def iqsToColName(iqs):
+		if iqs in Participant.iqs_to_col_name.keys():
+			return Participant.iqs_to_col_name[iqs] 
+		else:
+			# If an entry for an iqs doesn't exist, just use iqs as the key.
+			return iqs
 
 	def generateOrderByExpr(self, cursor, iqs, debug):
 		# returns subsection of 'order by' clause from 
@@ -66,12 +86,14 @@ class Participant():
 
 			# important quality key
 			iqk = Participant.iqsToPdpk(iqs)
-			# iqv   = Important Quality Value belonging to participant whose ranking of candidate
-			# mentors/mentees is being created (is a value in 'rankings' dict)
-			iqv = self.data_points[iqk]
+
+			# iqv   = Important Quality Value belonging to participant (self) whose ranking 
+			# of candidate mentors/mentees is being created (is a value in 'rankings' dict)
+			iqv = self.data_points[Participant.iqsToColName(iqs)]
 
 			if debug:
-				print('rankings[{}][{}]'.format(iqk, iqv))
+				# print(self.data_points['starid'])
+				print('Considering: rankings[{}][{}]...'.format(iqk, iqv))
 
 			# order by case...
 			result = 'case'
@@ -93,6 +115,8 @@ class Participant():
 			return result + ' when TRUE then {} end asc'.format(cur_rank + 1)
 
 		else:
+			if debug:
+				print('Considering: hobbies...')
 			# order by ... 
 			return '`matching hobbies count` desc'
 
@@ -118,18 +142,21 @@ class Participant():
 			) for i in range(3)
 		]
 
+		# need to generate the table at the start of the query so we can reference it in the ORDER BY clause
 		join_with_matching_hobbies_clause = '''
-			participant left join `matching hobbies table` 
-				on participant.starid = `matching hobbies table`.`candidate starid`
+			participant LEFT JOIN `matching hobbies table` 
+				ON participant.starid = `matching hobbies table`.`candidate starid`
 		'''
 
 		candidate_ranking_query = '''
-			with `matching hobbies table` as ({})
-			select starid
-			from {}
-			order by {}, {}, {};'''.format(
+			WITH `matching hobbies table` AS ({})
+			SELECT starid
+			FROM {}
+			WHERE `is mentor` = {}
+			ORDER BY {}, {}, {};'''.format(
 				count_matching_hobbies_query,
 				join_with_matching_hobbies_clause,
+				'FALSE' if self.data_points['is mentor'] else 'TRUE',
 				*custom_order_exprs
 			)
 

@@ -22,7 +22,7 @@ VALUES
 	('major'),
 	('gender'),
 	('race'),
-	('second language(s)'),
+	('second language'),
 	('religious affiliation'),
 	('interested in diversity groups'),
 	('hobbies')
@@ -36,6 +36,7 @@ VALUES
 
 DROP TABLE IF EXISTS `participant`;
 CREATE TABLE `participant` (
+	`is mentor`                       boolean     NOT NULL,
 	`first name`                      varchar(64) NOT NULL,
 	`last name`                       varchar(64) NOT NULL,
 	`starid`                          char(8)     NOT NULL,
@@ -116,7 +117,7 @@ CREATE TABLE `participant` (
 		'pastafarian',
 		'other',
 		'prefer not to answer',
-		'doesn\'t matter'
+		'doesnt matter'
 	)                                             NOT NULL,
 	`international student`           boolean     NOT NULL,
 	`lgbtq+`                          boolean     NOT NULL,
@@ -133,7 +134,7 @@ CREATE TABLE `participant` (
 		'non-binary',
 		'other',
 		'prefers not to answer',
-		'doesn\'t matter'
+		'doesnt matter'
 	)                                             NOT NULL,
 	`preferred race`                            enum(
 		'white',
@@ -144,8 +145,9 @@ CREATE TABLE `participant` (
 		'native american',
 		'native hawaiian or pacific islander',
 		'mixed',
+		'other',
 		'prefers not to answer',
-		'doesn\'t matter'
+		'doesnt matter'
 	)                                             NOT NULL,
 	`preferred religious affiliation`           enum(
 		'christianity',
@@ -160,7 +162,7 @@ CREATE TABLE `participant` (
 		'pastafarian',
 		'other',
 		'prefers not to answer',
-		'doesn\'t matter'
+		'doesnt matter'
 	)                                              NOT NULL,
 	`1st most important quality`      varchar(50)  NOT NULL,
 	`2nd most important quality`      varchar(50)  NOT NULL,
