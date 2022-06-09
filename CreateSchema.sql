@@ -119,18 +119,19 @@ CREATE TABLE `participant` (
 		'other',
 		'none'
 	)                                             NOT NULL,
-	`race`                            enum(
-		'white',
-		'black',
-		'asian',
-		'hispanic',
-		'aboriginal',
-		'native american',
-		'native hawaiian or pacific islander',
-		'mixed',
-		'other',
-		'prefer not to answer'
-	)                                             NOT NULL,
+	
+	`race`                            set(
+		'american indian',
+        'asian',
+        'black',
+        'african',
+        'hispanic',
+        'white',
+        'native hawaiian',
+        'prefer not to say',
+        'other'
+	)  NOT NULL,
+	
 	`religious affiliation`           enum(
 		'christianity',
 		'judaism',
@@ -163,7 +164,7 @@ CREATE TABLE `participant` (
 		'prefers not to answer',
 		'doesnt matter'
 	)                                             NOT NULL,
-	`preferred race`                            enum(
+	`preferred race`                            set(
 		'white',
 		'black',
 		'asian',
@@ -246,6 +247,19 @@ CREATE TABLE `has hobby` (
 	PRIMARY KEY(starid, hobby)
 );
 
+
+-- ______________________________________________________________________________________________________________________________________
+
+DROP TABLE IF EXISTS `speaks second languages`;
+CREATE TABLE `speaks second languages` (
+	`starid` char(8),
+	`second languages` varchar(26),
+
+	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
+	FOREIGN KEY(`second languages`)  REFERENCES `second languages`(`second languages`) on delete cascade,
+
+	PRIMARY KEY(starid, `second languages`)
+);
 
 -- ______________________________________________________________________________________________________________________________________
 
