@@ -30,7 +30,34 @@ VALUES
 
 -- We DON'T need a table pairing `important quality` to `participant` because `participant` always has a fixed number of important qualities represented as atomic columns within the `participant` table
 
+-- const reference table for second languages
+DROP TABLE IF EXISTS `second languages`;
+CREATE TABLE `second languages` (
+	`second languages` varchar(50),
 
+	PRIMARY KEY(`second languages`)
+);
+
+INSERT INTO `second languages`
+(`second languages`)
+VALUES
+		('american sign language'),
+		('arabic'),
+		('bangla'),
+		('chinese'),
+		('french'),
+		('german'),
+		('hindi/urdu'),
+		('japanese'),
+		('korean'),
+		('russian'),
+		('somali'),
+		('spanish'),
+		('thai'),
+		('vietnamese'),
+		('other'),
+		('none')
+;
 -- ______________________________________________________________________________________________________________________________________
 
 
