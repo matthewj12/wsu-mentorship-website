@@ -30,7 +30,34 @@ VALUES
 
 -- We DON'T need a table pairing `important quality` to `participant` because `participant` always has a fixed number of important qualities represented as atomic columns within the `participant` table
 
+-- const reference table for second languages
+DROP TABLE IF EXISTS `second languages`;
+CREATE TABLE `second languages` (
+	`second languages` varchar(50),
 
+	PRIMARY KEY(`second languages`)
+);
+
+INSERT INTO `second languages`
+(`second languages`)
+VALUES
+		('american sign language'),
+		('arabic'),
+		('bangla'),
+		('chinese'),
+		('french'),
+		('german'),
+		('hindi/urdu'),
+		('japanese'),
+		('korean'),
+		('russian'),
+		('somali'),
+		('spanish'),
+		('thai'),
+		('vietnamese'),
+		('other'),
+		('none')
+;
 -- ______________________________________________________________________________________________________________________________________
 
 
@@ -92,18 +119,19 @@ CREATE TABLE `participant` (
 		'other',
 		'none'
 	)                                             NOT NULL,
-	`race`                            enum(
-		'white',
-		'black',
-		'asian',
-		'hispanic',
-		'aboriginal',
-		'native american',
-		'native hawaiian or pacific islander',
-		'mixed',
-		'other',
-		'prefer not to answer'
-	)                                             NOT NULL,
+	
+	`race`                            set(
+		'american indian',
+        'asian',
+        'black',
+        'african',
+        'hispanic',
+        'white',
+        'native hawaiian',
+        'prefer not to say',
+        'other'
+	)  NOT NULL,
+	
 	`religious affiliation`           enum(
 		'christianity',
 		'judaism',
@@ -119,15 +147,15 @@ CREATE TABLE `participant` (
 		'prefer not to answer',
 		'doesnt matter'
 	)                                             NOT NULL,
-	`international student`           boolean     NOT NULL,
-	`lgbtq+`                          boolean     NOT NULL,
-	`student athlete`                 boolean     NOT NULL,
-	`multilingual`                    boolean     NOT NULL,
-	`not born in this country`        boolean     NOT NULL,
-	`transfer student`                boolean     NOT NULL,
-	`first gen college student`       boolean     NOT NULL,
-	`unsure or undecided about major` boolean     NOT NULL,
-	`interested in diversity groups`  boolean     NOT NULL,
+	`international student`           boolean     NOT NULL default false,
+	`lgbtq+`                          boolean     NOT NULL default false,
+	`student athlete`                 boolean     NOT NULL default false,
+	`multilingual`                    boolean     NOT NULL default false,
+	`not born in this country`        boolean     NOT NULL default false,
+	`transfer student`                boolean     NOT NULL default false,
+	`first gen college student`       boolean     NOT NULL default false,
+	`unsure or undecided about major` boolean     NOT NULL default false,
+	`interested in diversity groups`  boolean     NOT NULL default false,
 	`preferred gender`                enum(
 		'male',
 		'female',
@@ -136,7 +164,7 @@ CREATE TABLE `participant` (
 		'prefers not to answer',
 		'doesnt matter'
 	)                                             NOT NULL,
-	`preferred race`                            enum(
+	`preferred race`                            set(
 		'white',
 		'black',
 		'asian',
@@ -219,6 +247,19 @@ CREATE TABLE `has hobby` (
 	PRIMARY KEY(starid, hobby)
 );
 
+
+-- ______________________________________________________________________________________________________________________________________
+
+DROP TABLE IF EXISTS `speaks second languages`;
+CREATE TABLE `speaks second languages` (
+	`starid` char(8),
+	`second languages` varchar(26),
+
+	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
+	FOREIGN KEY(`second languages`)  REFERENCES `second languages`(`second languages`) on delete cascade,
+
+	PRIMARY KEY(starid, `second languages`)
+);
 
 -- ______________________________________________________________________________________________________________________________________
 
