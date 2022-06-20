@@ -3,11 +3,6 @@ create database mp;
 use mp;
 
 
-
-
--- ______________________________________________________________________________________________________________________________________
-
-
 -- const reference table
 DROP TABLE IF EXISTS `important quality`;
 CREATE TABLE `important quality` (
@@ -29,37 +24,6 @@ VALUES
 ;
 
 -- We DON'T need a table pairing `important quality` to `participant` because `participant` always has a fixed number of important qualities represented as atomic columns within the `participant` table
-
--- const reference table for second languages
-DROP TABLE IF EXISTS `second languages`;
-CREATE TABLE `second languages` (
-	`second languages` varchar(50),
-
-	PRIMARY KEY(`second languages`)
-);
-
-INSERT INTO `second languages`
-(`second languages`)
-VALUES
-		('american sign language'),
-		('arabic'),
-		('bangla'),
-		('chinese'),
-		('french'),
-		('german'),
-		('hindi/urdu'),
-		('japanese'),
-		('korean'),
-		('russian'),
-		('somali'),
-		('spanish'),
-		('thai'),
-		('vietnamese'),
-		('other'),
-		('none')
-;
--- ______________________________________________________________________________________________________________________________________
-
 
 DROP TABLE IF EXISTS `participant`;
 CREATE TABLE `participant` (
@@ -101,37 +65,6 @@ CREATE TABLE `participant` (
 		'physician assistant',
 		'none/not applicable'
 	)                                             NOT NULL,
-	`second language`                 enum(
-		'american sign language',
-		'arabic',
-		'bangla',
-		'chinese',
-		'french ',
-		'german',
-		'hindi/urdu',
-		'japanese',
-		'korean',
-		'russian',
-		'somali',
-		'spanish',
-		'thai',
-		'vietnamese',
-		'other',
-		'none'
-	)                                             NOT NULL,
-	
-	`race`                            set(
-		'american indian',
-        'asian',
-        'black',
-        'african',
-        'hispanic',
-        'white',
-        'native hawaiian',
-        'prefer not to say',
-        'other'
-	)  NOT NULL,
-	
 	`religious affiliation`           enum(
 		'christianity',
 		'judaism',
@@ -164,7 +97,7 @@ CREATE TABLE `participant` (
 		'prefers not to answer',
 		'doesnt matter'
 	)                                             NOT NULL,
-	`preferred race`                            set(
+	`preferred race`                            enum(
 		'white',
 		'black',
 		'asian',
@@ -203,9 +136,6 @@ CREATE TABLE `participant` (
 	FOREIGN KEY(`2nd most important quality`) REFERENCES `important quality`(`important quality`) on delete cascade,
 	FOREIGN KEY(`3rd most important quality`) REFERENCES `important quality`(`important quality`) on delete cascade
 );
-
-
--- ______________________________________________________________________________________________________________________________________
 
 
 -- const reference table
@@ -248,20 +178,77 @@ CREATE TABLE `has hobby` (
 );
 
 
--- ______________________________________________________________________________________________________________________________________
+-- const reference table for second languages
+DROP TABLE IF EXISTS `second language`;
+CREATE TABLE `second language` (
+	`second language` varchar(50),
 
-DROP TABLE IF EXISTS `speaks second languages`;
-CREATE TABLE `speaks second languages` (
-	`starid` char(8),
-	`second languages` varchar(26),
-
-	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
-	FOREIGN KEY(`second languages`)  REFERENCES `second languages`(`second languages`) on delete cascade,
-
-	PRIMARY KEY(starid, `second languages`)
+	PRIMARY KEY(`second language`)
 );
 
--- ______________________________________________________________________________________________________________________________________
+INSERT INTO `second language`
+(`second language`)
+VALUES
+		('american sign language'),
+		('arabic'),
+		('bangla'),
+		('chinese'),
+		('french'),
+		('german'),
+		('hindi/urdu'),
+		('japanese'),
+		('korean'),
+		('russian'),
+		('somali'),
+		('spanish'),
+		('thai'),
+		('vietnamese'),
+		('other')
+;
+
+DROP TABLE IF EXISTS `speaks second language`;
+CREATE TABLE `speaks second language` (
+	`starid` char(8),
+	`second language` varchar(26),
+
+	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
+	FOREIGN KEY(`second language`)  REFERENCES `second language`(`second language`) on delete cascade,
+
+	PRIMARY KEY(starid, `second language`)
+);
+
+-- const reference table for races
+DROP TABLE IF EXISTS `race`;
+CREATE TABLE `race` (
+	`race` varchar(50),
+
+	PRIMARY KEY(race)
+);
+
+INSERT INTO `race`
+(`race`)
+VALUES
+	('american indian'),
+	('asian'),
+	('black'),
+	('african'),
+	('hispanic'),
+	('white'),
+	('native hawaiian'),
+	('prefer not to say'),
+	('other')
+;
+
+DROP TABLE IF EXISTS `is race`;
+CREATE TABLE `is race` (
+	`starid` char(8),
+	`race` varchar(17),
+
+	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
+	FOREIGN KEY(`race`)  REFERENCES `race`(`race`) on delete cascade,
+
+	PRIMARY KEY(starid, `race`)
+);
 
 
 DROP TABLE IF EXISTS `mentorship`;

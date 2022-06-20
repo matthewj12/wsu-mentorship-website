@@ -112,11 +112,12 @@ rankings = {
 	},
 
 	'gender' : {
-		'male'                 : ('male',),
-		'female'               : ('female',),
-		'non-binary'           : ('non-binary',),
-		'other'                : ('other',),
-		'prefers not to answer': ('prefer not to answer',)
+		'male'                  : ('male',),
+		'female'                : ('female',),
+		'non-binary'            : ('non-binary',),
+		'other'                 : ('other',),
+		'doesnt matter'         : ('doesnt matter'),
+		'prefers not to answer' : ('prefer not to answer',)
 	},
 
 	'religious affiliation' : {
@@ -131,7 +132,7 @@ rankings = {
 		'atheist'                      : ('atheist',),
 		'pastafarian'                  : ('westboro baptist',),
 		'other'                        : ('other',),
-		'prefers not to answer'        : ('prefer not to answer',)
+		'prefer not to answer'        : ('prefer not to answer',)
 	},
 
 	'race' : {

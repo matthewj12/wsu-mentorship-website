@@ -9,8 +9,6 @@ class Participant():
 		'gender',
 		'major',
 		'pre program',
-		'second language',
-		'race',
 		'religious affiliation',
 		'international student',
 		'lgbtq+',
@@ -28,7 +26,6 @@ class Participant():
 		'2nd most important quality',
 		'3rd most important quality',
 		'misc info'
-		#'hobbies'
 	]
 		
 	'''
@@ -67,7 +64,7 @@ class Participant():
 	iqs_to_col_name = {
 		'gender'   : 'preferred gender',
 		'religion' : 'preferred religion',
-		'race'     : 'preferred race'
+		'race'     : 'preferred race',
 	}
 
 	@staticmethod
@@ -81,7 +78,25 @@ class Participant():
 	def generateOrderByExpr(self, cursor, iqs, debug):
 		# returns subsection of 'order by' clause from 
 		# iqs   = Important Quality Specifier (is the outer key in 'rankings' dict)
-		if iqs != 'hobbies':
+		if iqs == 'hobbies':
+			if debug:
+				print('Considering: hobbies...')
+			# order by ... 
+			return '`matching hobbies count` desc'
+
+		elif iqs == 'second language':
+			if debug:
+				print('Considering: second languages...')
+
+			return '`matching second languages count` desc'
+
+		elif iqs == 'race':
+			if debug:
+				print('Considering: race...')
+
+			return '`matching races count` desc'
+
+		else:
 			cur_rank = 1
 
 			# important quality key
@@ -114,13 +129,6 @@ class Participant():
 			
 			return result + ' when TRUE then {} end asc'.format(cur_rank + 1)
 
-		else:
-			if debug:
-				print('Considering: hobbies...')
-			# order by ... 
-			return '`matching hobbies count` desc'
-
-
 	def generateRanking(self, cursor, participants, debug):
 		count_matching_hobbies_query = '''
 			with
@@ -130,6 +138,30 @@ class Participant():
 			from p1_hobby, p2_hobby
 			where p1_hobby.hobby = p2_hobby.hobby
 			group by p2_hobby.starid
+		'''.format(
+			self.data_points['starid']
+		)
+		
+		count_matching_second_languages_query = '''
+			with
+				p1_lang as (select * from `speaks second language` where starid = '{}'),
+				p2_lang as (select * from `speaks second language`)
+			select p2_lang.starid as `candidate starid`, count(*) as `matching second languages count`
+			from p1_lang, p2_lang
+			where p1_lang.`second language` = p2_lang.`second language`
+			group by p2_lang.starid
+		'''.format(
+			self.data_points['starid']
+		)
+
+		count_matching_races_query = '''
+			with
+				p1_race as (select * from `is race` where starid = '{}'),
+				p2_race as (select * from `is race`)
+			select p2_race.starid as `candidate starid`, count(*) as `matching races count`
+			from p1_race, p2_race
+			where p1_race.`race` = p2_race.`race`
+			group by p2_race.starid
 		'''.format(
 			self.data_points['starid']
 		)
@@ -143,19 +175,25 @@ class Participant():
 		]
 
 		# need to generate the table at the start of the query so we can reference it in the ORDER BY clause
-		join_with_matching_hobbies_clause = '''
-			participant LEFT JOIN `matching hobbies table` 
-				ON participant.starid = `matching hobbies table`.`candidate starid`
+		join_clause = '''
+			((participant LEFT JOIN `matching second languages table` ON participant.starid = `matching second languages table`.`candidate starid`)
+			             LEFT JOIN `matching hobbies table` ON participant.starid = `matching hobbies table`.`candidate starid`)
+			             LEFT JOIN `matching races table` ON participant.starid = `matching races table`.`candidate starid`
 		'''
 
 		candidate_ranking_query = '''
-			WITH `matching hobbies table` AS ({})
+			WITH 
+				`matching hobbies table` AS ({}),
+				`matching races table` AS ({}),
+				`matching second languages table` AS ({})
 			SELECT starid
 			FROM {}
 			WHERE `is mentor` = {}
 			ORDER BY {}, {}, {};'''.format(
 				count_matching_hobbies_query,
-				join_with_matching_hobbies_clause,
+				count_matching_races_query,
+				count_matching_second_languages_query,
+				join_clause,
 				'FALSE' if self.data_points['is mentor'] else 'TRUE',
 				*custom_order_exprs
 			)

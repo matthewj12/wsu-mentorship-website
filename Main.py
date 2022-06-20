@@ -95,7 +95,7 @@ def main():
 	if debugging_on: print('Generating {}\'s ranking...\n'.format(debug_participant_id))
 
 	for p in participants:
-		p.generateRanking(cursor, participants, debugging_on and debug_participant_id == p.data_points['starid'])
+		p.generateRanking(cursor, participants, debugging_on)
 
 	if debugging_on:
 		print()
