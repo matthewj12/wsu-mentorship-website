@@ -2,6 +2,7 @@ from Rankings import rankings
 
 class Participant():
 	columns = [
+		'is active',
 		'is mentor',
 		'first name',
 		'last name',

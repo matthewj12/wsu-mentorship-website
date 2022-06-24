@@ -27,6 +27,7 @@ VALUES
 
 DROP TABLE IF EXISTS `participant`;
 CREATE TABLE `participant` (
+	`is active`                       boolean     NOT NULL,
 	`is mentor`                       boolean     NOT NULL,
 	`first name`                      varchar(64) NOT NULL,
 	`last name`                       varchar(64) NOT NULL,

@@ -45,12 +45,28 @@ def printRanking(participants, participant_id):
 		print('{}: {}'.format(rank, starid))
 		rank += 1
 
+def alreadyPaired(cursor, p):
+	cursor.execute('''
+		SELECT *
+		FROM `mentorship`
+		WHERE `mentee starid` = '{}' OR `mentor starid` = '{}'
+	'''.format(p.data_points['starid'], p.data_points['starid'])
+	)
+
+	res_count = 0
+	for tup in cursor:
+		res_count += 1
+
+	return res_count > 0
 
 def matchParticipants(cursor, participants):
 	global debug_participant_id
 
-	mentee_prefs = dict( [(p.data_points['starid'], p.ranking) for p in participants if not p.data_points['is mentor']] )
-	mentor_prefs = dict( [(p.data_points['starid'], p.ranking) for p in participants if     p.data_points['is mentor']] )
+	mentee_prefs = dict( [(p.data_points['starid'], p.ranking) for p in participants if 
+		p.data_points['is active'] and not alreadyPaired(cursor, p) and not p.data_points['is mentor']] )
+
+	mentor_prefs = dict( [(p.data_points['starid'], p.ranking) for p in participants if 
+		p.data_points['is active'] and not alreadyPaired(cursor, p) and p.data_points['is mentor']] )
 
 	game = StableMarriage.create_from_dictionaries(mentee_prefs, mentor_prefs)
 	stable_pairings = game.solve()
@@ -83,7 +99,7 @@ def matchParticipants(cursor, participants):
 		cursor.execute(insert_str)
 
 
-debugging_on = True
+debugging_on = False
 # ignored when debugging is disabled
 debug_participant_id = 'bbbbbbbb'
 
