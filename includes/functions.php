@@ -133,7 +133,7 @@
 
     // }
 
-    function readEnumValues($openTag, $dbName, $tableName, $columnName)
+    function readEnumValues($fu, $dbName, $tableName, $columnName)
     {
         
         //PDO way
@@ -160,7 +160,7 @@
                 $options = str_getcsv($values[0]["val"], ',', "'");
                 // echo var_dump($options);
 
-                switch ($openTag) 
+                switch ($fu) 
                 {
                     case 'option':
                         ?>
@@ -178,8 +178,8 @@
                         {
                         ?>
                         <br>
-                        <input type = "checkbox" name = <?php echo $option.'[]'?> value="<?php echo $option ?>">
-                        <label for = <?php echo $option.'[]'?> ><?php echo $option ?></label>
+                        <input type = "checkbox" name = "<?php echo $option.'[]'?>" value="<?php echo $option ?>">
+                        <label for = "<?php echo $option.'[]'?>" ><?php echo $option ?></label>
                         
                         <?php
                         }
@@ -190,8 +190,8 @@
                         {
                             ?>
                             <br>
-                            <input type = "radio" name = <?php echo $option ?> value="<?php echo $option ?>">
-                            <label for = <?php echo $option?>><?php echo $option ?></label>
+                            <input type = "radio" name = "<?php echo $option?>" value="<?php echo $option?>">
+                            <label for = "<?php echo $option?>"><?php echo $option ?></label>
                             <?php
                         }
                       break;
@@ -217,16 +217,59 @@
 
     function readRefTable($fieldType,$tableName, $columnName, $conn)
     {
-        $stmt = "SELECT * from `important quality`";
+        //Mysqli way
+        $sql = "SELECT * from `$tableName`";
+        $stmt = connect()->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        return $result;
+        $stmt = "SELECT * from `$tableName`";
         $result = mysqli_query($conn, $stmt);
         if(mysqli_num_rows($result) > 0)
         {
-            while($row = mysqli_fetch_assoc($result))
+            switch ($fieldType) 
             {
-                ?>
-                <option name = "<?php echo $row["important quality"] ?>" value="major"><?php echo $row["important quality"] ?></option>  
-                <?php
+                case 'option':
+                    ?>
+                    <br>
+                    <?php
+                while($row = mysqli_fetch_assoc($result))
+                {
+                    ?>
+                    <option name = "<?php echo $row[$columnName] ?>" value="<?php echo $row[$columnName] ?>"><?php echo $row[$columnName] ?></option>  
+                    <?php
+                    
+                }
+
+                break;
+                case 'checkbox':
+                    while($row = mysqli_fetch_assoc($result))
+                    {
+                        ?>
+                        <br>
+                        <input type = "checkbox" name = "<?php echo $row[$columnName].'[]'?>" value= "<?php echo $row[$columnName] ?>">
+                        <label for = "<?php echo $row[$columnName].'[]'?>"><?php echo $row[$columnName] ?></label>
+                        <?php
+                        
+                    }
+
+                  break;
+                case 'radio':
+                    while($row = mysqli_fetch_assoc($result))
+                    {
+                        ?>
+                            <br>
+                            <input type = "radio" name = "<?php echo $row[$columnName]?>" value="<?php echo $row[$columnName]?>">
+                            <label for = "<?php echo $option?>"><?php echo $row[$columnName] ?></label>
+                        <?php
+                        
+                    }
+                  break;
+                    
+                default:
+                    echo "Invalid Input field";
             }
+
         }
 
     }
