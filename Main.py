@@ -85,7 +85,7 @@ def alreadyPaired(cursor, p):
 
 
 def getStaridsOfTopRankers(mentees_for_um_rankings, um):
-	top_rankers = [mentees_for_um_rankings[um][0]]
+	top_rankers = [mentees_for_um_rankings[um][0].data_points['starid']]
 
 	for i in range(1, len(mentees_for_um_rankings[um])):
 		# if they tie with the mentee "above" (lower index) them
@@ -120,7 +120,8 @@ def rematch(matches, mentor_starid, mentee_starid):
 	matches.remove((getMatchByMenteeStarid(matches, mentee_starid)[0], mentee_starid))
 	matches.append((mentor_starid, mentee_starid))
 
-def updateMenteesForUmRankings(mentees_for_um_rankings, matched_mentor_starid, matched_mentee_starid):
+
+def updateMenteesForUmRankings(mentees_for_um_rankings, matched_mentor_starid, matched_mentee_starid, participants, matches):
 	# remove dictionary element for mentor
 	key_to_remove = 0
 
@@ -136,13 +137,25 @@ def updateMenteesForUmRankings(mentees_for_um_rankings, matched_mentor_starid, m
 	for um in mentees_for_um_rankings_keys:
 		remove_index = 0
 
-		for i in range(mentees_for_um_rankings[um]):
+		for i in range(len(mentees_for_um_rankings[um])):
 			if mentees_for_um_rankings[um][i].data_points['starid'] == matched_mentee_starid:
 				remove_index = i
 				break;
 
 		mentees_for_um_rankings[um].remove(mentees_for_um_rankings[um][remove_index])
-		
+
+	# remove mentees who are now no longer "extra" (they're the only mentor paired with the mentor that they're paired with)
+	mentees_for_um_rankings_keys = mentees_for_um_rankings.keys()
+	for um in mentees_for_um_rankings_keys:
+		remove_index = 0
+
+		for i in range(len(mentees_for_um_rankings[um])):
+			if countMatches(getParticipantByStarid(participants, mentees_for_um_rankings[um][i].data_points['starid']), matches) == 1:
+				remove_index = i
+				break;
+
+		mentees_for_um_rankings[um].remove(mentees_for_um_rankings[um][remove_index])
+	
 	return mentees_for_um_rankings
 
 
@@ -152,10 +165,10 @@ def createMatches(cursor, participants):
 	# _____________________________________________________ Do Hospital Resident Assignment Algorithm ______________________________________________________________
 
 	mentee_prefs = {p.data_points['starid'] : p.ranking for p in participants if 
-		p.data_points['is active'] and not alreadyPaired(cursor, p) and not int(p.data_points['is mentor'])}
+		int(p.data_points['is active']) and not alreadyPaired(cursor, p) and not int(p.data_points['is mentor'])}
 
 	mentor_prefs = {p.data_points['starid'] : p.ranking for p in participants if 
-		p.data_points['is active'] and not alreadyPaired(cursor, p) and int(p.data_points['is mentor'])}
+		int(p.data_points['is active']) and not alreadyPaired(cursor, p) and int(p.data_points['is mentor'])}
 
 	mentor_max_matches = {p.data_points['starid'] : int(p.data_points['max matches']) for p in participants
 		if int(p.data_points['is mentor'])}
@@ -261,7 +274,7 @@ def createMatches(cursor, participants):
 
 			
 			rematch(matches, starid_of_mentor_to_be_rematched, starid_of_mentee_to_be_rematched)
-			mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, starid_of_mentor_to_be_rematched, starid_of_mentee_to_be_rematched)
+			mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, starid_of_mentor_to_be_rematched, starid_of_mentee_to_be_rematched, participants, matches)
 
 			if not did_rematch:
 				# if we triggered this condition, it MUST be the case that ALL top-rankers for all remaining ums are top-rankers for multiple ums
@@ -273,9 +286,9 @@ def createMatches(cursor, participants):
 				if total_top_ranker_count >= len(mentees_for_um_rankings):
 					# arbitrarily choose which top-ranker each remaining um gets
 					for um in mentees_for_um_rankings.keys():
-						starid_of_mentee_to_be_rematched = mentees_for_um_rankings[um][0]
+						starid_of_mentee_to_be_rematched = mentees_for_um_rankings[um][0].data_points['starid']
 						rematch(um, starid_of_mentee_to_be_rematched)
-						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched)
+						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched, participants, matches)
 
 				else:
 					# e.g. if we have 3 ums left and only 1 top-ranker (for all 3), there are 3 different options for who gets the top ranker. For each of them, determine the sum of difference in indexes between the top-ranker and the next-best ranker
@@ -333,13 +346,13 @@ def createMatches(cursor, participants):
 					for um in ocs[min_oc_key]:
 						starid_of_mentee_to_be_rematched = mentees_for_um_rankings[um][0]
 						rematch(matches, um, starid_of_mentee_to_be_rematched)
-						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched)
+						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched, participants, matches)
 					
 					# ums who get second top-ranking mentee
 					for um in ocs[min_oc_key]:
 						starid_of_mentee_to_be_rematched = mentees_for_um_rankings[um][len(getStaridsOfTopRankers(mentees_for_um_rankings, um))]
 						rematch(matches, um, starid_of_mentee_to_be_rematched)
-						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched)
+						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched, participants, matches)
 
 		if debugging_on:
 			print()
@@ -426,43 +439,48 @@ def main():
 	# mpdb = "mentorship program database"
 	mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
 	
-	participants = buildParticipantsListFromQuery(cursor, where_clause_filter='TRUE')
+	# participants = buildParticipantsListFromQuery(cursor, where_clause_filter='TRUE')
 
 	# ________________ for if you want to mess around and test the matching algorithm manually ______________
-	# participants = [
-	# 	Participant(),
-	# 	Participant(),
-	# 	Participant(),
-	# 	Participant(),
+	participants = [
+		Participant(),
+		Participant(),
+		Participant(),
+		Participant(),
+		Participant(),
+		Participant(),
+		Participant(),
+		Participant()
+	]
 
-	# 	Participant(),
-	# 	Participant(),
-	# 	Participant(),
-	# ]
+	# def debug_constructor(self, is_active, is_mentor, starid, max_matches, ranking):
 
-	# participants[0].debug_constructor('1', '0', 'a', '1', ['e', 'f', 'g'])
-	# participants[1].debug_constructor('1', '0', 'b', '1', ['e', 'f', 'g'])
-	# participants[2].debug_constructor('1', '0', 'c', '1', ['f', 'e', 'g'])
-	# participants[3].debug_constructor('1', '0', 'd', '1', ['f', 'g', 'e'])
-	# participants[4].debug_constructor('1', '1', 'e', '2', ['a', 'b', 'c', 'd'])
-	# participants[5].debug_constructor('1', '1', 'f', '2', ['c', 'd', 'a', 'b'])
-	# participants[6].debug_constructor('1', '1', 'g', '2', ['a', 'b', 'c', 'd'])
+	# mentees
+	participants[0].debugConstructor('1', '0', 'a', '1', ['e', 'g', 'f', 'h'])
+	participants[1].debugConstructor('1', '0', 'b', '1', ['e', 'h', 'g', 'f'])
+	participants[2].debugConstructor('1', '0', 'c', '1', ['f', 'e', 'g', 'h'])
+	participants[3].debugConstructor('1', '0', 'd', '1', ['f', 'e', 'g', 'h'])
+	#mentors
+	participants[4].debugConstructor('1', '1', 'e', '2', ['a', 'b', 'c', 'd'])
+	participants[5].debugConstructor('1', '1', 'f', '2', ['a', 'b', 'c', 'd'])
+	participants[6].debugConstructor('1', '1', 'g', '2', ['a', 'b', 'c', 'd'])
+	participants[7].debugConstructor('1', '1', 'h', '2', ['a', 'b', 'c', 'd'])
 
-	if debugging_on:
-		print('Generating {}\'s ranking...\n'.format(debug_participant_id))
+	# if debugging_on:
+	# 	print('Generating {}\'s ranking...\n'.format(debug_participant_id))
 
-	for p in participants:
-		p.generateRanking(cursor, participants, debugging_on)
+	# for p in participants:
+	# 	p.generateRanking(cursor, participants, debugging_on)
 
-	if debugging_on:
-		print()
-		printRanking(participants, debug_participant_id)
+	# if debugging_on:
+	# 	print()
+	# 	printRanking(participants, debug_participant_id)
 
 	matches = createMatches(cursor, participants)
-	addMatchesToDatabase(cursor, matches)
+	# addMatchesToDatabase(cursor, matches)
 
-	mpdb.commit()
-	cursor.close()
-	mpdb.close()
+	# mpdb.commit()
+	# cursor.close()
+	# mpdb.close()
 
 main()
