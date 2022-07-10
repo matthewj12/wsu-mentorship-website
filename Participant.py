@@ -4,6 +4,7 @@ class Participant():
 	columns = [
 		'is active',
 		'is mentor',
+		'max matches',
 		'first name',
 		'last name',
 		'starid',
@@ -29,22 +30,32 @@ class Participant():
 		'misc info'
 	]
 		
-	'''
-	hobbbies is an aggregate data point. A seperate `hobbies` table references the `participant` table
-	Currently, we get a participant's list of hobbies via query without storing them. This eliminates any chance of using out-of-date data. We could 
-	handle all data points this way, but it seems excessively strict and slow to re-query the participant being processed every time we need another 
-	data point; we can easily update all records all records are up-to-date in linear time by calling 'getParticipantsListFromQuery()'.
-	'''
-		
-	def __init__(self, row):
-		# atomized data points within `participant` table
-		self.data_points = {}
-		self.ranking = []
+	def __init__(self, row=None):
+		if row != None:
+			# atomized data points within `participant` table
+			self.data_points = {}
+			self.ranking = []
+			# the index in 'ranking' of the participant we will propose to next (if we need too)
+			self.next_proposal_index = 0
 
-		i = 0
-		for data_point_val in row:
-			self.data_points[Participant.columns[i]] = data_point_val
-			i += 1
+			i = 0
+			for data_point_val in row:
+				self.data_points[Participant.columns[i]] = data_point_val
+				i += 1
+
+
+	# for testing purposed
+	def debug_constructor(self, is_active, is_mentor, starid, max_matches, ranking):
+		self.data_points = {}
+
+		self.ranking = ranking
+
+		self.data_points['is mentor'] = is_mentor
+		self.data_points['starid'] = starid
+		self.data_points['is active'] = is_active
+		self.data_points['max matches'] = max_matches
+
+		self.next_proposal_index = 0
 
 
 	# mapping of Important Quality Specifier to Participant Data Point Key
@@ -75,6 +86,20 @@ class Participant():
 		else:
 			# If an entry for an iqs doesn't exist, just use iqs as the key.
 			return iqs
+
+
+	# returns starid of current matched participant who is inferior to candidate or None if none are
+	def getInferiorMatch(self, candidate, matches):
+		self_index = 0 if self.data_points['is mentor'] else 1
+		match_index = 1 if self.data_points['is mentor'] else 0
+
+		for match in matches:
+			# if this match involves us and the participant it matches us with is inferior to candidate
+			if match[self_index] == self.data_points['starid'] and self.ranking.index(match[match_index]) < self.ranking.index(candidate.data_points['starid']):
+				return match[match_index]
+			
+		return None
+
 
 	def generateOrderByExpr(self, cursor, iqs, debug):
 		# returns subsection of 'order by' clause from 

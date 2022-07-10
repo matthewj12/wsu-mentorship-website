@@ -1,127 +1,48 @@
-import mysql.connector
-from Participant import Participant
-from matching.games import StableMarriage
+from CreateMatches import *
 
+# mpdb = "mentorship program database"
+mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
 
-def createCursor(host, user, password, database):
-	mpdb = mysql.connector.connect(
-		host=host,
-		user=user,
-		password=password,
-		database=database
-	)
+participants = buildParticipantsListFromQuery(cursor, where_clause_filter='TRUE')
 
-	return mpdb, mpdb.cursor(buffered=True)
+# ________________ for if you want to mess around and test the matching algorithm manually ______________
+# participants = [
+# 	Participant(),
+# 	Participant(),
+# 	Participant(),
+# 	Participant(),
+# 	Participant(),
+# 	Participant(),
+# 	Participant(),
+# 	Participant()
+# ]
 
-# copies all rows from the participant-related SQL tables into Participant objects. The only table this currently doesn't include is `mentorship`
-def buildParticipantsListFromQuery(cursor, where_clause_filter):
-	cursor.execute('select * from participant where {};'.format(where_clause_filter))
+# def debug_constructor(self, is_active, is_mentor, starid, max_matches, ranking):
 
-	# Populate atomized data points
-	results = []
-	for row_tuple in cursor:
-		results.append(Participant(row_tuple))
-		
+# mentees
+# participants[0].debugConstructor('1', '0', 'a', '1', ['e', 'g', 'f', 'h'])
+# participants[1].debugConstructor('1', '0', 'b', '1', ['e', 'h', 'g', 'f'])
+# participants[2].debugConstructor('1', '0', 'c', '1', ['f', 'e', 'g', 'h'])
+# participants[3].debugConstructor('1', '0', 'd', '1', ['f', 'e', 'g', 'h'])
+# mentors
+# participants[4].debugConstructor('1', '1', 'e', '2', ['a', 'b', 'c', 'd'])
+# participants[5].debugConstructor('1', '1', 'f', '2', ['a', 'b', 'c', 'd'])
+# participants[6].debugConstructor('1', '1', 'g', '2', ['a', 'b', 'c', 'd'])
+# participants[7].debugConstructor('1', '1', 'h', '2', ['a', 'b', 'c', 'd'])
 
-	# # Populate aggregate data points (utilizing seperate tables, each referencing the `participant` table)
-	# cursor.execute("select hobby from `has hobby` where starid = '{}'"
-	# 	.format(results[-1].data_points['starid'])
-	# )
-	# results[-1].data_points['hobbies'] = joinTuple(tup[0]).split(',')
+if debugging_on:
+	print('Generating {}\'s ranking...\n'.format(debug_participant_id))
 
-	return results
+for p in participants:
+	p.generateRanking(cursor, participants, debugging_on)
 
-
-def printRanking(participants, participant_id):
-	# Determine participants index where starid == debug_participant_starid
-	for i in range(len(participants)):
-		if participants[i].data_points['starid'] == debug_participant_id:
-			participant_index = i
-
-	# Print out debug participant's ranking
-	print("\n{}'s rankings:".format(participants[participant_index].data_points['starid']))
-	rank = 1
-	for starid in participants[participant_index].ranking:
-		print('{}: {}'.format(rank, starid))
-		rank += 1
-
-def alreadyPaired(cursor, p):
-	cursor.execute('''
-		SELECT *
-		FROM `mentorship`
-		WHERE `mentee starid` = '{}' OR `mentor starid` = '{}'
-	'''.format(p.data_points['starid'], p.data_points['starid'])
-	)
-
-	res_count = 0
-	for tup in cursor:
-		res_count += 1
-
-	return res_count > 0
-
-def matchParticipants(cursor, participants):
-	global debug_participant_id
-
-	mentee_prefs = dict( [(p.data_points['starid'], p.ranking) for p in participants if 
-		p.data_points['is active'] and not alreadyPaired(cursor, p) and not p.data_points['is mentor']] )
-
-	mentor_prefs = dict( [(p.data_points['starid'], p.ranking) for p in participants if 
-		p.data_points['is active'] and not alreadyPaired(cursor, p) and p.data_points['is mentor']] )
-
-	game = StableMarriage.create_from_dictionaries(mentee_prefs, mentor_prefs)
-	stable_pairings = game.solve()
-
+if debugging_on:
 	print()
+	printRanking(participants, debug_participant_id)
 
-	# for key in stable_pairings.keys():
-	# 	print('Mentee \'{}\' paired with mentor \'{}\''.format(key, stable_pairings[key]))
+matches = createMatches(cursor, participants)
+addMatchesToDatabase(cursor, matches)
 
-	# for pairing in stable_pairings:
-	# 	print(type(pairing))
-
-	mentees = list(stable_pairings.keys())
-	mentors = list(stable_pairings.values())
-
-	for i in range(len(mentors)):
-		insert_str = '''
-			INSERT INTO mentorship
-			(`mentor starid`, `mentee starid`, `start date`, `end date`)
-			VALUES
-			('{}', '{}', '2022-09-01', '2023-05-01');
-		'''.format(
-			# mentors/mentees list items are of type 'Player' (from matching library), and 'name' is simply therir unique identifier (in this case, starid).
-			mentors[i].name,
-			mentees[i].name
-		)
-
-		# print(insert_str)
-
-		cursor.execute(insert_str)
-
-
-debugging_on = False
-# ignored when debugging is disabled
-debug_participant_id = 'bbbbbbbb'
-
-def main():
-	# mpdb = "mentorship program database"
-	mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
-	participants = buildParticipantsListFromQuery(cursor, where_clause_filter='TRUE')
-
-	if debugging_on: print('Generating {}\'s ranking...\n'.format(debug_participant_id))
-
-	for p in participants:
-		p.generateRanking(cursor, participants, debugging_on)
-
-	if debugging_on:
-		print()
-		printRanking(participants, debug_participant_id)
-
-
-	matchParticipants(cursor, participants)
-
-	mpdb.commit()
-	cursor.close()
-	mpdb.close()
-
-main()
+mpdb.commit()
+cursor.close()
+mpdb.close()
