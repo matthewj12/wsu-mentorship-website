@@ -29,6 +29,11 @@ DROP TABLE IF EXISTS `participant`;
 CREATE TABLE `participant` (
 	`is active`                       boolean     NOT NULL,
 	`is mentor`                       boolean     NOT NULL,
+	`max matches`                     enum(
+		'1',
+		'2',
+		'3'
+	)                                             NOT NULL,
 	`first name`                      varchar(64) NOT NULL,
 	`last name`                       varchar(64) NOT NULL,
 	`starid`                          char(8)     NOT NULL,
