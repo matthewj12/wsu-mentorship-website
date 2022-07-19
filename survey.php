@@ -69,6 +69,17 @@
 				</label>
 			</div>
 
+			<!-- max matches -->
+			<div class="survey-item">
+				<label class="survey-item-label">
+					What's the maximum number of mentees you want to be matched with? (ignore if you are a mentee)
+				</label>
+
+				<select name="max matches">
+					<?php readEnumValues('option', 'mp', 'participant', 'max matches', 'max matches') ?>
+				</select>
+			</div>
+
 			<!-- first name -->
 			<div class="survey-item">
 				<label class="survey-item-label">
@@ -102,7 +113,7 @@
 					Gender
 				</label>
 
-				<select>
+				<select name="gender">
 					<?php readEnumValues('option', 'mp', 'participant', 'gender', 'gender') ?>
 				</select>
 			</div>
@@ -111,7 +122,7 @@
 			<div class="survey-item">
 				<label class="survey-item-label">What is your primary major?</label>
 
-				<select>
+				<select name="major">
 					<?php readEnumValues('option', 'mp', 'participant', 'major', 'major') ?>
 				</select>
 
@@ -123,7 +134,7 @@
 					What is your professional program in the College of Science and Enginnering?
 				</label>
 
-				<select>
+				<select name="pre program">
 					<?php readEnumValues('option', 'mp', 'participant', 'pre program', 'pre program') ?>
 				</select>
 			</div>
@@ -134,7 +145,7 @@
 					What is your religious affiliation?
 				</label>
 
-				<select>
+				<select name="religion">
 					<?php readEnumValues('option', 'mp', 'participant', 'religious affiliation', 'religious affiliation') ?>
 				</select>
 			</div>
@@ -192,7 +203,7 @@
 					Are you associated or do you plan to associate with the International Office, Office of Equity and Inclusive Excellence, or TRIO?
 				</label>
 
-				<input id="interested-in-diversity-groups-t" name="interested in diversity groups" type="radio" value="1">
+				<input id="interested-in-diversity-groups-t" name="interested in diversity groups" type="radio" value="1" checked>
 				<label for="interested-in-diversity-groups-t">
 					Yes
 				</label>
@@ -231,7 +242,7 @@
 					Preferred gender
 				</label>
 
-				<select>
+				<select name="preferred gender">
 					<?php readEnumValues('option', 'mp', 'participant', 'preferred gender', 'preferred gender') ?>
 				</select>
 			</div>
@@ -242,7 +253,7 @@
 					Preferred race
 				</label>
 
-				<select>
+				<select name="preferred race">
 					<?php readEnumValues('option', 'mp', 'participant', 'preferred race', 'preferred race') ?>
 				</select>
 			</div>
@@ -253,11 +264,32 @@
 					Preferred religious affiliation
 				</label>
 
-				<select>
+				<select name="preferred religious affiliation">
 					<?php readEnumValues('option', 'mp', 'participant', 'preferred religious affiliation', 'preferred religious affiliation') ?>
 				</select>
 			</div>
+
+			<!-- important qualities -->
+			<div class="survey-item">
+				<label class="survey-item-label">
+					What are the most important qualities you want in a mentor/mentee?
+				</label>
 			
+
+				<?php
+				$descriptors = ["1st most important quality", "2nd most important quality", "3rd most important quality"];
+
+				foreach ($descriptors as $descriptor) {
+					?>
+					<div class="dropdown-container">
+						<select name="<?php echo $descriptor ?>">
+							<?php readRefTable('option', 'important quality', 'important quality', 'important quality') ?>
+						</select>
+					</div>
+					<?php
+				}
+				?>
+			</div>
 
 			<!-- misc. info -->
 			<div class="survey-item">
