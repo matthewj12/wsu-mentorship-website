@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<title>Home</title>
-	<link rel="stylesheet" href="index.css">
+	<link rel="stylesheet" href="styles/index.css">
 	<script src="headerTemplate.js"></script>
 <head>
 <body>

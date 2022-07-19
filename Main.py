@@ -5,6 +5,8 @@ mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
 
 participants = buildParticipantsListFromQuery(cursor, where_clause_filter='TRUE')
 
+print(len(participants))
+
 # ________________ for if you want to mess around and test the matching algorithm manually ______________
 # participants = [
 # 	Participant(),

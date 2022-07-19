@@ -79,7 +79,7 @@ CREATE TABLE `participant` (
 		'pastafarian',
 		'other',
 		'prefer not to answer',
-		'doesnt matter'
+		"doesn't matter"
 	)                                             NOT NULL,
 	`international student`           boolean     NOT NULL default false,
 	`lgbtq+`                          boolean     NOT NULL default false,
@@ -96,7 +96,7 @@ CREATE TABLE `participant` (
 		'non-binary',
 		'other',
 		'prefers not to answer',
-		'doesnt matter'
+		"doesn't matter"
 	)                                             NOT NULL,
 	`preferred race`                            enum(
 		'white',
@@ -105,11 +105,10 @@ CREATE TABLE `participant` (
 		'hispanic',
 		'aboriginal',
 		'native american',
-		'native hawaiian or pacific islander',
-		'mixed',
+		'pacific islander',
 		'other',
 		'prefers not to answer',
-		'doesnt matter'
+		"doesn't matter"
 	)                                             NOT NULL,
 	`preferred religious affiliation`           enum(
 		'christianity',
@@ -124,7 +123,7 @@ CREATE TABLE `participant` (
 		'pastafarian',
 		'other',
 		'prefers not to answer',
-		'doesnt matter'
+		"doesn't matter"
 	)                                              NOT NULL,
 	`1st most important quality`      varchar(50)  NOT NULL,
 	`2nd most important quality`      varchar(50)  NOT NULL,
@@ -142,9 +141,10 @@ CREATE TABLE `participant` (
 -- const reference table
 DROP TABLE IF EXISTS `hobby`;
 CREATE TABLE `hobby` (
+	`id` int AUTO_INCREMENT,
 	`hobby` varchar(26),
 
-	PRIMARY KEY(hobby)
+	PRIMARY KEY(`id`)
 );
 
 INSERT INTO `hobby`
@@ -173,7 +173,7 @@ CREATE TABLE `has hobby` (
 	`hobby` varchar(26),
 
 	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
-	FOREIGN KEY(hobby)  REFERENCES hobby(hobby)        on delete cascade,
+	-- FOREIGN KEY(hobby)  REFERENCES hobby(hobby)        on delete cascade,
 
 	PRIMARY KEY(starid, hobby)
 );
@@ -182,29 +182,30 @@ CREATE TABLE `has hobby` (
 -- const reference table for second languages
 DROP TABLE IF EXISTS `second language`;
 CREATE TABLE `second language` (
+	`id` int AUTO_INCREMENT,
 	`second language` varchar(50),
 
-	PRIMARY KEY(`second language`)
+	PRIMARY KEY(`id`)
 );
 
 INSERT INTO `second language`
 (`second language`)
 VALUES
-		('american sign language'),
-		('arabic'),
-		('bangla'),
-		('chinese'),
-		('french'),
-		('german'),
-		('hindi/urdu'),
-		('japanese'),
-		('korean'),
-		('russian'),
-		('somali'),
-		('spanish'),
-		('thai'),
-		('vietnamese'),
-		('other')
+	('american sign language'),
+	('arabic'),
+	('bangla'),
+	('chinese'),
+	('french'),
+	('german'),
+	('hindi/urdu'),
+	('japanese'),
+	('korean'),
+	('russian'),
+	('somali'),
+	('spanish'),
+	('thai'),
+	('vietnamese'),
+	('other')
 ;
 
 DROP TABLE IF EXISTS `speaks second language`;
@@ -213,7 +214,7 @@ CREATE TABLE `speaks second language` (
 	`second language` varchar(26),
 
 	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
-	FOREIGN KEY(`second language`)  REFERENCES `second language`(`second language`) on delete cascade,
+	-- FOREIGN KEY(`second language`)  REFERENCES `second language`(`second language`) on delete cascade,
 
 	PRIMARY KEY(starid, `second language`)
 );
@@ -221,23 +222,24 @@ CREATE TABLE `speaks second language` (
 -- const reference table for races
 DROP TABLE IF EXISTS `race`;
 CREATE TABLE `race` (
+	`id` int AUTO_INCREMENT,
 	`race` varchar(50),
 
-	PRIMARY KEY(race)
+	PRIMARY KEY(`id`)
 );
 
 INSERT INTO `race`
 (`race`)
 VALUES
-	('american indian'),
-	('asian'),
-	('black'),
-	('african'),
-	('hispanic'),
 	('white'),
-	('native hawaiian'),
-	('prefer not to say'),
-	('other')
+	('black'),
+	('asian'),
+	('hispanic'),
+	('aboriginal'),
+	('native american'),
+	('pacific islander'),
+	('other'),
+	('prefer not to answer')
 ;
 
 DROP TABLE IF EXISTS `is race`;
@@ -246,7 +248,7 @@ CREATE TABLE `is race` (
 	`race` varchar(17),
 
 	FOREIGN KEY(starid) REFERENCES participant(starid) on delete cascade,
-	FOREIGN KEY(`race`)  REFERENCES `race`(`race`) on delete cascade,
+	-- FOREIGN KEY(`race`)  REFERENCES `race`(`race`) on delete cascade,
 
 	PRIMARY KEY(starid, `race`)
 );

@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 	<title>Login</title>
-	<link rel="stylesheet" href="adminDashboard.css">
+	<link rel="stylesheet" href="styles/adminDashboard.css">
 	<script src="headerTemplate.js"></script>
 <head>
 <body>
 	<div class="main-container">
-		<form action="runMain.py">
-			<button class="create-matches" action:>
+		<form action="phpfiletorun.php">
+			<button class="create-matches">
 				Create Matches
 			</button>
 		</form>
