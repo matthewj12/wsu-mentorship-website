@@ -1,34 +1,19 @@
 <?php
 
 
-$columns = [
-	'is active',
-	'is mentor',
-	'max matches',
-	'first name',
-	'last name',
-	'starid',
-	'gender',
-	'major',
-	'pre program',
-	'religious affiliation',
-	'international student',
-	'lgbtq+',
-	'student athlete',
-	'multilingual',
-	'not born in this country',
-	'transfer student',
-	'first gen college student',
-	'unsure or undecided about major',
-	'interested in diversity groups',
-	'preferred gender',
-	'preferred race',
-	'preferred religious affiliation',
-	'1st most important quality',
-	'2nd most important quality',
-	'3rd most important quality',
-	'misc info'
-];
+function getParticipantFields() {
+	$columns = [];
+
+	$stmt = connect()->prepare("select group_concat(column_name) as '' from information_schema.columns where table_schema = 'mp' and table_name = 'participant';");
+	$stmt->execute();
+	$fields = $stmt->fetchAll();
+
+	foreach (explode(",", $fields[0]['']) as $field) {
+		$columns[] = $field;
+	}
+
+	return $columns;
+}
 
 
 function connect()
@@ -46,7 +31,7 @@ function connect()
 		$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 		//setting error mode
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-					
+
 		return $pdo;
 	}
 	catch(PDOException $e)
@@ -88,7 +73,7 @@ function assignBooleanArray($inputField)
 
 
 function insertIntoParticipantTable($dataPoints) {
-	GLOBAL $columns;
+	$columns = getParticipantFields();
 
 	$sqlQuery = "INSERT INTO participant (`";
 
