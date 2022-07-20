@@ -1,35 +1,35 @@
 from Participant import Participant
 from matching.games import HospitalResident
-from Functions import *
+from CreateMatches import *
 from Variables import *
 
 
-
 # copies all rows from the participant-related SQL tables into Participant objects. The only table this currently doesn't include is `mentorship`
-def buildParticipantsListFromQuery(cursor, where_clause_filter):
-	cursor.execute('select * from participant where {};'.format(where_clause_filter))
+def buildParticipantsListFromQuery(cursor):
+	cursor.execute(get_available_participants_query)
 
 	# Populate atomized data points
 	results = []
 	for row_tuple in cursor:
 		results.append(Participant(row_tuple))
-		
+	
 	return results
 
 
 def printRanking(participants, participant_id):
-	participant_index = 0
+	participant_index = -1
 
-	# Determine participants index where starid == debug_participant_starid
+	# Determine participants index where starid == debug_participant_id
 	for i in range(len(participants)):
-		if participants[i].data_points['starid'] == debug_participant_id:
+		if participants[i].data_points['starid'] == participant_id:
 			participant_index = i
+			break
 
 	# Print out debug participant's ranking
-	print("\n{}'s rankings:".format(participants[participant_index].data_points['starid']))
+	print("\n\tRankings:")
 	rank = 1
 	for starid in participants[participant_index].ranking:
-		print('{}: {}'.format(rank, starid))
+		print('\t{}: {}'.format(rank, starid))
 		rank += 1
 
 
@@ -132,7 +132,7 @@ def updateMenteesForUmRankings(mentees_for_um_rankings, matched_mentor_starid, m
 		for i in range(len(mentees_for_um_rankings[um])):
 			if mentees_for_um_rankings[um][i].data_points['starid'] == matched_mentee_starid:
 				remove_index = i
-				break;
+				break
 
 		mentees_for_um_rankings[um].remove(mentees_for_um_rankings[um][remove_index])
 
@@ -144,7 +144,7 @@ def updateMenteesForUmRankings(mentees_for_um_rankings, matched_mentor_starid, m
 		for i in range(len(mentees_for_um_rankings[um])):
 			if countMatches(getParticipantByStarid(participants, mentees_for_um_rankings[um][i].data_points['starid']), matches) == 1:
 				remove_index = i
-				break;
+				break
 
 		mentees_for_um_rankings[um].remove(mentees_for_um_rankings[um][remove_index])
 	
@@ -165,15 +165,16 @@ def createMatches(cursor, participants):
 	mentor_max_matches = {p.data_points['starid'] : int(p.data_points['max matches']) for p in participants
 		if int(p.data_points['is mentor'])}
 
+
 	game = HospitalResident.create_from_dictionaries(mentee_prefs, mentor_prefs, mentor_max_matches)
 	stable_pairings = game.solve()
 
-	num_of_new_matches = len(stable_pairings)
-	if num_of_new_matches == 0:
-		print("No new matches can be made.")
+	new_matches_count = len(stable_pairings)
+	if new_matches_count == 0:
+		print("No new matches can be made at this time.")
 		return []
 
-	print("{} new matches made.".format(num_of_new_matches))
+	print("{} new {} made.".format(new_matches_count, "match" if new_matches_count == 1 else "matches"))
 
 	# (mentor_starid, mentee_starid)
 	if debugging_on:
@@ -188,10 +189,10 @@ def createMatches(cursor, participants):
 				print("{} matched with {}".format(matches[-1][0], matches[-1][1]))
 
 
+
 	# _______________________________________________________ Rematch Extra Mentees With Unmatched Mentors _________________________________________________________
 
 	# "extra" meaning "matched with a mentor who has > 1 mentees"
-	# TODO: ensure that mentor with multilple mentees retains at least one mentee (can be an issue even if len(mentees) >= len(mentors))
 
 	# get list of mentors with no matches
 	all_mentors = [starid for starid in mentor_prefs.keys()]

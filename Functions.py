@@ -1,4 +1,4 @@
-import mysql.connector
+import mysql.connector;
 
 def createCursor(host, user, password, database):
 	mpdb = mysql.connector.connect(

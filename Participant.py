@@ -1,5 +1,6 @@
 from Rankings import rankings
 from Functions import *
+from Variables import *
 
 class Participant():
 	# populates the columns list via query
@@ -23,12 +24,11 @@ class Participant():
 	def debugConstructor(self, is_active, is_mentor, starid, max_matches, ranking):
 		self.data_points = {}
 
-		self.ranking = ranking
-
 		self.data_points['is mentor'] = is_mentor
 		self.data_points['starid'] = starid
 		self.data_points['is active'] = is_active
 		self.data_points['max matches'] = max_matches
+		self.ranking = ranking
 
 		self.next_proposal_index = 0
 
@@ -76,25 +76,19 @@ class Participant():
 		return None
 
 
-	def generateOrderByExpr(self, cursor, iqs, debug):
+	def generateOrderByExpr(self, iqs, debug):
 		# returns subsection of 'order by' clause from 
 		# iqs   = Important Quality Specifier (is the outer key in 'rankings' dict)
 		if iqs == 'hobbies':
-			if debug:
-				print('Considering: hobbies...')
-			# order by ... 
+			print('\tconsidering: hobbies...' if debug else '', end='')
 			return '`matching hobbies count` desc'
 
 		elif iqs == 'second language':
-			if debug:
-				print('Considering: second languages...')
-
+			print('\tconsidering: second languages...' if debug else '', end='')
 			return '`matching second languages count` desc'
 
 		elif iqs == 'race':
-			if debug:
-				print('Considering: race...')
-
+			print('\tconsidering: race...' if debug else '', end='')
 			return '`matching races count` desc'
 
 		else:
@@ -108,8 +102,7 @@ class Participant():
 			iqv = self.data_points[Participant.iqsToColName(iqs)]
 
 			if debug:
-				# print(self.data_points['starid'])
-				print('Considering: rankings[{}][{}]...'.format(iqk, iqv))
+				print('\tconsidering: rankings[{}][{}]...'.format(iqk, iqv))
 
 			# order by case...
 			result = 'case'
@@ -130,7 +123,7 @@ class Participant():
 			
 			return result + ' when TRUE then {} end asc'.format(cur_rank + 1)
 
-	def generateRanking(self, cursor, participants, debug):
+	def generateRanking(self, cursor, debug):
 		count_matching_hobbies_query = '''
 			with
 				p1_hobby as (select * from `has hobby` where starid = '{}'),
@@ -169,7 +162,6 @@ class Participant():
 
 		custom_order_exprs = [
 			self.generateOrderByExpr(
-				cursor,
 				self.data_points['{} most important quality'.format(['1st', '2nd', '3rd'][i])],
 				debug
 			) for i in range(3)
@@ -177,20 +169,26 @@ class Participant():
 
 		# need to generate the table at the start of the query so we can reference it in the ORDER BY clause
 		join_clause = '''
-			((participant LEFT JOIN `matching second languages table` ON participant.starid = `matching second languages table`.`candidate starid`)
-			             LEFT JOIN `matching hobbies table` ON participant.starid = `matching hobbies table`.`candidate starid`)
-			             LEFT JOIN `matching races table` ON participant.starid = `matching races table`.`candidate starid`
-		'''
+			`available participants table`
+				LEFT JOIN `matching second languages table` 
+					ON `available participants table`.starid = `matching second languages table`.`candidate starid`
+				LEFT JOIN `matching hobbies table` 
+					ON `available participants table`.starid = `matching hobbies table`.`candidate starid`
+				LEFT JOIN `matching races table` 
+					ON `available participants table`.starid = `matching races table`.`candidate starid`
+		'''.format(get_available_participants_query)
 
 		candidate_ranking_query = '''
 			WITH 
+				`available participants table` AS ({}),
 				`matching hobbies table` AS ({}),
 				`matching races table` AS ({}),
 				`matching second languages table` AS ({})
 			SELECT starid
-			FROM {}
+			FROM ({})
 			WHERE `is mentor` = {}
 			ORDER BY {}, {}, {};'''.format(
+				get_available_participants_query,
 				count_matching_hobbies_query,
 				count_matching_races_query,
 				count_matching_second_languages_query,
@@ -204,7 +202,5 @@ class Participant():
 		# if debug_participant_id != None and p.data_points['starid'] == debug_participant_id:
 		# 	print('\nquery: {}\n'.format(candidate_ranking_query))
 
-		i = 0
 		for tup in cursor:
 			self.ranking.append(tup[0])
-			i += 1
