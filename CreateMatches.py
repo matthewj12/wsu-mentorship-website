@@ -1,24 +1,9 @@
-import mysql.connector
 from Participant import Participant
 from matching.games import HospitalResident
+from Functions import *
+from Variables import *
 
 
-
-debugging_on = True
-# ignored when debugging is disabled
-debug_participant_id = 'g'
-
-
-
-def createCursor(host, user, password, database):
-	mpdb = mysql.connector.connect(
-		host=host,
-		user=user,
-		password=password,
-		database=database
-	)
-
-	return mpdb, mpdb.cursor(buffered=True)
 
 # copies all rows from the participant-related SQL tables into Participant objects. The only table this currently doesn't include is `mentorship`
 def buildParticipantsListFromQuery(cursor, where_clause_filter):
@@ -183,10 +168,17 @@ def createMatches(cursor, participants):
 	game = HospitalResident.create_from_dictionaries(mentee_prefs, mentor_prefs, mentor_max_matches)
 	stable_pairings = game.solve()
 
-	print()
+	num_of_new_matches = len(stable_pairings)
+	if num_of_new_matches == 0:
+		print("No new matches can be made.")
+		return []
+
+	print("{} new matches made.".format(num_of_new_matches))
 
 	# (mentor_starid, mentee_starid)
-	print("matches before rematching:")
+	if debugging_on:
+		print("matches before rematching:")
+
 	matches = []
 	for mentor in stable_pairings.keys():
 		for matched_mentee in stable_pairings[mentor]:
@@ -194,6 +186,7 @@ def createMatches(cursor, participants):
 			
 			if debugging_on:
 				print("{} matched with {}".format(matches[-1][0], matches[-1][1]))
+
 
 	# _______________________________________________________ Rematch Extra Mentees With Unmatched Mentors _________________________________________________________
 

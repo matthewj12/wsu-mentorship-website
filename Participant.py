@@ -1,34 +1,9 @@
 from Rankings import rankings
+from Functions import *
 
 class Participant():
-	columns = [
-		'is active',
-		'is mentor',
-		'max matches',
-		'first name',
-		'last name',
-		'starid',
-		'gender',
-		'major',
-		'pre program',
-		'religious affiliation',
-		'international student',
-		'lgbtq+',
-		'student athlete',
-		'multilingual',
-		'not born in this country',
-		'transfer student',
-		'first gen college student',
-		'unsure or undecided about major',
-		'interested in diversity groups',
-		'preferred gender',
-		'preferred race',
-		'preferred religious affiliation',
-		'1st most important quality',
-		'2nd most important quality',
-		'3rd most important quality',
-		'misc info'
-	]
+	# populates the columns list via query
+	columns = getParticipantFields()
 		
 	def __init__(self, row=None):
 		if row != None:
@@ -45,7 +20,7 @@ class Participant():
 
 
 	# for testing purposed
-	def debug_constructor(self, is_active, is_mentor, starid, max_matches, ranking):
+	def debugConstructor(self, is_active, is_mentor, starid, max_matches, ranking):
 		self.data_points = {}
 
 		self.ranking = ranking
