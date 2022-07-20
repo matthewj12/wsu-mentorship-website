@@ -7,7 +7,7 @@
 <head>
 <body>
 	<div class="main-container">
-		<form action="phpfiletorun.php">
+		<form action="includes/runMain.php">
 			<button class="create-matches">
 				Create Matches
 			</button>
