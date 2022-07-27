@@ -1,26 +1,43 @@
 <?php
 
 
-function getParticipantFields() {
-	$columns = [];
+$columns = [
+	'is active',
+	'is mentor',
+	'max matches',
+	'first name',
+	'last name',
+	'starid',
+	'gender',
+	'major',
+	'pre program',
+	'religious affiliation',
+	'international student',
+	'lgbtq+',
+	'student athlete',
+	'multilingual',
+	'not born in this country',
+	'transfer student',
+	'first gen college student',
+	'unsure or undecided about major',
+	'interested in diversity groups',
+	'preferred gender',
+	'preferred race',
+	'preferred religious affiliation',
+	'1st most important quality',
+	'2nd most important quality',
+	'3rd most important quality',
+	'misc info'
+];
 
-	$stmt = connect()->prepare("select group_concat(column_name) as '' from information_schema.columns where table_schema = 'mp' and table_name = 'participant';");
-	$stmt->execute();
-	$fields = $stmt->fetchAll();
-
-	foreach (explode(",", $fields[0]['']) as $field) {
-		$columns[] = $field;
-	}
-
-	return $columns;
-}
+$mentorshipColumns = ['mentor starid', 'mentee starid', 'start date', 'end date'];
 
 
 function connect()
 {
 	$serverName = "localhost";
 	$dbUsername = "root";
-	$dbPassword = "";
+	$dbPassword = "Sql783knui1-1l;/klaa-9";
 	$dbName = "mp";
 
 	try
@@ -31,7 +48,7 @@ function connect()
 		$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 		//setting error mode
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+					
 		return $pdo;
 	}
 	catch(PDOException $e)
@@ -73,7 +90,7 @@ function assignBooleanArray($inputField)
 
 
 function insertIntoParticipantTable($dataPoints) {
-	$columns = getParticipantFields();
+	GLOBAL $columns;
 
 	$sqlQuery = "INSERT INTO participant (`";
 
@@ -217,4 +234,37 @@ function readRefTable($fieldType, $tableName, $columnName, $name)
 	}
 
 
+}
+
+function selectMentorship()
+{
+	$sql = 'SELECT * from mentorship';
+	try
+	{
+		$stmt = connect()->prepare($sql);
+		$stmt->execute();
+		$rows = $stmt->fetchAll();
+		if(!$rows)
+		{
+			echo "No matches so far";
+		}
+		else
+		{
+			return $rows;
+			// var_export($rows);
+			// echo "<br>";
+			// foreach($rows as $match)
+			// {
+			// 	echo $match['mentor starid']. '<br>';
+			// 	echo $match['mentee starid']. '<br>';
+			// 	echo $match['start date']. '<br>';
+			// 	echo $match['end date']. '<br>';
+			// }
+		}
+	}
+	catch(PDOException $e)
+	{
+		echo "New record addition to <h3>Participant</h3> FAILED";
+		echo $sql. $e->getMessage();
+	}
 }
