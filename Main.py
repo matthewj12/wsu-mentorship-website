@@ -1,11 +1,13 @@
-from CreateMatches import *
-from TestModeParticipants import *
-from Variables import *
+from matchingFunctions import *
+from testModeParticipants import *
+from globalVariables import *
 
 
-# mpdb = "mentorship program database"
+# # mpdb = "mentorship program database"
 mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
 participants = []
+
+print()
 
 if test_mode:
 	participants = getTestModeParticipants()
@@ -15,17 +17,12 @@ else:
 
 	if debugging_on:
 		if getParticipantByStarid(participants, debug_participant_id) == None:
-			print("Invalid debug_participant_id; could not find participant with id '{}'".format(debug_participant_id))
+			print("Invalid debug_participant_id; could not find participant with id '{}' (could be because they're not available for matching)".format(debug_participant_id))
+			print()
 			debugging_on = False
-
-		print("Generating {}'s ranking...".format(debug_participant_id))
 
 	for p in participants:
 		p.generateRanking(cursor, debugging_on and p.data_points['starid'] == debug_participant_id)
-
-	if debugging_on:
-		printRanking(participants, debug_participant_id)
-
 
 
 matches = createMatches(cursor, participants)
@@ -44,4 +41,4 @@ if not test_mode:
 	print(new_match_count, "match" if new_match_count == 1 else "matches", "inserted into database.")
 
 else:
-	print("0 matches inserted into database.")
+	print("0 matches inserted into database (test mode).")

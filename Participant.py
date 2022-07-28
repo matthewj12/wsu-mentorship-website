@@ -1,11 +1,30 @@
-from Rankings import rankings
-from Functions import *
-from Variables import *
+from rankings import rankings
+from miscellaneousFunctions import *
+from globalVariables import *
 
 class Participant():
-	# populates the columns list via query
-	columns = getParticipantFields()
-		
+	# columns = getParticipantColumns()
+
+	# We need these explicity defined here (as opposed to fetched via query) because we need them in the order they will appear in the survey.
+	columns = [
+		'is active',
+		'is mentor',
+		'first name',
+		'last name',
+		'starid',
+		'international student',
+		'lgbtq+',
+		'student athlete',
+		'multilingual',
+		'not born in this country',
+		'transfer student',
+		'first generation college student',
+		'unsure or undecided about major',
+		'interested in diversity groups',
+		'misc info'
+	]
+
+
 	def __init__(self, row=None):
 		if row != None:
 			# atomized data points within `participant` table
@@ -33,39 +52,22 @@ class Participant():
 		self.next_proposal_index = 0
 
 
-	# mapping of Important Quality Specifier to Participant Data Point Key
-	iqs_to_pdpk = {
-		# 'second language(s)' : 'second language'
-	}
+	def printRanking(self, base_indent):
+		tabs = ''.join(['\t' for indent in range(base_indent)])
+		
+		print(tabs + 'Rankings:')
+		
+		rank = 1
+		for starid in self.ranking:
+			print(tabs + '\t{}: {}'.format(rank, starid))
+			rank += 1
 
-	@staticmethod
-	def iqsToPdpk(iqs):
-		if iqs in Participant.iqs_to_pdpk.keys():
-			return Participant.iqs_to_pdpk[iqs] 
-		else:
-			# If an entry for an iqs doesn't exist, just use iqs as the key.
-			return iqs
-
-	
-	# thing that p chose as one of their important qualities : column name to get p's value used in comparison with candidates
-	iqs_to_col_name = {
-		'gender'   : 'preferred gender',
-		'religion' : 'preferred religion',
-		'race'     : 'preferred race',
-	}
-
-	@staticmethod
-	def iqsToColName(iqs):
-		if iqs in Participant.iqs_to_col_name.keys():
-			return Participant.iqs_to_col_name[iqs] 
-		else:
-			# If an entry for an iqs doesn't exist, just use iqs as the key.
-			return iqs
+		print()
 
 
 	# returns starid of current matched participant who is inferior to candidate or None if none are
 	def getInferiorMatch(self, candidate, matches):
-		self_index = 0 if self.data_points['is mentor'] else 1
+		self_index  = 0 if self.data_points['is mentor'] else 1
 		match_index = 1 if self.data_points['is mentor'] else 0
 
 		for match in matches:
@@ -75,132 +77,132 @@ class Participant():
 			
 		return None
 
+	# rankable non-reference-table data points
+	rankable_non_ref_tbl_dp = [
+		'international student',
+		'lgbtq+',
+		'student athlete',
+		'multilingual',
+		'not born in this country',
+		'transfer student',
+		'first generation college student',
+		'unsure or undecided about major',
+		'interested in diversity groups'
+	]
 
-	def generateOrderByExpr(self, iqs, debug):
-		# returns subsection of 'order by' clause from 
-		# iqs   = Important Quality Specifier (is the outer key in 'rankings' dict)
-		if iqs == 'hobbies':
-			print('\tconsidering: hobbies...' if debug else '', end='')
-			return '`matching hobbies count` desc'
 
-		elif iqs == 'second language':
-			print('\tconsidering: second languages...' if debug else '', end='')
-			return '`matching second languages count` desc'
-
-		elif iqs == 'race':
-			print('\tconsidering: race...' if debug else '', end='')
-			return '`matching races count` desc'
-
-		else:
-			cur_rank = 1
-
-			# important quality key
-			iqk = Participant.iqsToPdpk(iqs)
-
-			# iqv   = Important Quality Value belonging to participant (self) whose ranking 
-			# of candidate mentors/mentees is being created (is a value in 'rankings' dict)
-			iqv = self.data_points[Participant.iqsToColName(iqs)]
-
-			if debug:
-				print('\tconsidering: rankings[{}][{}]...'.format(iqk, iqv))
-
-			# order by case...
-			result = 'case'
-
-			# candidate rankings
-			cand_rankings = rankings[iqk][iqv]
-
-			for i in range(len(cand_rankings)):
-				# if debug_participant_id != None and participant.data_points['starid'] == debug_participant_id:
-				# 	print('important quality candidate value = ' + cand_rankings[i])
-
-				result += " when `{}` = '{}' then {}".format(
-					iqk,
-					cand_rankings[i],
-					cur_rank
-				)
-				cur_rank += 1
-			
-			return result + ' when TRUE then {} end asc'.format(cur_rank + 1)
-
-	def generateRanking(self, cursor, debug):
-		count_matching_hobbies_query = '''
-			with
-				p1_hobby as (select * from `has hobby` where starid = '{}'),
-				p2_hobby as (select * from `has hobby`)
-			select p2_hobby.starid as `candidate starid`, count(*) as `matching hobbies count`
-			from p1_hobby, p2_hobby
-			where p1_hobby.hobby = p2_hobby.hobby
-			group by p2_hobby.starid
-		'''.format(
-			self.data_points['starid']
-		)
-		
-		count_matching_second_languages_query = '''
-			with
-				p1_lang as (select * from `speaks second language` where starid = '{}'),
-				p2_lang as (select * from `speaks second language`)
-			select p2_lang.starid as `candidate starid`, count(*) as `matching second languages count`
-			from p1_lang, p2_lang
-			where p1_lang.`second language` = p2_lang.`second language`
-			group by p2_lang.starid
-		'''.format(
-			self.data_points['starid']
+	def getImportantQualitiesList(self, cursor):
+		query = (
+			'select `important quality id`\n'
+			'from `important quality assoc tbl`\n'
+			f"where `starid` = '{self.data_points['starid']}'\n"
+			'order by `important quality rank` asc;\n'
 		)
 
-		count_matching_races_query = '''
-			with
-				p1_race as (select * from `is race` where starid = '{}'),
-				p2_race as (select * from `is race`)
-			select p2_race.starid as `candidate starid`, count(*) as `matching races count`
-			from p1_race, p2_race
-			where p1_race.`race` = p2_race.`race`
-			group by p2_race.starid
-		'''.format(
-			self.data_points['starid']
-		)
+		cursor.execute(query)
 
-		custom_order_exprs = [
-			self.generateOrderByExpr(
-				self.data_points['{} most important quality'.format(['1st', '2nd', '3rd'][i])],
-				debug
-			) for i in range(3)
-		]
+		important_quality_ids = []
+		for row in cursor:
+			important_quality_ids.append(row[0])
 
-		# need to generate the table at the start of the query so we can reference it in the ORDER BY clause
-		join_clause = '''
-			`available participants table`
-				LEFT JOIN `matching second languages table` 
-					ON `available participants table`.starid = `matching second languages table`.`candidate starid`
-				LEFT JOIN `matching hobbies table` 
-					ON `available participants table`.starid = `matching hobbies table`.`candidate starid`
-				LEFT JOIN `matching races table` 
-					ON `available participants table`.starid = `matching races table`.`candidate starid`
-		'''.format(get_available_participants_query)
+		important_qualities = []
 
-		candidate_ranking_query = '''
-			WITH 
-				`available participants table` AS ({}),
-				`matching hobbies table` AS ({}),
-				`matching races table` AS ({}),
-				`matching second languages table` AS ({})
-			SELECT starid
-			FROM ({})
-			WHERE `is mentor` = {}
-			ORDER BY {}, {}, {};'''.format(
-				get_available_participants_query,
-				count_matching_hobbies_query,
-				count_matching_races_query,
-				count_matching_second_languages_query,
-				join_clause,
-				'FALSE' if self.data_points['is mentor'] else 'TRUE',
-				*custom_order_exprs
+		for iq_id in important_quality_ids:
+			query = (
+				"select `important quality`\n"
+				"from `important quality ref tbl`\n"
+				f"where `id` = '{iq_id};'\n"
 			)
 
-		cursor.execute(candidate_ranking_query)
+			cursor.execute(query)
 
-		# if debug_participant_id != None and p.data_points['starid'] == debug_participant_id:
+			for tup in cursor:
+				important_qualities.append(tup[0])
+
+		while 'unused' in important_qualities:
+			important_qualities.remove('unused')
+
+		return important_qualities
+
+			
+	# returns a query that will generate a table with:
+	# column 1) starid of every other participant that is in the opposite group to self (for example, if self is mentor, only query mentees)
+	# column 2) The number of X in common self has with the participant with that starid
+	def generateCountMatchingXQuery(self, x, base_indent_str):
+		bi = base_indent_str
+		starid = self.data_points['starid']
+		
+		if x in  self.rankable_non_ref_tbl_dp:
+			# count(*) will evaluate to either 0 or 1
+			return (
+				f"{bi}with\n"
+				f"{bi}\t`p1 {x}` as (select `starid`, `{x}` from `participant` where `participant`.`starid` = '{starid}'),\n"
+				f"{bi}\t`p2 {x}` as (select `starid`, `{x}` from `participant`)\n"
+				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
+				f"{bi}from `p1 {x}`, `p2 {x}`\n"
+				f"{bi}where `p1 {x}`.`{x}` = `p2 {x}`.`{x}`\n"
+				f"{bi}group by `p2 {x}`.`starid`\n"
+			)
+		else:
+			return (
+				f"{bi}with\n"
+				f"{bi}\t`p1 {x}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
+				f"{bi}\t`p2 {x}` as (select * from `{x} assoc tbl`)\n"
+				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
+				f"{bi}from `p1 {x}`, `p2 {x}`\n"
+				f"{bi}where `p1 {x}`.`{x} id` = `p2 {x}`.`{x} id`\n"
+				f"{bi}group by `p2 {x}`.`starid`\n"
+			)
+	
+		pass
+		# So VSCode will not exclude the ")" from the function's automatic fold
+
+
+	def generateCandidateRankingQuery(self, as_statements, join_clause, custom_order_exprs):
+		return (
+			f"WITH\n"
+			f"\t`available participants tbl` AS (\n"
+			f"{get_available_participants_query}),\n"
+			f"{''.join(as_statements)[:-2]}\n"
+			f"SELECT `starid`\n"
+			f"FROM {join_clause}"
+			f"WHERE `is mentor` = {'FALSE' if self.data_points['is mentor'] else 'TRUE'}\n"
+			f"ORDER BY {''.join(custom_order_exprs)[:-2]};\n" # [-2] removes the last comma + space
+		)
+	
+
+	def generateRanking(self, cursor, am_debug_participant):	
+		important_qualities = self.getImportantQualitiesList(cursor)
+
+		doubleTab = '\t\t'
+		as_statements = [
+			f"\t`matching {iqs} tbl` AS (\n"
+			f"{self.generateCountMatchingXQuery(iqs, doubleTab)}\t),\n" for iqs in important_qualities
+		# So VSCode will not exclude the ")" from the function's automatic fold
+		]
+
+		join_clause = '`available participants tbl`'
+		for iqs in important_qualities:
+			join_clause += (
+				f"\n\tLEFT JOIN `matching {iqs} tbl`\n"
+				f"\t\tON `available participants tbl`.`starid` = `matching {iqs} tbl`.`candidate starid`"
+			)
+
+		if am_debug_participant:
+			print("Generating {}'s ranking...".format(self.data_points['starid']))
+			for iq in important_qualities:
+				print(f'\tConsidering: {iqs}...')
+			print()
+
+		custom_order_exprs = [f"`matching {iqs} count` desc, " for iqs in important_qualities]
+		
+		cursor.execute(self.generateCandidateRankingQuery(as_statements, join_clause, custom_order_exprs))
+
+		# if am_debug_participant:
 		# 	print('\nquery: {}\n'.format(candidate_ranking_query))
 
 		for tup in cursor:
 			self.ranking.append(tup[0])
+
+		if am_debug_participant:
+			self.printRanking(base_indent=0)
