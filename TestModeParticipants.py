@@ -1,4 +1,4 @@
-from Participant import *
+from participant import *
 
 def getTestModeParticipants():
 	participants = []
