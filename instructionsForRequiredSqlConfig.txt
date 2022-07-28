@@ -1,0 +1,1 @@
+Add "local_infile=1" in the [mysqld] and [client] sections of your config file.
