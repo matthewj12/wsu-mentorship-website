@@ -1,119 +1,115 @@
-majors = {
-	'chemistry' : (
-		'chemistry',
-		'biology (allied health or cell molecular)',
-		'biology (medical lab science)', 
-		'biology (radiography)', 
-		'biology (ecology or environmental science)',
-		'geoscience'
-	),
-
-	'geoscience' : (
-		'geoscience',
-		'chemistry', 
-		'biology (ecology or environmental science)',
-		'biology (radiography)', 
-		'biology (allied health or cell molecular)', 
-		'biology (medical lab science)'
-	),
-
-	'math' : (
-		'math',
-		'statistics', 
-		'data science', 
-		'computer science', 
-		'general engineering', 
-		'composite material engineering', 
-		'physics'
-	),
-
-	'data science' : (
-		'data science',
-		'computer science', 
-		'statistics', 
-		'math', 
-		'physics'
-	),
-
-	'undecided' : (
-		'undecided'
-		# 'economics' # lol
-	),
-
-	'general engineering' : (
-		'general engineering',
-		'composite materials engineering',
-		'physics',
-		'math'
-	),
-
-	'computer science' : (
-		'computer science',
-		'data science',
-		'math',
-		'statistics'
-	),
-
-	'statistics' : (
-		'statistics',
-		'math',
-		'data science',
-		'computer science'
-	),
-
-	'composite materials engineering' : (
-		'composite materials engineering',
-		'general engineering',
-		'chemistry',
-		'physics',
-		'math'
-	),
-
-	'physics' : (
-		'physics',
-		'general engineering',
-		'composite materials engineering',
-		'math'
-	),
-
-	'biology (allied health or cell molecular)' : (
-		'biology (allied health or cell molecular)',
-		'biology (medical lab science)',
-		'biology (ecology or environmental science)',
-		'biology (radiography)',
-		'chemistry'
-	),
-
-	'biology (medical lab science)' : (
-		'biology (medical lab science)',
-		'biology (allied health or cell molecular)',
-		'biology (radiography)',
-		'biology (ecology or environmental science)',
-		'chemistry'
-	),
-
-	'biology (ecology or environmental science)' : (
-		'biology (ecology or environmental science)',
-		'biology (allied health or cell molecular)',
-		'biology (medical lab science)',
-		'biology (radiography)',
-		'chemistry'
-	),
-
-	'biology (radiography)' : (
-		'biology (radiography)',
-		'biology (medical lab science)',
-		'biology (allied health or cell molecular)',
-		'biology (ecology or environmental science)',
-		'chemistry'
-	)
-}
-
 # All unlisted pairings share last place.
 rankings = {
-	'primary major' : majors,
+	'major' : {
+		'chemistry' : (
+			'chemistry',
+			'biology (allied health or cell molecular)',
+			'biology (medical lab science)', 
+			'biology (radiography)', 
+			'biology (ecology or environmental science)',
+			'geoscience'
+		),
 
-	'secondary major' : majors,
+		'geoscience' : (
+			'geoscience',
+			'chemistry', 
+			'biology (ecology or environmental science)',
+			'biology (radiography)', 
+			'biology (allied health or cell molecular)', 
+			'biology (medical lab science)'
+		),
+
+		'math' : (
+			'math',
+			'statistics', 
+			'data science', 
+			'computer science', 
+			'general engineering', 
+			'composite material engineering', 
+			'physics'
+		),
+
+		'data science' : (
+			'data science',
+			'computer science', 
+			'statistics', 
+			'math', 
+			'physics'
+		),
+
+		'undecided' : (
+			'undecided'
+			# 'economics' # lol
+		),
+
+		'general engineering' : (
+			'general engineering',
+			'composite materials engineering',
+			'physics',
+			'math'
+		),
+
+		'computer science' : (
+			'computer science',
+			'data science',
+			'math',
+			'statistics'
+		),
+
+		'statistics' : (
+			'statistics',
+			'math',
+			'data science',
+			'computer science'
+		),
+
+		'composite materials engineering' : (
+			'composite materials engineering',
+			'general engineering',
+			'chemistry',
+			'physics',
+			'math'
+		),
+
+		'physics' : (
+			'physics',
+			'general engineering',
+			'composite materials engineering',
+			'math'
+		),
+
+		'biology (allied health or cell molecular)' : (
+			'biology (allied health or cell molecular)',
+			'biology (medical lab science)',
+			'biology (ecology or environmental science)',
+			'biology (radiography)',
+			'chemistry'
+		),
+
+		'biology (medical lab science)' : (
+			'biology (medical lab science)',
+			'biology (allied health or cell molecular)',
+			'biology (radiography)',
+			'biology (ecology or environmental science)',
+			'chemistry'
+		),
+
+		'biology (ecology or environmental science)' : (
+			'biology (ecology or environmental science)',
+			'biology (allied health or cell molecular)',
+			'biology (medical lab science)',
+			'biology (radiography)',
+			'chemistry'
+		),
+
+		'biology (radiography)' : (
+			'biology (radiography)',
+			'biology (medical lab science)',
+			'biology (allied health or cell molecular)',
+			'biology (ecology or environmental science)',
+			'chemistry'
+		),
+	},
 
 	'gender' : {
 		'male'                  : ('male',),
