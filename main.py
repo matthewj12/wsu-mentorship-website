@@ -1,44 +1,47 @@
-from matchingFunctions import *
-from testModeParticipants import *
-from globalVariables import *
+import matchingfunctions, miscellaneousfunctions
+import testmodeparticipants
+import globalvariables
 
 
 # # mpdb = "mentorship program database"
-mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
+mpdb, cursor = miscellaneousfunctions.createCursor('localhost', 'root', '', 'mp')
 participants = []
 
 print()
 
-if test_mode:
-	participants = getTestModeParticipants()
+if globalvariables.test_mode:
+	participants = testmodeparticipants.gettestmodeparticipants()
 
 else:
-	participants = buildParticipantsListFromQuery(cursor)
+	participants = matchingfunctions.buildParticipantsListFromQuery(cursor)
 
-	if debugging_on:
-		if getParticipantByStarid(participants, debug_participant_id) == None:
-			print("Invalid debug_participant_id; could not find participant with id '{}' (could be because they're not available for matching)".format(debug_participant_id))
-			print()
-			debugging_on = False
+	if globalvariables.debugging_on:
+		if matchingfunctions.getParticipantByStarid(participants, globalvariables.debug_participant_id) == None:
+			print("Invalid globalvariables.debug_participant_id; could not find participant with id '{}' (could be because they're not available for matching).".format(globalvariables.debug_participant_id))
+			print('Set debugging_on = False in main.py ignore.')
+			quit()
+
+		print("debug_participant_id = '{}'".format(globalvariables.debug_participant_id))
+		print()
+		
 
 	for p in participants:
-		p.generateRanking(cursor, debugging_on and p.data_points['starid'] == debug_participant_id)
+		p.generateRanking(cursor, globalvariables.debugging_on and p.data_points['starid'] == globalvariables.debug_participant_id)
 
 
-matches = createMatches(cursor, participants)
+#----------------------------------------------------------------------------
+matches = matchingfunctions.createMatches(cursor, participants)
+#----------------------------------------------------------------------------
 
 
-# don't add anything to the database if we're in test mode
-if not test_mode:
-	addMatchesToDatabase(cursor, matches)
+if globalvariables.test_mode:
+	print("0 matches inserted into database (test mode).")
+
+else:
+	matchingfunctions.addMatchesToDatabase(cursor, matches)
 
 	mpdb.commit()
 	cursor.close()
 	mpdb.close()
 
-	new_match_count = len(matches)
-
-	print(new_match_count, "match" if new_match_count == 1 else "matches", "inserted into database.")
-
-else:
-	print("0 matches inserted into database (test mode).")
+	print(len(matches), "match" if len(matches) == 1 else "matches", "inserted into database.")

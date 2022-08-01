@@ -1,6 +1,6 @@
 from participant import *
 
-def getTestModeParticipants():
+def gettestmodeparticipants():
 	participants = []
 
 	# for if you want to mess around and test the matching algorithm manually

@@ -3,7 +3,7 @@
 <head>
 	<title>Home</title>
 	<link rel="stylesheet" href="styles/index.css">
-	<script src="headerTemplate.js"></script>
+	<script src="header-template.js"></script>
 <head>
 <body>
 	<button class="survey-btn" type="submit" name="survey_btn">

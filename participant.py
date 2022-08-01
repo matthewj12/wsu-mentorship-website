@@ -1,9 +1,7 @@
-from rankings import rankings
-from miscellaneousFunctions import *
-from globalVariables import *
+import rankings, miscellaneousfunctions, globalvariables
 
 class Participant():
-	# columns = getParticipantColumns()
+	# columns = miscellaneousfunctions.getParticipantColumns()
 
 	# We need these explicity defined here (as opposed to fetched via query) because we need them in the order they will appear in the survey.
 	columns = [
@@ -162,7 +160,7 @@ class Participant():
 		return (
 			f"WITH\n"
 			f"\t`available participants tbl` AS (\n"
-			f"{get_available_participants_query}),\n"
+			f"{globalvariables.get_available_participants_query}),\n"
 			f"{''.join(as_statements)[:-2]}\n"
 			f"SELECT `starid`\n"
 			f"FROM {join_clause}"
