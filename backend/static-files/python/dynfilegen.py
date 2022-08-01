@@ -1,10 +1,10 @@
 # This file contains all the functions/dictionaries/code used in dynamically generating .sql and 
 # .bat files for the entire project (see file-structure.svg for exactly how they are used.)
 
-import miscellaneousfunctions, os, globalvariables
+import miscfuncs, os, globvars
 
 
-base_dir = 'dynamically-generated-files\\'
+backend = os.getcwd() + '\\backend'
 
 mockaroo_base_url = "https://api.mockaroo.com/api/"
 distinct_part_of_urls = {
@@ -35,25 +35,20 @@ distinct_part_of_urls = {
 }
 mockaroo_key = "1d04b730"
 
-def createDynamicFileDir():
-	if os.system('cd {} && cd ..'.format(base_dir)) != 0:
-		print("Directory '{}' has been created.".format(base_dir[:-1]))
-		os.system(f"mkdir {base_dir}")
+def ensureFolderExists(folder):
+	if not os.path.exists(folder):
+		os.makedirs(folder)
+		print(f"Directory '{folder}' has been created.")
 
 # generates and/or executes the batch file (Windows) that creates all the associative tables plus the `participant` table
-def generateSampleDataCurlRequestsFile(file_extension='.bat', what_to_do=['generate file', 'execute file']):
-	createDynamicFileDir()
-	
-	if 'generate file' in what_to_do:
-		out_file = open(base_dir + 'sample-data-curl-requests' + file_extension, 'w')
+def genSampleDataCurlRequestsFile(generate_file, execute_file):
+	if generate_file:
+		ensureFolderExists(f"{backend}\\dynamically-generated-files\\batch")
+
+		out_file = open(f"{backend}\\dynamically-generated-files\\batch\\sample-data-curl-requests.bat", 'w')
 		out_file.write('pushd .\n')
 
-		# Create the directory if it doesn't already exist
-		if os.system('cd ' + globalvariables.sample_data_dir) != 0:
-			print("Directory '{}' has been created.".format(globalvariables.sample_data_dir))
-			os.system('mkdir "{}"'.format(globalvariables.sample_data_dir))
-
-		out_file.write('cd ' + globalvariables.sample_data_dir + '\n')
+		out_file.write(f"cd {globvars.sample_data_dir}\n")
 
 		for distinct in distinct_part_of_urls.keys():
 			suffix = '-assoc-tbl' if distinct != 'participant' else ''
@@ -69,20 +64,18 @@ def generateSampleDataCurlRequestsFile(file_extension='.bat', what_to_do=['gener
 		# out_file.write('exit')
 		out_file.close()
 
-	if 'execute file' in what_to_do:
-		result_code = os.system('{}sample-data-curl-requests{}'.format(base_dir, file_extension))
-
-		if result_code == 0:
-			print('Sample data has been successfully downloaded.')
-		else:
-			print("Error executing 'sample-data-curl-requests.bat' in 'generateSampleDataCurlRequestsBatch()' in 'dynamicfilegeneration.py'")
-
+	if execute_file:
+		to_execute = f"{backend}\\dynamically-generated-files\\batch\\sample-data-curl-requests.bat"
+		assert(os.path.exists(to_execute))
+		return_code = os.system(to_execute)
+		assert(return_code == 0)
+		print('\nSample data has been successfully downloaded.')
 
 # Association Tables: There are 2 types of `[...] assoc tbl`s in the `mp` schema: 
 #     1) tables where participants can select any subset of the elements, including all and none.
 #     2) tables where participants can select one and only one element; they can't select none.
 
-distinct_part_of_assoc_tbl_names = {
+assoc_tbl_names_unique_substr = {
 	'max matches'          : 1,
 	'gender'               : 1,
 	'religious affiliation': 1,
@@ -113,20 +106,20 @@ def forRefTbl(distinct):
 	return distinct
 
 # so we can add to the dictionary while iterating through the original keys
-distinct_part_of_assoc_tbl_names_keys = [key for key in distinct_part_of_assoc_tbl_names.keys()]
-for distinct in distinct_part_of_assoc_tbl_names_keys:
-	if not distinct in has_no_corresponding_preferred_table:
+assoc_tbl_names_unique_substr_keys = [key for key in assoc_tbl_names_unique_substr.keys()]
+for unique in assoc_tbl_names_unique_substr_keys:
+	if not unique in has_no_corresponding_preferred_table:
 		# Some data points (for example, religious affiliation) only allow 
 		# participants to select one option, but they can still select 
 		# multiple options for the corresponding preference table
-		distinct_part_of_assoc_tbl_names['preferred ' + distinct] = 2
+		assoc_tbl_names_unique_substr['preferred ' + unique] = 2
 
 # only used internally (in this file)
 def genericCreateStmt(distinct, suffix=' assoc tbl'):
 	concat = distinct + suffix
 	
 	primary_key = '`starid`'
-	if distinct_part_of_assoc_tbl_names[distinct] == 2:
+	if assoc_tbl_names_unique_substr[distinct] == 2:
 		primary_key += f", `{distinct} id`"
 	# primary and secondary major/pre program both use the major/pre program table
 	
@@ -155,7 +148,7 @@ def genericLoadStmt(distinct, suffix=' assoc tbl'):
 	concat = distinct + suffix
 
 	return (
-		f"load data local infile \"{globalvariables.sample_data_dir}{miscellaneousfunctions.toHyphenatedSnakeCase(concat)}.csv\"\n"
+		f"load data local infile \"{globvars.sample_data_dir}{miscfuncs.toHyphSnakeCase(concat)}.csv\"\n"
 		f"into table `{concat}`\n"
 		f"fields terminated by \",\" enclosed by \"'\"\n"
 		f"lines terminated by \"\\n\"\n"
@@ -164,57 +157,52 @@ def genericLoadStmt(distinct, suffix=' assoc tbl'):
 	pass # to get VSCode to fold this function properly
 
 # generates and/or executes the SQL file that creates all the associative tables plus the `participant` table
-def generateCreateTablesFile(file_extension='.sql', what_to_do=['generate file', 'execute file']):
-	createDynamicFileDir()
+def genCreateTablesFile(generate_file, execute_file):
+	ensureFolderExists(f"{backend}\\dynamically-generated-files\\sql")
 	
-	if 'execute file' in what_to_do:
-		os.system('mysql -u root < "drop-db-and-create-empty-db.sql')
+	if execute_file:
+		os.system(f"mysql -u root < \"{backend}\\static-files\\sql\\drop-db-and-create-empty-db.sql\"")
 
-	if 'generate file' in what_to_do:
+	if generate_file:
 		create_str = ''
-
 		# staticly generated (in other words, non-for-loop) SQL
-		create_str += ''.join([line for line in open('static-sql.sql', 'r')]) + '\n\n\n'
-
+		create_str += ''.join([line for line in open(f"{backend}\\static-files\\sql\\static-sql.sql", 'r')]) + '\n\n\n'
 		# dynamic sql
-		for distinct in distinct_part_of_assoc_tbl_names.keys():
+		for distinct in assoc_tbl_names_unique_substr.keys():
 			create_str += genericCreateStmt(distinct);
-
 		# remove trailing newlines (I prefer having just one newline at the end of every file)
 		create_str = create_str[:-2]
 
-		create_out_file = open(base_dir + 'create-tables' + file_extension, 'w')
-		create_out_file.write(create_str)
-		create_out_file.close()
+		with open(f"{backend}\\dynamically-generated-files\\sql\\create-tables.sql", 'w') as out_file:
+			out_file.write(create_str)
 
-	if 'execute file' in what_to_do:
-		os.system('mysql -u root mp < "{}create-tables{}"'.format(base_dir, file_extension))
+	if execute_file:
+		to_execute = f"{backend}\\dynamically-generated-files\\sql\\create-tables.sql"
+		assert(os.path.exists(to_execute))
+		return_code = os.system('mysql -u root mp < "{}"'.format(to_execute))
+		assert(return_code == 0)
+		print('Tables have been sucessfully created in `mp` database.')
 
 # generates and/or executes the SQL file that loads in sample data for all the associative tables plus the `participant` table
-def generateImportSampleDataFile(file_extension='.sql', what_to_do=['generate file', 'execute file']):
-	createDynamicFileDir()
+def genImportSampleDataFile(generate_file, execute_file):
+	ensureFolderExists(f"{backend}\\dynamically-generated-files\\sql")
 	
-	if 'generate file' in what_to_do:
+	if generate_file:
 		import_str = ''
-
 		# staticly generated (in other words, non-for-loop) SQL
 		import_str += genericLoadStmt('participant', '')
-
 		# dynamic sql
-		for distinct in distinct_part_of_assoc_tbl_names.keys():
+		for distinct in assoc_tbl_names_unique_substr.keys():
 			import_str += genericLoadStmt(distinct);
-
 		# remove trailing newlines (I prefer having just one newline at the end of every file)
 		import_str = import_str[:-2]
 
-		import_out_file = open(base_dir + 'import-sample-data' + file_extension, 'w')
-		import_out_file.write(import_str)
-		import_out_file.close()
+		with open(f"{backend}\\dynamically-generated-files\\sql\\import-sample-data.sql", 'w') as out_file:
+			out_file.write(import_str)
 
-	if 'execute file' in what_to_do:
-		return_code = os.system('mysql -u root --local_infile mp < "{}import-sample-data.{}"'.format(base_dir, file_extension))
-
-		if return_code == 0:
-			print('Sample data has been successfully imported.')
-		else:
-			print("Error executing 'import-sample-data.sql' in 'generateImportSampleDataSql()' in 'dynamicfilegeneration.py'")			
+	if execute_file:
+		to_execute = f"{backend}\\dynamically-generated-files\\sql\\import-sample-data.sql"
+		assert(os.path.exists(to_execute))
+		return_code = os.system(f"mysql -u root --local_infile mp < {to_execute}")
+		assert(return_code == 0)
+		print('\nSample data has been successfully imported.')

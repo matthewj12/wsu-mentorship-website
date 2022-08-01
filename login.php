@@ -3,7 +3,7 @@
 <head>
 	<title>Login</title>
 	<link rel="stylesheet" href="styles/login.css">
-	<script src="header-template.js"></script>
+	<script src="scripts/header-template.js"></script>
 <head>
 <body>
 	<div class="form-container">

@@ -1,4 +1,5 @@
-__pycache__
+/backend/static-files/python/__pycache__
+*TODO*.txt
 # commit note
 *commit*.txt
 dynamically-generated-files

@@ -9,7 +9,7 @@
 <head>
 	<title>Survey</title>
 	<link rel="stylesheet" href="styles/survey.css">
-	<script src="header-template.js"></script>
+	<script src="scripts/header-template.js"></script>
 	<script>
 		function checkboxDefaultValues() {
 			const all = document.getElementsByClassName("post-val-when-unchecked");
@@ -33,7 +33,7 @@
 	<?php $connection = connect() ?>
 
 	<div class="form-container">
-		<form class="survey-form" method="post" action="includes/insert-participant.inc.php">
+		<form class="survey-form" method="post" action="includes/backend/static-files/php/insert-participant.inc.php">
 
 	<p>Work in progress (will be updated in my next committ)</p>
 

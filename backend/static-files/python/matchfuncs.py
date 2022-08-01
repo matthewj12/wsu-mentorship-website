@@ -1,11 +1,11 @@
 import participant
 import matching.games.hospital_resident
-import globalvariables
+import globvars
 
 
 # copies all rows from the participant-related SQL tables into Participant objects. The only table this currently doesn't include is `mentorship`
 def buildParticipantsListFromQuery(cursor):
-	cursor.execute(globalvariables.get_available_participants_query)
+	cursor.execute(globvars.get_available_participants_query)
 
 	# Populate atomized data points
 	results = []
@@ -98,7 +98,7 @@ def getMatchByMenteeStarid(matches, mentee_starid):
 
 
 def rematch(matches, mentor_starid, mentee_starid):
-	if globalvariables.debugging_on:
+	if globvars.debugging_on:
 		print('removing: ({}, {})'.format(getMatchByMenteeStarid(matches, mentee_starid)[0], mentee_starid))
 		print('adding: ({}, {})'.format(mentor_starid, mentee_starid))
 
@@ -242,7 +242,7 @@ def createMatches(cursor, participants):
 					
 			mentees_for_um_rankings[um] = mentees_for_um_ranking
 
-		if globalvariables.debugging_on:
+		if globvars.debugging_on:
 			print()
 			print('Re-matching mentees with unmatched mentors...')
 			print()
@@ -366,7 +366,7 @@ def createMatches(cursor, participants):
 						rematch(matches, um, starid_of_mentee_to_be_rematched)
 						mentees_for_um_rankings = updateMenteesForUmRankings(mentees_for_um_rankings, um, starid_of_mentee_to_be_rematched, participants, matches)
 
-		if globalvariables.debugging_on:
+		if globvars.debugging_on:
 			printMatches('matches after rematching:', matches, base_indent=1)
 
 

@@ -1,8 +1,10 @@
-import dynamicfilegeneration, os
+import sys, os
+sys.path.insert(0, 'backend/static-files/python')
+import dynfilegen
 
 
 #        +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#            Crucial settings are specified in globalvariables.py! 
+#            Crucial settings are specified in globvars.py! 
 #                        Comment out steps as needed.
 #        +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -19,7 +21,7 @@ Create all the tables in the new schema via executing the SQL we just
        generated.
 '''
 
-dynamicfilegeneration.generateCreateTablesFile(file_extension='.sql', what_to_do=['generate file', 'execute file'])
+dynfilegen.genCreateTablesFile(generate_file=True, execute_file=True)
 # -------------------------------------------------------------------------------
 
 # ------------------------------ Download Sample Data ---------------------------
@@ -27,15 +29,15 @@ dynamicfilegeneration.generateCreateTablesFile(file_extension='.sql', what_to_do
 Generate and execute the curl requests to download the sample data in CSV format from Mockaroo
 '''
 
-dynamicfilegeneration.generateSampleDataCurlRequestsFile(file_extension='.bat', what_to_do=['generate file', 'execute file'])
-dynamicfilegeneration.generateImportSampleDataFile(file_extension='.sql', what_to_do=['generate file', 'execute file'])
+dynfilegen.genSampleDataCurlRequestsFile(generate_file=True, execute_file=True)
+dynfilegen.genImportSampleDataFile(generate_file=True, execute_file=True)
 # -------------------------------------------------------------------------------
 
 # ------------------------------ Run Matching Algorithm -------------------------
 '''
 Run the matching algorithm, adding the results to the `mentorship` table 
-(assuming 'globalvariables.test_mode = False' in globalvariables.py)
+(assuming 'globvars.test_mode = False' in globvars.py)
 '''
 
-os.system('py main.py')
+os.system('py backend/static-files/python/main.py')
 # -------------------------------------------------------------------------------

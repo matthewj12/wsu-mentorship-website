@@ -23,7 +23,7 @@ def getParticipantColumns():
 
 	return fields
 
-
-def toHyphenatedSnakeCase(s):
+# hyphenated-snake-case
+def toHyphSnakeCase(s):
 	l = s.split(' ')
 	return l[0] + ''.join([f"-{word}" for word in l[1:]])

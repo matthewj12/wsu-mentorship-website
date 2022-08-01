@@ -10,7 +10,7 @@ sample_data_dir = 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sample-data/'
 test_mode = False
 # Prints useful debugging info throughought the matching process
 debugging_on = False
-# ignored when globalvariables.debugging_on == False
+# ignored when globvars.debugging_on == False
 debug_participant_id = 'aaaaaaaa'
 
 get_available_participants_query = (
