@@ -7,7 +7,7 @@
 <head>
 <body>
 	<div class="main-container">
-		<form action="includes/run-main.php">
+		<form action="backend/static-files/php/run-main.php">
 			<button class="create-matches">
 				Create Matches
 			</button>
