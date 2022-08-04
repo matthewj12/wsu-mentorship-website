@@ -166,7 +166,8 @@ def genCreateTablesFile(generate_file, execute_file):
 	if generate_file:
 		create_str = ''
 		# staticly generated (in other words, non-for-loop) SQL
-		create_str += ''.join([line for line in open(f"{backend}\\static-files\\sql\\static-sql.sql", 'r')]) + '\n\n\n'
+		create_str += ''.join([line for line in open(f"{backend}\\static-files\\sql\\ref-tbls.sql", 'r')]) + '\n\n\n'
+		create_str += ''.join([line for line in open(f"{backend}\\static-files\\sql\\participant-and-mentorship.sql", 'r')]) + '\n\n\n'
 		# dynamic sql
 		for distinct in assoc_tbl_names_unique_substr.keys():
 			create_str += genericCreateStmt(distinct);
@@ -181,6 +182,7 @@ def genCreateTablesFile(generate_file, execute_file):
 		assert(os.path.exists(to_execute))
 		return_code = os.system('mysql -u root mp < "{}"'.format(to_execute))
 		assert(return_code == 0)
+		print()
 		print('Tables have been sucessfully created in `mp` database.')
 
 # generates and/or executes the SQL file that loads in sample data for all the associative tables plus the `participant` table

@@ -19,11 +19,15 @@
 	<?php $connection = connect() ?>
 
 	<div class="form-container">
-		<form class="survey-form" method="post" action="backend/static-files/php/insert-participant.php">
+		<form class="survey-form" method="post" action="backend/static-files/php/call-insert-participant.php">
 			<?php
 
-
 			$surveyItemGroups = [
+				'textbox' => [
+					['first name', 'First Name:'],
+					['last name',  'Last Name'],
+					['starid',     'StarID:']
+				],
 				'radio' => [
 					[
 						'is active',
@@ -34,12 +38,12 @@
 						'is mentor',
 						'Are you a mentor or mentee?',
 						[new Option('Mentor', 1), new Option('Mentee', 0)]
+					],
+					[
+						'is residually matchable',
+						'Should we consider you for residual matches? In the case that we can\'t find you a _ when the primary round of matching occurs, this will allow you to still be matched with _ who sign up after the deadline.',
+						[new Option('Consider me for residual matches', 1), new Option('Don\'t consider me for residual matches', 0)]
 					]
-				],
-				'textbox' => [
-					['first name', 'First Name:'],
-					['last name',  'Last Name'],
-					['starid',     'StarID:']
 				],
 				'checkbox bool' => [
 					['international student',            'International student'],
@@ -92,6 +96,8 @@
 			}
 
 			?>
+
+			<input type="submit">
 		</form>
 	</div>
 </body>
