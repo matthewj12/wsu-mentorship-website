@@ -8,6 +8,7 @@
 	<title>Survey</title>
 	<link rel="stylesheet" href="styles/survey.css">
 	<script src="scripts/header-template.js"></script>
+	<script src="scripts/functions.js"></script>
 </head>
 <body>
 	<div class="welcome-container">
@@ -100,5 +101,9 @@
 			<input type="submit">
 		</form>
 	</div>
+
+	<script>
+		addIsMentorListeners();
+	</script>
 </body>
 </html>

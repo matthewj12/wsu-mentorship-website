@@ -65,14 +65,6 @@ function insertParticipant() {
 		}
 	}
 
-	// echo "<p style=\"font-family: monospace; font-size: 16px;\">";
-	// foreach ($userData as $name => $tbl) {
-	// 	print("key:.....$name<br>value:...");
-	// 	print_r($tbl);
-	// 	print('<br><br>');
-	// }
-	// echo "</p>";
-
 	foreach ($userData as $tblName => $newEntries) {
 		foreach ($newEntries as $newEntry) {
 			doInsert($starid, $tblName, $newEntry);
@@ -95,13 +87,6 @@ function doInsert($starid, $tblName, $colsAndVals) {
 	foreach ($colsAndVals as $val) {
 		$sqlQuery .= "'$val', ";
 	}
-
-	// $sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 2);
-	// $sqlQuery .= ') ON DUPLICATE KEY UPDATE ';
-
-	// foreach (array_keys($colsAndVals) as $colName) {
-	// 	$sqlQuery .= "`$colName` = values(`$colName`), ";
-	// }
 
 	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 2) . ');';
 	
@@ -190,18 +175,23 @@ class SurveyItem {
 	}
 
 	public function echoHtml() {
-		$html = '<div class = "survey-item">';
+		$extraClass = $this->type == 'checkbox bool' ? ' checkbox-bool' : '';
+		$html = "<div class = \"survey-item$extraClass\">";
+
+		$tblNameHyph = str_replace(' ', '-', $this->tblName);
+		$nameVal = $tblNameHyph.'_'.$this->colName;
 
 		// Group the checkbox bool data points together.
 		if ($this->type != "checkbox bool") {
-			$html .= "<label class = \"survey-item-label\">\n";
+			$id = '';
+
+			if ($tblNameHyph == 'max-matches-assoc-tbl') {
+				$id = "id=\"max-matches-label\"";
+			}
+			$html .= "<label $id class = \"survey-item-label\">\n";
 			$html .= "\t$this->desc\n";
 			$html .= "</label>\n";
 		}
-
-
-		$tblNameHyph = str_replace(' ', '-', $this->tblName);
-		$nameVal = "$tblNameHyph.$this->colName";
 
 		switch ($this->type) {
 			case "radio":
@@ -235,9 +225,8 @@ class SurveyItem {
 
 			case "dropdown":
 				$this->options = readRefTbl($this->tblName);
-				
 				$name = "name = \"$nameVal\"";
-				$html .= "<select $name>";
+				$html .= "<select $name id=\"$nameVal\">";
 
 				foreach ($this->options as $option) {
 					$idVal  = $nameVal.'_'.$option->value;
@@ -247,7 +236,6 @@ class SurveyItem {
 					
 					$html .= " $<option $value $id required>$option->label</option>";
 					$html .= "\n";
-					
 				}
 
 				$html .= "</select>";
