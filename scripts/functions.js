@@ -2,7 +2,7 @@ let enabledLabel = '';
 let disabledLabel = '';
 let disabledSubstr = '<br><span class="context-message">Mentees can only be matched with one mentor.<span>';
 
-function disableMaxMatches() {
+function disablemaxMatchesDropdown() {
 	let id = 'max-matches-assoc-tbl_max-matches-id';
 
 	document.getElementById(id).value = 1;
@@ -11,7 +11,7 @@ function disableMaxMatches() {
 	document.getElementById('max-matches-label').innerHTML = disabledLabel;
 }
 
-function enableMaxMatches() {
+function enablemaxMatchesDropdown() {
 	document.getElementById('max-matches-assoc-tbl_max-matches-id').disabled = false;
 
 	document.getElementById('max-matches-label').innerHTML = enabledLabel;
@@ -28,11 +28,11 @@ function replaceTextContentXWithY(className, X, Y) {
 	}
 }
 
-function replaceMentorWithMentee() {
+function replaceTextContentMentorWithMentee() {
 	replaceTextContentXWithY('survey-item-label', 'mentor', 'mentee');
 }
 
-function replaceMenteeWithMentor() {
+function replaceTextContentMenteeWithMentor() {
 	replaceTextContentXWithY('survey-item-label', 'mentee', 'mentor');
 }
 
@@ -40,11 +40,11 @@ function addIsMentorListeners() {
 	enabledLabel = document.getElementById('max-matches-label').innerHTML;
 	disabledLabel = enabledLabel + disabledSubstr;
 
-	document.getElementById('participant_is-mentor_0').addEventListener("click", disableMaxMatches);
-	document.getElementById('participant_is-mentor_1').addEventListener("click", enableMaxMatches);
+	document.getElementById('participant_is-mentor_0').addEventListener("click", disablemaxMatchesDropdown);
+	document.getElementById('participant_is-mentor_1').addEventListener("click", enablemaxMatchesDropdown);
 
-	document.getElementById('participant_is-mentor_0').addEventListener("click", replaceMenteeWithMentor);
-	document.getElementById('participant_is-mentor_1').addEventListener("click", replaceMentorWithMentee);
+	document.getElementById('participant_is-mentor_0').addEventListener("click", replaceTextContentMenteeWithMentor);
+	document.getElementById('participant_is-mentor_1').addEventListener("click", replaceTextContentMentorWithMentee);
 }
 
 function updateResults() {

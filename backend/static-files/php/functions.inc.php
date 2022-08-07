@@ -44,6 +44,8 @@ function insertParticipant() {
 
 	foreach ($_POST as $tblAndColName => $valToInsert) {
 		if ($tblAndColName != "submit_survey") {
+			$valToInsert = preg_replace('/[^a-z,0-9, ,\',.]/', '', $valToInsert);
+			
 			$split   = explode('_', $tblAndColName);
 			// $tblName = str_replace('-', ' ', str_replace([' 1 ', ' 2 ', ' 3 '], '', $split[0]));
 			$tblName = str_replace('-', ' ', $split[0]);
