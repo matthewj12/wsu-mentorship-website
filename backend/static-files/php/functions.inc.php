@@ -38,20 +38,31 @@ function getParticipantFields() {
 function insertParticipant() {
 	$starid = $_POST['participant_starid'];
 	wipeParticipant($starid);
+	// to be consistent with the association tables where there can be multiple entries, we need an array inside an array for a single participant
 	$userData = ['participant' => [[]]];
+	// special column only in `has important quality assoc tbl` needs special handling, -1 signifies that this is not the current table
 
 	foreach ($_POST as $tblAndColName => $valToInsert) {
 		if ($tblAndColName != "submit_survey") {
 			$split   = explode('_', $tblAndColName);
+			// $tblName = str_replace('-', ' ', str_replace([' 1 ', ' 2 ', ' 3 '], '', $split[0]));
 			$tblName = str_replace('-', ' ', $split[0]);
 			$colName = str_replace('-', ' ', $split[1]);
+
+			$rank = -1;
+			if (str_contains($tblName, 'important quality')) {
+				$rank = substr($tblName, 18, 1);
+				// echo "$tblName contains it, has = $rank<br>";
+			}
+
+			// echo str_replace(['1', '2', '3'], '', $tblName) . '->' . str_replace(['1', '2', '3'], '', $colName) . '<br><br>';
+			$tblName = str_replace(['1', '2', '3'], '', $tblName);
+			$colName = str_replace(['1', '2', '3'], '', $colName);
 
 			// create the array for the values of the table with name $name if it doesn't already exist
 			if (array_search($tblName, array_keys($userData)) === false) {
 				$userData[$tblName] = [];
 			}
-
-			$newEntry = [];
 
 			if ($tblName == 'participant') {
 				// We don't have all the values needed for the entire row
@@ -59,7 +70,12 @@ function insertParticipant() {
 			}
 			else {
 				// We have all the values needed for the entire row
-				$userData[$tblName][] = ['starid' => $starid, $colName => $valToInsert];
+				if (str_contains($tblName, 'important quality')) {
+					$userData[$tblName][] = ['starid' => $starid, $colName => $valToInsert, 'important quality rank' => $rank];
+				}
+				else {
+					$userData[$tblName][] = ['starid' => $starid, $colName => $valToInsert];
+				}
 
 			}
 		}
@@ -67,20 +83,23 @@ function insertParticipant() {
 
 	foreach ($userData as $tblName => $newEntries) {
 		foreach ($newEntries as $newEntry) {
-			doInsert($starid, $tblName, $newEntry);
+			doInsert($starid, $tblName, $newEntry, $rank);
 		}
 	}
 }
 	
-function doInsert($starid, $tblName, $colsAndVals) {
-	// $columns = getParticipantFields();
-
+function doInsert($starid, $tblName, $colsAndVals, $rank) {
 	$sqlQuery = "INSERT INTO `$tblName`(`";
 
 	foreach (array_keys($colsAndVals) as $colName) {
 		$sqlQuery .= $colName . "`, `";
 	}
+	// Spacial case for important quality (`important quality assoc tbl` has additional `important quality rank` column)
+	if ($rank != -1) {
+		$sqlQuery .= "important quality rank`, `";
+	}
 
+	// remove final backtick + comman + space
 	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 4);
 	$sqlQuery .= "`) VALUES (";
 
@@ -88,7 +107,14 @@ function doInsert($starid, $tblName, $colsAndVals) {
 		$sqlQuery .= "'$val', ";
 	}
 
-	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 2) . ');';
+	// Spacial case for important quality
+	if ($rank != -1) {
+		$sqlQuery .= "'$rank', ";
+	}
+
+	// remove final comma + space
+	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 2);
+	$sqlQuery .= ');';
 	
 	// echo "<br><p style=\"font-family: monospace; font-size: 22px\">$sqlQuery<br>";
 
@@ -124,10 +150,11 @@ function wipeParticipant($starid) {
 
 function forRefTbl($distinct) {
 	$to_remove_for_ref_tbl_names = [
-		'primary ',
-		'secondary ',
 		'preferred ',
-		' assoc tbl'
+		' assoc tbl',
+		' 1',
+		' 2',
+		' 3'
 	];
 
 	foreach ($to_remove_for_ref_tbl_names as $to_remove) {
@@ -181,7 +208,7 @@ class SurveyItem {
 		$tblNameHyph = str_replace(' ', '-', $this->tblName);
 		$nameVal = $tblNameHyph.'_'.$this->colName;
 
-		// Group the checkbox bool data points together.
+		// One label for the entire set of checkbox bool survey items.
 		if ($this->type != "checkbox bool") {
 			$id = '';
 
@@ -196,13 +223,14 @@ class SurveyItem {
 		switch ($this->type) {
 			case "radio":
 				foreach ($this->options as $option) {
-					$idVal  = $nameVal.'_'.$option->value;
-					$id     = "id    = \"$idVal\"";
-					$name   = "name  = \"$nameVal\"";
-					$value  = "value = \"$option->value\"";
-					$type   = 'type  = "radio"';
+					$idVal   = $nameVal.'_'.$option->value;
+					$id      = "id    = \"$idVal\"";
+					$name    = "name  = \"$nameVal\"";
+					$value   = "value = \"$option->value\"";
+					$type    = 'type  = "radio"';
+					$default = $idVal == 'participant_is-mentor_0' ? 'checked' : '';
 					
-					$html .= "<input $name $value $id $type required>\n";
+					$html .= "<input $name $value $id $type $default required>\n";
 					$html .= "\n";
 					
 					// ------------------------------------------
@@ -219,7 +247,7 @@ class SurveyItem {
 				$name   = "name = \"$nameVal\"";
 				$id = $tblNameHyph.'_'.$this->colName;
 				
-				$html .= "<input $name $id type = \"text\" required>";
+				$html .= "<input $name class=\"textbox\" $id type = \"text\" required>";
 
 				break;
 
@@ -296,8 +324,7 @@ class SurveyItem {
 			case "textarea":
 				$name = "name = \"$nameVal\"";
 				
-				$html .= "<textarea $name id = \"$this->colName\" rows = \"8\" cols = \"60\">\n";
-				$html .= "Enter optional response\n";
+				$html .= "<textarea $name id = \"$this->colName\" rows = \"8\" cols = \"60\" placeholder=\"Enter optional response\">\n";
 				$html .= "</textarea>\n";
 				break;
 		}

@@ -1,3 +1,8 @@
 <?php
 
-shell_exec("py main.py");
+try {
+	shell_exec('py backend/static-files/python/main.py');
+}
+catch (Exception $e) {
+	echo $e;
+}

@@ -22,10 +22,8 @@ CREATE TABLE `important quality ref tbl` (
 );
 INSERT INTO `important quality ref tbl`(`important quality`) VALUES
 	('gender'),
-	('primary major'),
-	('secondary major'),
-	('primary pre program'),
-	('secondary pre program'),
+	('major'),
+	('pre program'),
 	('religious affiliation'),
 	('hobby'),
 	('international student'),

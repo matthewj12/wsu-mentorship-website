@@ -1,7 +1,10 @@
 * {
 	margin: 0;
 	padding: 0;
-	box-sizing: border-box;
+	font-size: 1.1rem;
+	/* font-weight: 400;
+	color: black; */
+	/* box-sizing: border-box; */
 }
 
 .form-container {
@@ -26,6 +29,7 @@
 
 .survey-form {
 	/* padding: 50px 100px 50px; */
+	padding: 10px;
 }
 
 .survey-item {
@@ -43,24 +47,29 @@
 	margin: 0;
 }
 
+/* applies only to option labels, survey-item-label will override */
+label {
+}
+
 .survey-item-label {
+	margin-left: -30px;
+	font-size: 1.3rem;
+	/* font-weight: 300; */
+	/* color: rgb(86, 91, 117); */
+	/* font-style: italic; */
 	display: block;
 	margin-bottom: 10px;
 }
 
-.important-quality-container {
-	margin-bottom: 10px;
+.textbox, select, textarea {
+	/* border: 1px solid black; */
+	border-radius: 4px;
 }
 
-.important-quality-label {
-	display: block;
-	margin-bottom: 10px;
-}
-
-.misc-info {
-	width: min(50vw, 600px);
-	height: 100px;
-	font-family: serif;
-	font-size: 1rem;
+textarea {
+	/* width: min(50vw, 600px); */
+	/* height: 100px; */
+	font-family: sans-serif;
+	/* font-size: 1rem; */
 	padding: 10px
 }

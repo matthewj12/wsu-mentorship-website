@@ -1,27 +1,7 @@
 import rankings, miscfuncs, globvars
 
 class Participant():
-	# columns = miscfuncs.getParticipantColumns()
-
-	# We need these explicity defined here (as opposed to fetched via query) because we need them in the order they will appear in the survey.
-	columns = [
-		'is active',
-		'is mentor',
-		'first name',
-		'last name',
-		'starid',
-		'international student',
-		'lgbtq+',
-		'student athlete',
-		'multilingual',
-		'not born in this country',
-		'transfer student',
-		'first generation college student',
-		'unsure or undecided about major',
-		'interested in diversity groups',
-		'misc info'
-	]
-
+	columns = miscfuncs.getParticipantColumns()
 
 	def __init__(self, row=None):
 		if row != None:
@@ -163,7 +143,7 @@ class Participant():
 			f"{globvars.get_available_participants_query}),\n"
 			f"{''.join(as_statements)[:-2]}\n"
 			f"SELECT `starid`\n"
-			f"FROM {join_clause}"
+			f"FROM {join_clause}\n"
 			f"WHERE `is mentor` = {'FALSE' if self.data_points['is mentor'] else 'TRUE'}\n"
 			f"ORDER BY {''.join(custom_order_exprs)[:-2]};\n" # [-2] removes the last comma + space
 		)
@@ -193,8 +173,13 @@ class Participant():
 			print()
 
 		custom_order_exprs = [f"`matching {iqs} count` desc, " for iqs in important_qualities]
+
+		query = self.generateCandidateRankingQuery(as_statements, join_clause, custom_order_exprs)
+
+		# with open('temp.sql', 'w') as temp_file:
+		# 	temp_file.write(query)
 		
-		cursor.execute(self.generateCandidateRankingQuery(as_statements, join_clause, custom_order_exprs))
+		cursor.execute(query)
 
 		# if am_debug_participant:
 		# 	print('\nquery: {}\n'.format(candidate_ranking_query))

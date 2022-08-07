@@ -17,7 +17,7 @@
 			<br>
 
 			<button class="login">
-				<a href="adminDashboard.php">Login</a>
+				<a href="admin-dashboard.php">Login</a>
 			</button>
 		</form>
 	</div>

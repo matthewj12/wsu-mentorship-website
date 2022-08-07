@@ -42,7 +42,7 @@
 					],
 					[
 						'is residually matchable',
-						'Should we consider you for residual matches? In the case that we can\'t find you a _ when the primary round of matching occurs, this will allow you to still be matched with _ who sign up after the deadline.',
+						'Should we consider you for residual matches? In the case that we can\'t find you a mentor when the primary round of matching occurs, this will allow you to still be matched with mentor who sign up after the deadline.',
 						[new Option('Consider me for residual matches', 1), new Option('Don\'t consider me for residual matches', 0)]
 					]
 				],
@@ -57,23 +57,23 @@
 					['unsure or undecided about major',  'Unsure or undecided about major'],
 					['interested in diversity groups',   'Interested in diversity groups']
 				],
+				'checkbox assoc tbl' => [
+					['hobby',           'What are your hobbies?'],
+					['major',           'What are your secondary major(s)?'],
+					['pre program',     'What are your secondary pre program(s)?'],
+					['race',            'What race(s) are you?'],
+					['second language', 'Select any second language(s) that you speak.']
+				],
 				'dropdown' => [
-					['max matches',           'What is the maximum number of _ you want to be matched with?'],
+					['max matches',           'What is the maximum number of mentor you want to be matched with?'],
 					['gender',                'Select your gender.'],
 					['religious affiliation', 'Select your religious affiliation.'],
-				],
-				'checkbox assoc tbl' => [
-					['important quality',     'What are the most important qualities you value in a mentor/mentee?'],
-					['hobby',                 'What are your hobbies?'],
-					['primary major',         'What are your primary major(s)?'],
-					['secondary major',       'What are your secondary major(s)?'],
-					['primary pre program',   'What are your primary pre program(s)?'],
-					['secondary pre program', 'What are your secondary pre program(s)?'],
-					['race',                  'What race(s) are you?'],
-					['second language',       'Select any second language(s) that you speak.']
+					['important quality 1',   'What is the first most important quality you value in a mentor?'],
+					['important quality 2',   'What is the second most important quality you value in a mentor?'],
+					['important quality 3',   'What is the third most important quality you value in a mentor?']
 				],
 				'textarea' => [
-					['misc info', 'Is there anything else we should know when finding a _ for you uwu?']
+					['misc info', 'Is there anything else we should know when finding a mentor for you uwu?']
 				]
 			];
 

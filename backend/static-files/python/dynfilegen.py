@@ -76,17 +76,15 @@ def genSampleDataCurlRequestsFile(generate_file, execute_file):
 #     2) tables where participants can select one and only one element; they can't select none.
 
 assoc_tbl_names_unique_substr = {
-	'max matches'          : 1,
-	'gender'               : 1,
-	'religious affiliation': 1,
-	'important quality'    : 2,
-	'hobby'                : 2,
-	'primary major'        : 2,
-	'secondary major'      : 2,
-	'primary pre program'  : 2,
-	'secondary pre program': 2,
-	'race'                 : 2,
-	'second language'      : 2
+	'max matches'           : 1,
+	'gender'                : 1,
+	'religious affiliation' : 1,
+	'important quality'     : 2,
+	'hobby'                 : 2,
+	'major'                 : 2,
+	'pre program'           : 2,
+	'race'                  : 2,
+	'second language'       : 2
 }
 has_no_corresponding_preferred_table = [
 	'important quality',
@@ -125,7 +123,7 @@ def genericCreateStmt(distinct, suffix=' assoc tbl'):
 	
 	important_quality_rank = ''
 	if distinct == 'important quality':
-		important_quality_rank = '`important quality rank` tinyint NOT NULL,'
+		important_quality_rank = '\t`important quality rank` tinyint NOT NULL,\n'
 
 	return (
 		f"drop table if exists `{concat}`;\n"
