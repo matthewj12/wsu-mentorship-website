@@ -23,7 +23,7 @@ function replaceTextContentXWithY(className, X, Y) {
 
 	for (let i = 0; i < surveyItemLabels.length; i++) {
 		if (surveyItemLabels[i].textContent.includes(X)) {
-			surveyItemLabels[i].textContent = surveyItemLabels[i].textContent.replaceAll(X, Y)
+			surveyItemLabels[i].textContent = surveyItemLabels[i].textContent.replaceAll(X, Y);
 		}
 	}
 }
