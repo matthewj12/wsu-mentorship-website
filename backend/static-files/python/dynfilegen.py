@@ -12,10 +12,8 @@ distinct_part_of_urls = {
 	
 	'gender'                : '7024c370?count=6',
 	'hobby'                 : '4ba241f0?count=24',
-	'primary-major'         : 'ca372f90?count=9',
-	'secondary-major'       : '641893e0?count=2',
-	'primary-pre-program'   : '92987040?count=4',
-	'secondary-pre-program' : '8c177de0?count=2',
+	'major'                 : 'ca372f90?count=9',
+	'pre-program'           : '92987040?count=4',
 	'race'                  : 'e78c2170?count=6',
 	'religious-affiliation' : '9be133f0?count=6',
 	'second-language'       : '6b95d550?count=4',
@@ -25,10 +23,8 @@ distinct_part_of_urls = {
 
 	'preferred-gender'                : 'c0420be0?count=12',
 	'preferred-hobby'                 : 'eae20460?count=4',
-	'preferred-primary-major'         : '3735e520?count=18',
-	'preferred-secondary-major'       : 'cdc61170?count=4',
-	'preferred-primary-pre-program'   : '6dda7f50?count=4',
-	'preferred-secondary-pre-program' : '00a3ad80?count=4',
+	'preferred-major'                 : '3735e520?count=18',
+	'preferred-pre-program'           : '6dda7f50?count=4',
 	'preferred-race'                  : '77ea45e0?count=12',
 	'preferred-religious-affiliation' : '2fb733b0?count=12',
 	'preferred-second-language'       : '4d7ce400?count=8'
@@ -65,6 +61,7 @@ def genSampleDataCurlRequestsFile(generate_file, execute_file):
 		out_file.close()
 
 	if execute_file:
+		ensureFolderExists(globvars.sample_data_dir)
 		to_execute = f"{backend}\\dynamically-generated-files\\batch\\sample-data-curl-requests.bat"
 		assert(os.path.exists(to_execute))
 		return_code = os.system(to_execute)
@@ -121,6 +118,7 @@ def genericCreateStmt(distinct, suffix=' assoc tbl'):
 		primary_key += f", `{distinct} id`"
 	# primary and secondary major/pre program both use the major/pre program table
 	
+	# special case for `important quality` table which has one additional column
 	important_quality_rank = ''
 	if distinct == 'important quality':
 		important_quality_rank = '\t`important quality rank` tinyint NOT NULL,\n'

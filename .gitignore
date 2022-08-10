@@ -1,4 +1,6 @@
 /backend/static-files/python/__pycache__
+*test*
+*temp*
 *TODO*.txt
 # commit note
 *commit*.txt

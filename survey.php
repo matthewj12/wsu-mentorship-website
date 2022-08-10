@@ -1,5 +1,6 @@
 <?php
 	require_once('backend/static-files/php/functions.inc.php');
+	require_once('backend/static-files/php/classes.inc.php');
 ?>
 
 <!DOCTYPE html>
@@ -17,8 +18,6 @@
 		</h1>
 	</div>
 
-	<?php $connection = connect() ?>
-
 	<div class="form-container">
 		<form class="survey-form" method="post" action="backend/static-files/php/call-insert-participant.php">
 			<?php
@@ -26,13 +25,13 @@
 			$surveyItemGroups = [
 				'textbox' => [
 					['first name', 'First Name:'],
-					['last name',  'Last Name'],
+					['last name',  'Last Name:'],
 					['starid',     'StarID:']
 				],
 				'radio' => [
 					[
 						'is active',
-						'Should we consider you for matches as of now (active)? If not, we will save your information until you are ready (inactive)',
+						'Should we consider you for matches as of now (active)? If not, we will save your information until you are ready (inactive).',
 						[new Option('Active', 1), new Option('Inactive', 0)]
 					],
 					[
@@ -42,7 +41,7 @@
 					],
 					[
 						'is residually matchable',
-						'Should we consider you for residual matches? In the case that we can\'t find you a mentor when the primary round of matching occurs, this will allow you to still be matched with mentor who sign up after the deadline.',
+						'Should we consider you for residual matches? In the case that we can\'t find you a mentor/mentee when the primary round of matching occurs, this will allow you to still be matched with mentor/mentee who sign up after the deadline.',
 						[new Option('Consider me for residual matches', 1), new Option('Don\'t consider me for residual matches', 0)]
 					]
 				],
@@ -65,15 +64,15 @@
 					['second language', 'Select any second language(s) that you speak.']
 				],
 				'dropdown' => [
-					['max matches',           'What is the maximum number of mentor you want to be matched with?'],
+					['max matches',           'What is the maximum number of mentor/mentee you want to be matched with?'],
 					['gender',                'Select your gender.'],
 					['religious affiliation', 'Select your religious affiliation.'],
-					['important quality 1',   'What is the first most important quality you value in a mentor?'],
-					['important quality 2',   'What is the second most important quality you value in a mentor?'],
-					['important quality 3',   'What is the third most important quality you value in a mentor?']
+					['important quality 1',   'What is the first most important quality you value in a mentor/mentee?'],
+					['important quality 2',   'What is the second most important quality you value in a mentor/mentee?'],
+					['important quality 3',   'What is the third most important quality you value in a mentor/mentee?']
 				],
 				'textarea' => [
-					['misc info', 'Is there anything else we should know when finding a mentor for you uwu?']
+					['misc info', 'Is there anything else we should know when finding a mentor/mentee for you uwu?']
 				]
 			];
 
@@ -103,6 +102,7 @@
 	</div>
 
 	<script>
+		formatMiscDataPoints();
 		addIsMentorListeners();
 	</script>
 </body>

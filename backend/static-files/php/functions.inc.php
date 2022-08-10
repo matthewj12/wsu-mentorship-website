@@ -16,7 +16,7 @@ function connect() {
 
 		return $pdo;
 	}
-	catch(PDOException $e) {
+	catch (PDOException $e) {
 		echo "Connection Failed:". $e->getMessage();
 	}
 }
@@ -38,7 +38,7 @@ function getParticipantFields() {
 function insertParticipant() {
 	$starid = $_POST['participant_starid'];
 	wipeParticipant($starid);
-	// to be consistent with the association tables where there can be multiple entries, we need an array inside an array for a single participant
+	// to be consistent with the association tables where there can be multiple entries, we want an array inside an array for a single participant
 	$userData = ['participant' => [[]]];
 	// special column only in `has important quality assoc tbl` needs special handling, -1 signifies that this is not the current table
 
@@ -54,12 +54,10 @@ function insertParticipant() {
 			$rank = -1;
 			if (str_contains($tblName, 'important quality')) {
 				$rank = substr($tblName, 18, 1);
-				// echo "$tblName contains it, has = $rank<br>";
 			}
 
-			// echo str_replace(['1', '2', '3'], '', $tblName) . '->' . str_replace(['1', '2', '3'], '', $colName) . '<br><br>';
-			$tblName = str_replace(['1', '2', '3'], '', $tblName);
-			$colName = str_replace(['1', '2', '3'], '', $colName);
+			$tblName = str_replace([' 1', ' 2', ' 3'], '', $tblName);
+			$colName = str_replace([' 1', ' 2', ' 3'], '', $colName);
 
 			// create the array for the values of the table with name $name if it doesn't already exist
 			if (array_search($tblName, array_keys($userData)) === false) {
@@ -83,22 +81,24 @@ function insertParticipant() {
 		}
 	}
 
+	// need to handle participant table first because participant's primary key (starid) is referenced in association tables
+	// we can use index 0 because there is only ever one participant to insert for each survey completed
+
+	doInsert('participant', $userData['participant'][0]);
+	unset($userData['participant']);
+
 	foreach ($userData as $tblName => $newEntries) {
 		foreach ($newEntries as $newEntry) {
-			doInsert($starid, $tblName, $newEntry, $rank);
+			doInsert($tblName, $newEntry);
 		}
 	}
 }
 	
-function doInsert($starid, $tblName, $colsAndVals, $rank) {
+function doInsert($tblName, $colsAndVals) {
 	$sqlQuery = "INSERT INTO `$tblName`(`";
 
 	foreach (array_keys($colsAndVals) as $colName) {
 		$sqlQuery .= $colName . "`, `";
-	}
-	// Spacial case for important quality (`important quality assoc tbl` has additional `important quality rank` column)
-	if ($rank != -1) {
-		$sqlQuery .= "important quality rank`, `";
 	}
 
 	// remove final backtick + comman + space
@@ -109,16 +109,11 @@ function doInsert($starid, $tblName, $colsAndVals, $rank) {
 		$sqlQuery .= "'$val', ";
 	}
 
-	// Spacial case for important quality
-	if ($rank != -1) {
-		$sqlQuery .= "'$rank', ";
-	}
-
 	// remove final comma + space
 	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 2);
 	$sqlQuery .= ');';
 	
-	// echo "<br><p style=\"font-family: monospace; font-size: 22px\">$sqlQuery<br>";
+	// echo "<p style=\"font-family: monospace;\">$sqlQuery</p><br>";
 
 	try {
 		$stmt = connect()->prepare($sqlQuery);
@@ -126,16 +121,14 @@ function doInsert($starid, $tblName, $colsAndVals, $rank) {
 	}
 	catch(PDOException $e) {
 		echo "<p style=\"font-family: monospace; font-size: 22px\">";
-		echo "New insertion to `$tblName` failed.<br><br> Query:<br><br>";
-		echo "$sqlQuery<br><br>";
-		echo $sqlQuery. $e->getMessage();
+		echo $sqlQuery . $e->getMessage();
 		echo "</p>";
 	}
 }
 
 // Wipes participant's entries in `participant` and `[...] assoc tbl` tables
 function wipeParticipant($starid) {
-	$getTblsToWipeQuery = "SHOW TABLES WHERE Tables_in_mp != 'mentorship' AND INSTR(Tables_in_mp, 'ref tbl') = 0;";
+	$getTblsToWipeQuery = "SHOW TABLES WHERE tables_in_mp != 'mentorship' AND INSTR(Tables_in_mp, 'ref tbl') = 0;";
 
 	$stmt = connect()->prepare($getTblsToWipeQuery);
 	$stmt->execute();
@@ -150,6 +143,7 @@ function wipeParticipant($starid) {
 	}
 }
 
+// Also used to obtain name(s) for non-association tables
 function forRefTbl($distinct) {
 	$to_remove_for_ref_tbl_names = [
 		'preferred ',
@@ -166,175 +160,6 @@ function forRefTbl($distinct) {
 	// $distinct = str_replace(' ', '-', $distinct);
 
 	return $distinct;
-}
-
-class Option {
-	public string $label;
-	public string $value;
-
-	public function __construct($label, $value) {
-		$this->label = $label;
-		$this->value = $value;
-	}
-}
-
-class SurveyItem {
-	private string $type;
-	private string $tblName;
-	private string $colName;
-	private string $desc;
-	private $options;
-
-	public function __construct($type, $colName, $desc, $options=null){
-		$this->type    = $type;
-		$this->tblName = 'participant';
-
-		if ($type == 'dropdown' || $type == 'checkbox assoc tbl') {
-			$this->tblName = "$colName assoc tbl";
-			$colName .= ' id';
-		}
-
-		$this->colName = str_replace(' ', '-', $colName);
-
-		$this->desc    = $desc;
-
-		if ($type == 'radio') {
-			$this->options = $options;
-		}
-	}
-
-	public function echoHtml() {
-		$extraClass = $this->type == 'checkbox bool' ? ' checkbox-bool' : '';
-		$html = "<div class = \"survey-item$extraClass\">";
-
-		$tblNameHyph = str_replace(' ', '-', $this->tblName);
-		$nameVal = $tblNameHyph.'_'.$this->colName;
-
-		// One label for the entire set of checkbox bool survey items.
-		if ($this->type != "checkbox bool") {
-			$id = '';
-
-			if ($tblNameHyph == 'max-matches-assoc-tbl') {
-				$id = "id=\"max-matches-label\"";
-			}
-			$html .= "<label $id class = \"survey-item-label\">\n";
-			$html .= "\t$this->desc\n";
-			$html .= "</label>\n";
-		}
-
-		switch ($this->type) {
-			case "radio":
-				foreach ($this->options as $option) {
-					$idVal   = $nameVal.'_'.$option->value;
-					$id      = "id    = \"$idVal\"";
-					$name    = "name  = \"$nameVal\"";
-					$value   = "value = \"$option->value\"";
-					$type    = 'type  = "radio"';
-					$default = $idVal == 'participant_is-mentor_0' ? 'checked' : '';
-					
-					$html .= "<input $name $value $id $type $default required>\n";
-					$html .= "\n";
-					
-					// ------------------------------------------
-
-					$for   = "for = \"$idVal\"";
-
-					$html .= "<label $for>\n";
-					$html .= "\t$option->label";
-					$html .= "</label>\n";
-				}
-				break;
-
-			case "textbox":
-				$name   = "name = \"$nameVal\"";
-				$id = $tblNameHyph.'_'.$this->colName;
-				
-				$html .= "<input $name class=\"textbox\" $id type = \"text\" required>";
-
-				break;
-
-			case "dropdown":
-				$this->options = readRefTbl($this->tblName);
-				$name = "name = \"$nameVal\"";
-				$html .= "<select $name id=\"$nameVal\">";
-
-				foreach ($this->options as $option) {
-					$idVal  = $nameVal.'_'.$option->value;
-					$id     = "id = \"$idVal\"";
-					$value  = "value = \"$option->value\"";
-					$for    = "for = \"$idVal\"";
-					
-					$html .= " $<option $value $id required>$option->label</option>";
-					$html .= "\n";
-				}
-
-				$html .= "</select>";
-
-				break;
-
-			case "checkbox bool":
-				$idVal  = "$nameVal.1";
-				$id     = "id = \"$idVal\"";
-				$name   = "name = \"$idVal\"";
-				$value  = "value = \"1\"";
-				$for    = "for = \"$idVal\"";
-				$type   = 'type = "checkbox"';
-				
-				$html .= "<input $name $value $id $type>";
-				$html .= "\n";
-
-				// ------------------------------------------
-
-				$for   = "for = \"$idVal\"";
-
-				$html .= "<label $for>\n";
-				$html .= "\t$this->desc";
-				$html .= "</label>";
-				$html .= "<br>";
-
-				break;
-
-			case "checkbox assoc tbl":
-				// "options" in this context refers to checkboxes
-				$this->options = readRefTbl($this->tblName);
-				
-				foreach ($this->options as $option) {
-					$idVal  = "$nameVal.$option->value";
-					$id     =    "id = \"$idVal\"";
-					$name   =  "name = \"$idVal\"";
-					$value  = "value = \"$option->value\"";
-					$for    =   "for = \"$idVal\"";
-					$type   =  'type = "checkbox"';
-					
-					$html .= "<input $name $value $id $type>";
-					$html .= "\n";
-
-					// ------------------------------------------
-
-					$for   = "for = \"$idVal\"";
-
-					$html .= "<label $for>\n";
-					$html .= "\t$option->label";
-					$html .= "</label>";
-					$html .= "<br>";
-				}
-
-				$html .= "</select>";
-
-				break;
-
-			case "textarea":
-				$name = "name = \"$nameVal\"";
-				
-				$html .= "<textarea $name id = \"$this->colName\" rows = \"8\" cols = \"60\" placeholder=\"Enter optional response\">\n";
-				$html .= "</textarea>\n";
-				break;
-		}
-
-		$html .= "</div>\n";
-		$html .= "\n";
-		echo $html;
-	}
 }
 
 // returne an array that maps option id => option label
