@@ -3,18 +3,24 @@ import rankings, miscfuncs, globvars
 class Participant():
 	columns = miscfuncs.getParticipantColumns()
 
-	def __init__(self, row=None):
-		if row != None:
+	def __init__(self, starid=None, cursor=None):
+		if starid != None and cursor != None:
 			# atomized data points within `participant` table
 			self.data_points = {}
 			self.ranking = []
 			# the index in 'ranking' of the participant we will propose to next (if we need too)
 			self.next_proposal_index = 0
 
-			i = 0
-			for data_point_val in row:
-				self.data_points[Participant.columns[i]] = data_point_val
-				i += 1
+			for col in self.columns:
+				sql_query = f"SELECT `{col}` FROM `participant` WHERE `participant`.`starid` = '{starid}'"
+
+				cursor.execute(sql_query)
+
+				col_val = ''
+				for tup in cursor:
+					col_val = str(tup[0])
+				
+				self.data_points[col] = col_val
 
 
 	# for testing purposed
@@ -100,6 +106,7 @@ class Participant():
 		while 'unused' in important_qualities:
 			important_qualities.remove('unused')
 
+
 		return important_qualities
 
 			
@@ -136,15 +143,15 @@ class Participant():
 		# So VSCode will not exclude the ")" from the function's automatic fold
 
 
-	def generateCandidateRankingQuery(self, as_statements, join_clause, custom_order_exprs):
+	def generateCandidateRankingQuery(self, as_statements, custom_select_as_exprs, join_clause, custom_order_exprs):
 		return (
 			f"WITH\n"
 			f"\t`available participants tbl` AS (\n"
 			f"{globvars.get_available_participants_query}),\n"
 			f"{''.join(as_statements)[:-2]}\n"
-			f"SELECT `starid`\n"
+			f"SELECT `starid`, {custom_select_as_exprs}\n"
 			f"FROM {join_clause}\n"
-			f"WHERE `is mentor` = {'FALSE' if self.data_points['is mentor'] else 'TRUE'}\n"
+			f"WHERE `is mentor` = {'FALSE' if int(self.data_points['is mentor']) else 'TRUE'}\n"
 			f"ORDER BY {''.join(custom_order_exprs)[:-2]};\n" # [-2] removes the last comma + space
 		)
 	
@@ -167,14 +174,15 @@ class Participant():
 			)
 
 		if am_debug_participant:
-			print("Generating {}'s ranking...".format(self.data_points['starid']))
+			# print("Generating {}'s ranking...".format(self.data_points['starid']))
 			for iq in important_qualities:
 				print(f'\tConsidering: {iqs}...')
 			print()
 
 		custom_order_exprs = [f"`matching {iqs} count` desc, " for iqs in important_qualities]
+		custom_select_as_exprs = ''.join([f"IFNULL(`matching {iqs} count`, 0) as `matching {iqs} count`, " for iqs in important_qualities])[:-2]
 
-		query = self.generateCandidateRankingQuery(as_statements, join_clause, custom_order_exprs)
+		query = self.generateCandidateRankingQuery(as_statements, custom_select_as_exprs, join_clause, custom_order_exprs)
 
 		# with open('temp.sql', 'w') as temp_file:
 		# 	temp_file.write(query)
@@ -187,5 +195,11 @@ class Participant():
 		for tup in cursor:
 			self.ranking.append(tup[0])
 
+		# Append all the rest of the participants with 0 matches at last place
+		all_available = []
+		cursor.execute(globvars.get_available_participant_starids_query)
+		for tup in cursor:
+			all_available.append(tup[0])
+
 		if am_debug_participant:
-			self.printRanking(base_indent=0)
+			self.printRanking(base_indent=1)

@@ -10,7 +10,7 @@ template.innerHTML = `
     <!-- <meta http-equiv="refresh" content="30"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="styles/common.css">
 
     <script src="index.js"></script>
 

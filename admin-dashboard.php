@@ -13,9 +13,7 @@
 <body>
 	<div class="main-container">
 		<form action="backend/static-files/php/run-main.php">
-			<button id="create-matches-btn">
-				Create Matches
-			</button>
+			<input type="submit" value="Create Matches" id="create-matches-btn">
 		</form>
 
 		<div id="search-container">

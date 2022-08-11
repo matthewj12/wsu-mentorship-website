@@ -35,6 +35,9 @@
 .survey-item {
 	/* margin-bottom: 30px; */
 	margin-top: 40px;
+}
+
+.survey-item, .participant.interested-in-diversity-groups {
 	margin-bottom: 40px;
 }
 

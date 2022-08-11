@@ -5,14 +5,18 @@ import globvars
 
 # copies all rows from the participant-related SQL tables into Participant objects. The only table this currently doesn't include is `mentorship`
 def buildParticipantsListFromQuery(cursor):
-	cursor.execute(globvars.get_available_participants_query)
+	cursor.execute(globvars.get_available_participant_starids_query)
 
 	# Populate atomized data points
-	results = []
+	participants = []
+	starids = []
 	for tup in cursor:
-		results.append(participant.Participant(tup))
-	
-	return results
+		starids.append(tup[0])
+
+	for starid in starids:
+		participants.append(participant.Participant(starid, cursor))
+
+	return participants
 
 
 def getParticipantByStarid(participants, starid):
@@ -152,6 +156,9 @@ def createMatches(cursor, participants):
 
 	mentor_prefs = {p.data_points['starid'] : p.ranking for p in participants if 
 		int(p.data_points['is active']) and not alreadyPaired(cursor, p) and int(p.data_points['is mentor'])}
+
+	# print(mentor_prefs)
+	# print(mentee_prefs)
 
 	query = (
 		'select `participant`.`starid`, `max matches id`\n'
@@ -392,14 +399,15 @@ def isTopRankerForMultipleUms(mentees_for_um_rankings, mentee_starid):
 
 def addMatchesToDatabase(cursor, matches):
 	for match in matches:
-		insert_str = '''
-			INSERT INTO mentorship
-			(`mentor starid`, `mentee starid`, `start date`, `end date`)
-			VALUES
-			('{}', '{}', '2022-09-01', '2023-05-01');
-		'''.format(
+		insert_str = (
+			'INSERT INTO mentorship'
+			'(`mentor starid`, `mentee starid`, `start date`, `end date`)'
+			' VALUES '
+			"('{}', '{}', '2022-09-01', '2023-05-01');"
+		).format(
 			match[0],
 			match[1]
 		)
 
 		cursor.execute(insert_str)
+
