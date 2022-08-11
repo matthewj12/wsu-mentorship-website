@@ -1,81 +1,120 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
-$signUpErrors = array('fname' => null, 'lname' => null, 'email' => null, 'password' => null, 'birthday' => null, 'city' => null, 'state' => null, 'ph number' => null, 'signUpAttempt' => null);
-$signUpSuccess = array('fname' => null, 'lname' => null, 'email' => null, 'password' => null, 'birthday' => null, 'city' => null, 'state' => null, 'ph number' => null, 'signUpAttempt' => null);
-$firstName = $lastName =  $email = $password =  $birthday = $city = $state = $phNumber = "";
-$success = '';
+require 'composer\vendor\autoload.php';
+require 'backend\static-files\php\functions.inc.php';
+require 'backend\static-files\php\form-handlers.php';
 
-if (isset($_POST['signup'])) {
-    session_start();
-    $email = $_POST['useremail'];
-    $password = $_POST["userpassword"];
-    // $password = password_hash($_POST['userpassword'], PASSWORD_DEFAULT);
-    echo "Email:". $email;
-    echo "<br>";
-    echo "Password:". $password;
-    echo "<br>";
+$userInput = array('email' => null, 'password' => null, 'verification code' => null);
+$signInErrors = array('email' => null, 'password' => null, 'signIn' => null, 'verification' => null);
+$signInSuccess = array('email' => null, 'password' => null, 'signIn' => null, 'verification' => null);
+
+//Use php mailer
+
+if (isset($_POST['signUp'])) {
+    $userInput['email'] = trim($_POST['email']);
+    $userInput['password'] = trim($_POST['password']);
+
+    //check empty input
+    //if email is not empty
+    if (checkEmpty($userInput['email']) == false) {
+        //check email format
+        //if email is valid
+        if (checkEmail($userInput['email']) == true) {
+            $signInSuccess['email'] = 'Valid Email';
+            $signInSuccess['signIn'] = 'Signing you in...';
+        } elseif (checkEmail($userInput['email']) == false) {
+            $signInErrors['email'] = 'Invalid Email';
+            $signInErrors['signIn'] = 'Sign In failed';
+        }
+    }
+
+    //if email is empty
+    elseif (checkEmpty($userInput['email']) == true) {
+        $signInErrors['email'] = 'Email should not be blank.';
+        $signInErrors['signIn'] = 'Sign In failed';
+    }
+
+    //if the email is valid and no errors
+    if ($signInErrors['signIn'] == null) {
+        //create activation code    
+        
+        //
+    }
 }
-	
-	//Check Empty and valid email
-    if ($signUpContr->checkEmptyEmail() == false) {
-        $signUpErrors['email'] = 'Email should not be blank';
-        echo $signUpErrors['email'];
-    } else {
-        if ($signUpContr->checkValidEmail() == false) {
-            $signUpErrors['email'] = 'Invalid Email';
-            echo $signUpErrors['email'];
-        }
-        else if ($signUpContr->checkValidEmail() == true) {
-            $signUpSuccess['email'] = 'Valid Email';
-            echo $signUpSuccess['email'];
-        }
 
-    }
-
-    //Check Empty and valid Password
-    echo $signUpContr->checkEmptyPwd();
-    echo "password strength" . $signUpContr->checkPwdstrength();
-    if ($signUpContr->checkEmptyPwd() == false) {
-        $signUpErrors['password'] = 'Password should not be blank';
-        echo $signUpErrors['password'];
-    } else {
-        if ($signUpContr->checkPwdstrength() == false) {
-            $signUpErrors['password'] = 'Password should be at least 12 characters, contain at least 1 uppercase, 1 lowercase, 1 special character, and 1 number';
-            echo $signUpErrors['password'];
-        }
-
-        else if ($signUpContr->checkPwdstrength() == true) {
-            $signUpSuccess['password'] = 'Valid Password';
-            echo $signUpSuccess['password'];
-        }
-    }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>Login</title>
-	<link rel="stylesheet" href="styles/login.css">
-	<script src="scripts/header-template.js"></script>
-<head>
-<body>
-	<div class="form-container">
-		<form>
-                    <input type="email" name="useremail" placeholder="Email" value=<?php echo $email ?>>
-                    <p class="error useremail-error"><?php echo $signUpErrors['email'] ?></p>
-                    <p class="success useremail-success"><?php echo $signUpSuccess['email'] ?></p>
-                    <br>
 
-                    <input type="password" name="userpassword" placeholder="Password">
-                    <p class="error userpassword-error"><?php echo $signUpErrors['password'] ?></p>
-                    <p class="success userpassword-success"><?php echo $signUpSuccess['password'] ?></p>
-                    <br>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <script src="scripts/header-template.js"></script>
+    <style>
 
-			<br>
-                    <button type="submit" class="check-inbtn" name="signup"><a href="admin-dashboard.php">Login</a></button>
-                    <p class="success memberSignUp-success"><?php echo $signUpSuccess['signUpAttempt'] ?></p>
-                    <p class="error memberSignUp-error"><?php echo $signUpErrors['signUpAttempt'] ?></p>
-		</form>
-	</div>
-</body>
+    </style>
+
+    <head>
+
+    <body>
+        <main>
+            <div class="form-container" id="registration">
+                <div class="form-title">
+                    <h3>Please Sign in here</h3>
+                </div>
+                <form action="includes/login.inc.php" method="post">
+                    <div class="form-field">
+                        <label for="email" class="form-label">WSU email:</label>
+                        <input type="text" name="email" class="form-input" required></input>
+                        <p class="success email"><?php echo $signInSuccess['email'] ?></p>
+                        <p class="error email"><?php echo $signInErrors['email'] ?></p>
+                    </div>
+                    <div class="form-field">
+                        <input type="submit" value="Login" name="signUp">
+                        <p class="success signIn"><?php $signInErrors['signIn'] ?></p>
+                        <p class="error signIn"><?php $signInErrors['signIn'] ?></p>
+
+                    </div>
+                </form>
+                <!-- <div class="link">
+                        <span>Don't have an account yet?</span>
+                        <a href="signup.php" class="heading3">Sign up here</a>
+                    </div> -->
+            </div>
+
+            <div class="form-container" id="verification">
+                <div class="form-title">
+                    <h3>Email Verification</h3>
+                </div>
+                <form action="includes/login.inc.php" method="post">
+                    <div class="form-field">
+                        <p class="text">
+                            Please enter the Verification code that has been sent to your WSU email.
+                        </p>
+                    </div>
+                    <div class="form-field">
+                        <label for="verificationCode" class="form-label">Enter Verification Code:</label>
+                        <input type="text" name="verificationCode" class="form-input" required></input>
+                        <p class="success verificationCode"><?php echo $signInSuccess['verification'] ?></p>
+                        <p class="error verificationCode"><?php echo $signInErrors['verification'] ?></p>
+                    </div>
+                    <div class="form-field">
+                        <input type="submit" value="Verify" name="signUp">
+                        <p class="success verification"><?php $signInErrors['verification'] ?></p>
+                        <p class="error verification"><?php $signInErrors['verification'] ?></p>
+
+                    </div>
+                </form>
+                <div class="link">
+                    <span>Resend Code?</span>
+                    <a href="signup.php" class="heading3">Sign up here</a>
+                </div>
+            </div>
+        </main>
+    </body>
+
 </html>
