@@ -7,25 +7,27 @@ require 'composer\vendor\autoload.php';
 require 'backend\static-files\php\functions.inc.php';
 require 'backend\static-files\php\form-handlers.php';
 
-$userInput = array('email' => null, 'password' => null, 'verification code' => null);
-$signInErrors = array('email' => null, 'password' => null, 'signIn' => null, 'verification' => null);
-$signInSuccess = array('email' => null, 'password' => null, 'signIn' => null, 'verification' => null);
+session_start();
 
-//Use php mailer
+$userInput = array('email' => null);
+$signInErrors = array('email' => null, 'signIn' => null, 'verification' => null);
+$signInSuccess = array('email' => null, 'signIn' => null, 'verification' => null);
+$verificationCode = null;
 
 if (isset($_POST['signUp'])) {
     $userInput['email'] = trim($_POST['email']);
-    $userInput['password'] = trim($_POST['password']);
-
     //check empty input
     //if email is not empty
     if (checkEmpty($userInput['email']) == false) {
         //check email format
-        //if email is valid
+        //if email is valid - has to be @go.minnstate.edu
         if (checkEmail($userInput['email']) == true) {
             $signInSuccess['email'] = 'Valid Email';
             $signInSuccess['signIn'] = 'Signing you in...';
-        } elseif (checkEmail($userInput['email']) == false) {
+
+        } 
+        //if email is not valid
+        elseif (checkEmail($userInput['email']) == false) {
             $signInErrors['email'] = 'Invalid Email';
             $signInErrors['signIn'] = 'Sign In failed';
         }
@@ -37,14 +39,46 @@ if (isset($_POST['signUp'])) {
         $signInErrors['signIn'] = 'Sign In failed';
     }
 
-    //if the email is valid and no errors
-    if ($signInErrors['signIn'] == null) {
-        //create activation code    
-        
-        //
+    //if there are no sign in errors
+    if($signInSuccess['signIn'] != null && $signInErrors['signIn'] == null)
+    {
+        echo "Sign in success";
+        //check if this email exists in participant
+        $rowFound = getParticipantCount($userInput['email']) . 'rows found.';
+        //create activation code
+        $verificationCode = createVerificationCode();
+        echo $verificationCode;
+            //if no
+            if($rowFound == 0)
+            {
+                //add this participant and activation codeto the db \
+                insertToParticipant($userInput['email']);       
+            }
+
+            //if yes
+            else if($rowFound == 1)
+            {
+                //update the activation code of this participant in db
+                
+            }
+
+            //send activation code to the participant's email using php mailer
+
+    }
+
+    //if there are sign in errors
+    else
+    {
+        //direct back to login.php
+        // header( "refresh:1;url=login.php");
+
     }
 }
 
+echo $signInErrors['email'];
+echo $signInSuccess['email'];
+echo $signInErrors['signIn'];
+echo $signInErrors['signIn'];
 ?>
 
 <!DOCTYPE html>
@@ -53,9 +87,56 @@ if (isset($_POST['signUp'])) {
 <head>
     <title>Login</title>
     <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/login.css">
+
     <script src="scripts/header-template.js"></script>
     <style>
+        <?php
 
+        //To show fname Error Message
+        if ($signInErrors['email'] != null) {
+        ?>.email-error {
+            display: block;
+        }
+        <?php
+        }
+
+        else if($signInSuccess['email'] != null)
+        {
+            ?>
+            .email-success
+            {
+                display: block;
+                /* border-color: green; */
+            }
+
+            <?php
+        }
+
+        if($signInErrors['signIn'] != null)
+        {
+            ?>
+            .signIn-error
+            {
+                display: block;
+                text-align: center;
+            }
+
+            <?php
+        }
+
+        else if($signInSuccess['signIn'] != null)
+        {
+            ?>
+            .signIn-success
+            {
+                display: block;
+                text-align: center;
+            }
+
+            <?php
+        }
+        ?>
     </style>
 
     <head>
@@ -64,56 +145,25 @@ if (isset($_POST['signUp'])) {
         <main>
             <div class="form-container" id="registration">
                 <div class="form-title">
-                    <h3>Please Sign in here</h3>
+                    <h3>Log in with StarID@Winona.edu</h3>
                 </div>
-                <form action="includes/login.inc.php" method="post">
+                <form action="" method="post">
                     <div class="form-field">
                         <label for="email" class="form-label">WSU email:</label>
-                        <input type="text" name="email" class="form-input" required></input>
-                        <p class="success email"><?php echo $signInSuccess['email'] ?></p>
-                        <p class="error email"><?php echo $signInErrors['email'] ?></p>
+                        <input type="text" name="email" class="form-input"></input>
+                        <p class="success email-success"><?php echo $signInSuccess['email'] ?></p>
+                        <p class="error email-error"><?php echo $signInErrors['email'] ?></p>
                     </div>
                     <div class="form-field">
                         <input type="submit" value="Login" name="signUp">
-                        <p class="success signIn"><?php $signInErrors['signIn'] ?></p>
-                        <p class="error signIn"><?php $signInErrors['signIn'] ?></p>
+                        <p class="error signIn-error"><?php echo $signInErrors['signIn'] ?></p>
+                        <p class="success signIn-success"><?php echo $signInSuccess['signIn'] ?></p>
 
                     </div>
                 </form>
-                <!-- <div class="link">
-                        <span>Don't have an account yet?</span>
-                        <a href="signup.php" class="heading3">Sign up here</a>
-                    </div> -->
+
             </div>
 
-            <div class="form-container" id="verification">
-                <div class="form-title">
-                    <h3>Email Verification</h3>
-                </div>
-                <form action="includes/login.inc.php" method="post">
-                    <div class="form-field">
-                        <p class="text">
-                            Please enter the Verification code that has been sent to your WSU email.
-                        </p>
-                    </div>
-                    <div class="form-field">
-                        <label for="verificationCode" class="form-label">Enter Verification Code:</label>
-                        <input type="text" name="verificationCode" class="form-input" required></input>
-                        <p class="success verificationCode"><?php echo $signInSuccess['verification'] ?></p>
-                        <p class="error verificationCode"><?php echo $signInErrors['verification'] ?></p>
-                    </div>
-                    <div class="form-field">
-                        <input type="submit" value="Verify" name="signUp">
-                        <p class="success verification"><?php $signInErrors['verification'] ?></p>
-                        <p class="error verification"><?php $signInErrors['verification'] ?></p>
-
-                    </div>
-                </form>
-                <div class="link">
-                    <span>Resend Code?</span>
-                    <a href="signup.php" class="heading3">Sign up here</a>
-                </div>
-            </div>
         </main>
     </body>
 

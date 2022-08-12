@@ -40,9 +40,11 @@ function verifyPassword($userpassword, $hashedpassword)
     return $result;
 }
 
-//check Email Format
+//check Email Format - it has to be starid@go.winona.edu
+//use regex or other filter_var or use arrays and use explode
 function checkEmail($email)
 {
+
     $result = "";
     if(!filter_var($email, FILTER_VALIDATE_EMAIL))
     {

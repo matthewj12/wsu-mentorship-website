@@ -3,7 +3,7 @@
 function connect() {
 	$serverName = "localhost";
 	$dbUsername = "root";
-	$dbPassword = "";
+	$dbPassword = "Sql783knui1-1l;/klaa-9";
 	$dbName = "mp";
 
 	try {
@@ -193,4 +193,63 @@ function readRefTbl($assocTblName){
 	catch(PDOException $e) {
 		echo $e->getMessage();        
 	}
+}
+
+function insertToParticipant($values)
+{
+	$sql = "INSERT INTO `participant` values (?)";
+	try
+	{
+		$stmt = connect()->prepare($sql);
+		$stmt->execute([$values]);
+		$result = "Data Addition successful";
+        echo $result;
+
+	}
+	catch(PDOException $e)
+	{
+		echo $stmt. $e->getMessage();
+	}
+
+
+}
+
+function getParticipant($values)
+{
+	$sql = "SELECT FROM `participant` WHERE `email` = ?";
+    try {
+        // $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
+        $stmt = connect()->prepare($sql);
+        $stmt->execute($values);
+        $result = $stmt->fetchAll();
+        return $result;
+    } catch (PDOException $e) {
+        // echo $stmt . $e->getMessage();
+        return $e->getMessage();
+    }
+	// $sql = "SELECT * from `drink menus` WHERE `main category` = '$category'";
+
+
+}
+
+function getParticipantCount($values)
+{
+	$sql = "SELECT COUNT(*) FROM `participant` WHERE `email` = ?";
+    try {
+        // $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
+        $stmt = connect()->prepare($sql);
+        $stmt->execute([$values]);
+        $result = $stmt->fetchColumn();
+        return $result;
+    } catch (PDOException $e) {
+        // echo $stmt . $e->getMessage();
+        return $e->getMessage();
+    }
+	// $sql = "SELECT * from `drink menus` WHERE `main category` = '$category'";
+}
+
+function createVerificationCode()
+{
+	$verificationCode = rand();
+	return $verificationCode;
 }

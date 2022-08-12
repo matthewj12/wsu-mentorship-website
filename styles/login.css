@@ -1,4 +1,4 @@
-.form-container {
+/* .form-container {
 	position: absolute;
 	left: 50vw;
 	top: 50vh;
@@ -7,4 +7,20 @@
 
 .login {
 	margin: 50px;
+} */
+
+.error{
+	color: #af4242;
+	/* background-color: #fde8ec; */
+	padding: 10px;
+	display: none;
+	/* margin-bottom: 10px; */
+	font-size: 14px;
+}
+.success{
+	color: green;
+		/* margin-bottom: 30px; */
+	padding: 10px;
+	display: none;
+	/* margin-left: 20px; */
 }
