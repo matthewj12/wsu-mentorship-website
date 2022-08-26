@@ -197,18 +197,18 @@ function readRefTbl($assocTblName){
 
 function insertToParticipant($values)
 {
-	$sql = "INSERT INTO `participant` values (?)";
+	$sql = "INSERT INTO `participant`(`email`) values (?)";
 	try
 	{
 		$stmt = connect()->prepare($sql);
-		$stmt->execute([$values]);
+		$stmt->execute(array($values));
 		$result = "Data Addition successful";
         echo $result;
 
 	}
 	catch(PDOException $e)
 	{
-		echo $stmt. $e->getMessage();
+		echo $e->getMessage();
 	}
 
 
@@ -246,6 +246,23 @@ function getParticipantCount($values)
         return $e->getMessage();
     }
 	// $sql = "SELECT * from `drink menus` WHERE `main category` = '$category'";
+}
+
+function updateParticipant($values)
+{
+	$sql = "UPDATE `participant` SET `verification code` = ? WHERE `email` = ? ";
+	try
+	{
+		$stmt = connect()->prepare($sql);
+		$stmt->execute($values);
+		$result = "Data Updatesuccessful";
+        echo $result;
+
+	}
+	catch(PDOException $e)
+	{
+		echo $e->getMessage();
+	}
 }
 
 function createVerificationCode()

@@ -13,6 +13,7 @@ CREATE TABLE `participant` (
 
 INSERT INTO `participant`(`email`) values ('11111111@go.minnstate.edu');
 INSERT INTO `participant`(`email`) values ('ei@gmail.com');
+UPDATE `participant` SET `verification code` = '123435678' WHERE `email` = 'ei@gmail.com';
 
 select * from `participant`;
 
