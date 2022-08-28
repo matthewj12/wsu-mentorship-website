@@ -216,7 +216,7 @@ function insertToParticipant($values)
 
 function getParticipant($values)
 {
-	$sql = "SELECT FROM `participant` WHERE `email` = ?";
+	$sql = "SELECT * FROM `participant` WHERE `email` = ?";
     try {
         // $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
         $stmt = connect()->prepare($sql);
