@@ -6,15 +6,21 @@
 	<script src="scripts/header-template.js"></script>
 <head>
 <body>
-	<button class="survey-btn" type="submit" name="survey_btn">
+	<button class="survey-btn" type="submit" name="survey-btn">
 		<a href="survey.php">
 			Start Survey
 		</a>
 	</button>
 
-	<button class="login-btn" type="submit" name="login_btn">
+	<button class="login-btn" type="submit" name="login-btn">
 		<a href="login.php">
 			Login
+		</a>
+	</button>
+
+	<button class="admin-dashboard-btn" type="submit" name="admin-dashboard-btn">
+		<a href="admin-dashboard.php">
+			Admin Dashboard
 		</a>
 	</button>
 </body>

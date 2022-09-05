@@ -4,9 +4,9 @@ CREATE TABLE `participant` (
 	`first name`                       varchar(50)  NOT NULL,
 	`last name`                        varchar(50)  NOT NULL,
 	`starid`                           char(8)      NOT NULL,
+	`graduation date`                  date         NOT NULL,
 	`is active`                        boolean      NOT NULL,
 	`is mentor`                        boolean      NOT NULL,
-	`is residually matchable`          boolean      NOT NULL,
 	`international student`            boolean      default false,
 	`lgbtq+`                           boolean      default false,
 	`student athlete`                  boolean      default false,
@@ -24,10 +24,12 @@ CREATE TABLE `participant` (
 
 DROP TABLE IF EXISTS `mentorship`;
 CREATE TABLE `mentorship` (
-	`mentor starid`  char(8),
-	`mentee starid`  char(8),
-	`start date`    datetime,
-	`end date`      datetime,
+	`mentor starid`     char(8),
+	`mentee starid`     char(8),
+	`start date`        date,
+	`end date`          date,
+	`is extendable`     boolean,
+	`earlier grad date` date,
 
 	PRIMARY KEY(`mentor starid`, `mentee starid`),
 

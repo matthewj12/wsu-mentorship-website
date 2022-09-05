@@ -1,6 +1,5 @@
 <?php
 
-
 class Option {
 	public string $label;
 	public string $value;
@@ -27,9 +26,11 @@ class SurveyItem {
 			$colName .= ' id';
 		}
 
-		$this->colName = str_replace(' ', '-', $colName);
+		// $this->tblName = str_replace(' ', '-', $this->tblName);
+		// $this->colName = str_replace(' ', '-', $colName);
+		$this->colName = $colName;
 
-		$this->desc    = $desc;
+		$this->desc = $desc;
 
 		if ($type == 'radio') {
 			$this->options = $options;
@@ -41,11 +42,12 @@ class SurveyItem {
 		$html = "<div class = \"survey-item$extraClass\">";
 
 		$tblNameHyph = str_replace(' ', '-', $this->tblName);
-		$nameVal = "$tblNameHyph.$this->colName";
+		$colNameHyph = str_replace(' ', '-', $this->colName);
+		$nameVal = "$tblNameHyph.$colNameHyph";
 
-		$id = "id=\"$this->tblName.$this->colName.label\"";
+		$labelId = "id=\"$tblNameHyph.$colNameHyph.label\"";
 
-		$html .= "<label $id class = \"survey-item-label\">\n";
+		$html .= "<label $labelId class=\"survey-item-label\">\n";
 		$html .= "\t$this->desc\n";
 		$html .= "</label>\n";
 
@@ -161,5 +163,39 @@ class SurveyItem {
 		$html .= "</div>\n";
 		$html .= "\n";
 		echo $html;
+	}
+}
+
+class Participant {
+	public $participantCols;
+	public $assocTblDistinct;
+	public $dataPoints = [];
+
+	public function __construct($starid) {
+		$this->participantCols = getParticipantFields();
+		$this->assocTblDistinct = [
+			'gender',
+			'hobby',
+			'major',
+			'pre program',
+			'race',
+			'religious affiliation',
+			'second language',
+			'important quality',
+			'max matches',
+			'preferred gender',
+			'preferred hobby',
+			'preferred major',
+			'preferred pre program',
+			'preferred race',
+			'preferred religious affiliation',
+			'preferred second language'
+		];
+		
+		$this->dataPoints['starid'] = [$starid];
+
+		$allCols = array_merge($this->participantCols, $this->assocTblDistinct);
+
+		$this->dataPoints = getParticipantInfo($this->dataPoints['starid'][0], $allCols);
 	}
 }

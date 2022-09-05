@@ -6,30 +6,30 @@ import miscfuncs, os, globvars
 
 backend = os.getcwd() + '\\backend'
 
-mockaroo_base_url = "https://api.mockaroo.com/api/"
+mockaroo_base_url = 'https://api.mockaroo.com/api/'
+mockaroo_key = '1d04b730'
 distinct_part_of_urls = {
-	'participant' : 'b7266940?count=6',
+	'participant' : 'b7266940',
 	
-	'gender'                : '7024c370?count=6',
-	'hobby'                 : '4ba241f0?count=24',
-	'major'                 : 'ca372f90?count=9',
-	'pre-program'           : '92987040?count=4',
-	'race'                  : 'e78c2170?count=6',
-	'religious-affiliation' : '9be133f0?count=6',
-	'second-language'       : '6b95d550?count=4',
+	'gender'                : '7024c370',
+	'hobby'                 : '4ba241f0',
+	'major'                 : '3735e520',
+	'pre-program'           : '92987040',
+	'race'                  : 'e78c2170',
+	'religious-affiliation' : '9be133f0',
+	'second-language'       : '6b95d550',
 
-	'important-quality' : '2157a8c0?count=18',
-	'max-matches'       : '7d771050?count=6',
+	'important-quality' : '2157a8c0',
+	'max-matches'       : '7d771050',
 
-	'preferred-gender'                : 'c0420be0?count=12',
-	'preferred-hobby'                 : 'eae20460?count=4',
-	'preferred-major'                 : '3735e520?count=18',
-	'preferred-pre-program'           : '6dda7f50?count=4',
-	'preferred-race'                  : '77ea45e0?count=12',
-	'preferred-religious-affiliation' : '2fb733b0?count=12',
-	'preferred-second-language'       : '4d7ce400?count=8'
+	'preferred-gender'                : 'c0420be0',
+	'preferred-hobby'                 : 'eae20460',
+	'preferred-major'                 : '3735e520',
+	'preferred-pre-program'           : '6dda7f50',
+	'preferred-race'                  : '77ea45e0',
+	'preferred-religious-affiliation' : '2fb733b0',
+	'preferred-second-language'       : '4d7ce400'
 }
-mockaroo_key = "1d04b730"
 
 def ensureFolderExists(folder):
 	if not os.path.exists(folder):
@@ -49,7 +49,7 @@ def genSampleDataCurlRequestsFile(generate_file, execute_file):
 		for distinct in distinct_part_of_urls.keys():
 			suffix = '-assoc-tbl' if distinct != 'participant' else ''
 
-			curl = 'curl -s "{}{}&key={}" > "{}{}.csv"\n'.format(
+			curl = 'curl -s "{}{}?key={}" > "{}{}.csv"\n'.format(
 				mockaroo_base_url, distinct_part_of_urls[distinct], mockaroo_key,
 				distinct, suffix
 			)
