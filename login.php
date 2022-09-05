@@ -46,22 +46,25 @@ if (isset($_POST['signUp'])) {
         //check if this email exists in participant
         $rowFound = getParticipantCount($email);
         $verificationCode = createVerificationCode();
-        echo $verificationCode;
+        echo "Verification code: ".  $verificationCode;
+        echo "<br>";
 
         //if no
         if ($rowFound == 0) {
-            echo "row found 0";
+            echo "new participant";
             //add this participant and activation codeto the db \
-            echo insertToParticipant($email);
-            echo updateParticipant(array($verificationCode, $email));
+            echo "Insertion : " . insertToParticipant($email);
+            echo "Update :" . updateParticipant(array($verificationCode, $email));
+            echo "<br>";
 
         }
 
         //if yes
         else if ($rowFound == 1) {
-
+            echo "signed up already";
             //update the activation code of this participant in db
-            echo updateParticipant(array($verificationCode, $email));
+            echo "Update: ". updateParticipant(array($verificationCode, $email));
+            echo "<br>";
         }
 
         else
@@ -144,7 +147,7 @@ echo $signInErrors['signIn'];
                 <form action="" method="post">
                     <div class="form-field">
                         <label for="email" class="form-label">WSU email:</label>
-                        <input type="text" name="email" class="form-input" value=<?php echo $email ?>>
+                        <input type="text" name="email" class="form-input" value=<?php echo $email?>>
                         <p class="success email-success"><?php echo $signInSuccess['email'] ?></p>
                         <p class="error email-error"><?php echo $signInErrors['email'] ?></p>
                     </div>

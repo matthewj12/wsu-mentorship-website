@@ -17,12 +17,6 @@ if (isset($_POST['verify'])) {
         $verifyError['verificationCode'] = "Verification Code Should not be blank";
         $verifyError['verifyAttempt'] = "Verification failed";
     } else if (checkEmpty($verificationCode) == false) {
-        // if (checkCode($verificationCode) == false) {
-        //     $verifyError['verificationCode'] = "Wrong Verification Code";
-        // } else if (checkCode($verificationCode) == true) {
-        //     $verifySuccess['verificationCode'] = "Valid Verification Code";
-        //     $verifySuccess['verifyAttempt'] = "Forms are all validated...";
-        // }
         $verifySuccess['verificationCode'] = "Valid Verification Code";
         $verifySuccess['verifyAttempt'] = "Forms are all validated...";
     }
@@ -37,11 +31,12 @@ if (isset($_POST['verify'])) {
         var_dump($rowFound);
 
         if (count($rowFound) == 1) {
-            // $rowFound = getParticipant(array($_SESSION['email'], $verificationCode));
-            // var_dump($rowFound);
             if ($rowFound[0]['verification code'] == $verificationCode) {
+                $_SESSION["verification code"] = $verificationCode;
                 $verifySuccess['verifyAttempt'] = "Verification Successful";
                 $_SESSION['logged in'] = true;
+                $otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
+                echo json_encode($otpDetails);
                 header("refresh:3;homepage.php");
             } else if ($rowFound[0]['verification code'] != $verificationCode) {
                 header("location:emailVerify.php?error=wrongVerificationCode");
@@ -65,8 +60,38 @@ if (isset($_POST['verify'])) {
     <title>Login</title>
     <link rel="stylesheet" href="styles/common.css">
     <link rel="stylesheet" href="styles/login.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script src="scripts/header-template.js"></script>
+    <script>
+        function unsetOTP() {
+            $.ajax({
+                url: 'unsetOTP.php',
+                type: 'post',
+                success: function(response) {
+                    // // Perform operation on the return value
+                    $("#verifySignIn").html(
+                        "Verification code expired."
+                    )
+                    // window.location.replace("Old link in the previous browser")
+                    // $('#test').prop('disabled', true);
+                    console.log(response);
+                }
+            });
+        }
+
+        function directToLogin()
+        {
+            window.location.href = 'login.php';
+        }
+
+        $(document).ready(function() {
+            setTimeout(unsetOTP, 12000);
+        });
+
+    </script>
+
     <style>
         <?php
 
@@ -108,12 +133,11 @@ if (isset($_POST['verify'])) {
 
     <body>
 
-
         <div class="form-container" id="verification">
             <div class="form-title">
                 <h3>Email Verification</h3>
             </div>
-            <form action="" method="post">
+            <form action="" method="post" id="verifySignIn">
                 <div class="form-field">
                     <p class="text">
                         Please enter the Verification code that has been sent to your WSU email.
@@ -129,15 +153,17 @@ if (isset($_POST['verify'])) {
                     <input type="submit" value="Verify" name="verify">
                     <p class="success verify-success"><?php $verifySuccess['verifyAttempt'] ?></p>
                     <p class="error verify-error"><?php $verifyError['verifyAttempt'] ?></p>
-
                 </div>
             </form>
             <div class="link">
-                <span>Resend Code?</span>
+                <button id="resend" onclick="directToLogin()">Login again to Resend Code?</button>
+                <!-- <span class="heading3"><a href = "login.php">Resend Code?</a></span> -->
                 <a href="signup.php" class="heading3">Sign up here</a>
             </div>
         </div>
         </main>
+
+
     </body>
 
 </html>

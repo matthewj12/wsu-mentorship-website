@@ -255,7 +255,7 @@ function updateParticipant($values)
 	{
 		$stmt = connect()->prepare($sql);
 		$stmt->execute($values);
-		$result = "Data Updatesuccessful";
+		$result = "Data Update successful";
         echo $result;
 
 	}

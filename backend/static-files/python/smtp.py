@@ -13,7 +13,7 @@ verification_code = sys.argv[2]
 print(recver_email_addr)
 # recver_email_addr = 'eimyatnoeaung98@gmail.com'
 
-email_body_content = '\n\nEnter this verification code: ' + verification_code + '\n\n'
+email_body_content = '\n\nEnter this verification code: ' + verification_code + '\n\nnext 5 minutes to finish confirming your email.'
 
 def main():
 	# Standard SMTP port
