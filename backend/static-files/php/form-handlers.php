@@ -19,26 +19,6 @@ function checkEmpty($attribute)
     return $result;
 }
 
-//password hash
-
-
-
-//password verify
-function verifyPassword($userpassword, $hashedpassword)
-{
-    if(password_verify($userpassword, $hashedpassword))
-    {
-        $result = true;
-        
-    }
-
-    else
-    {
-        $result = false;
-    }
-
-    return $result;
-}
 
 //check Email Format - it has to be starid@go.winona.edu
 //use regex or other filter_var or use arrays and use explode
@@ -81,21 +61,5 @@ function checkvalidString($string)
     return $result;
 }
 
-function checkPhone($phNumber)
-{
-    $result = "";
-    if(!preg_match('/^[0-9_]*$/',$phNumber))
-    {
-
-        $result = false;
-    }
-
-    else
-    {
-        $result = true;
-    }
-
-    return $result;
-}
 
 

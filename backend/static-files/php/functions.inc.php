@@ -267,6 +267,6 @@ function updateParticipant($values)
 
 function createVerificationCode()
 {
-	$verificationCode = rand();
+	$verificationCode = rand(100000,999999);;
 	return $verificationCode;
 }

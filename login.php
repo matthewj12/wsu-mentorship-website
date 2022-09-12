@@ -1,9 +1,5 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
 require 'composer\vendor\autoload.php';
 require 'backend\static-files\php\functions.inc.php';
 require 'backend\static-files\php\form-handlers.php';
@@ -22,19 +18,19 @@ if (isset($_POST['signUp'])) {
     if (checkEmpty($email) == false) {
         //check email format
         //if email is valid - has to be @go.minnstate.edu
-        if (checkEmail($email) == true) {
+        if (checkEmail($email)) {
             $signInSuccess['email'] = 'Valid Email';
             $signInSuccess['signIn'] = 'Form fields are validated';
         }
         //if email is not valid
-        elseif (checkEmail($email) == false) {
+        elseif (checkEmail($email)) {
             $signInErrors['email'] = 'Invalid Email';
             $signInErrors['signIn'] = 'Sign In failed';
         }
     }
 
     //if email is empty
-    elseif (checkEmpty($email) == true) {
+    elseif (checkEmpty($email)) {
         $signInErrors['email'] = 'Email should not be blank.';
         $signInErrors['signIn'] = 'Sign In failed';
     }
@@ -84,10 +80,6 @@ if (isset($_POST['signUp'])) {
     }
 }
 
-echo $signInErrors['email'];
-echo $signInSuccess['email'];
-echo $signInErrors['signIn'];
-echo $signInErrors['signIn'];
 ?>
 
 <!DOCTYPE html>
@@ -97,11 +89,11 @@ echo $signInErrors['signIn'];
     <title>Login</title>
     <link rel="stylesheet" href="styles/common.css">
     <link rel="stylesheet" href="styles/login.css">
-
     <script src="scripts/header-template.js"></script>
     <style>
+        
         <?php
-
+        //Error Handlers
         //To show fname Error Message
         if ($signInErrors['email'] != null) {
         ?>.email-error {
@@ -155,7 +147,6 @@ echo $signInErrors['signIn'];
                         <input type="submit" value="Login" name="signUp">
                         <p class="error signIn-error"><?php echo $signInErrors['signIn'] ?></p>
                         <p class="success signIn-success"><?php echo $signInSuccess['signIn'] ?></p>
-
                     </div>
                 </form>
 

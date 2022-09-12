@@ -14,7 +14,6 @@ template.innerHTML = `
 
     <script src="index.js"></script>
 
-
 `;
 
 document.head.appendChild(template.content);
