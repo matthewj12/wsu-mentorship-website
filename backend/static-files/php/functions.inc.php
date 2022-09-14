@@ -3,7 +3,7 @@
 function connect() {
 	$serverName = "localhost";
 	$dbUsername = "root";
-	$dbPassword = "Sql783knui1-1l;/klaa-9";
+	$dbPassword = "";
 	$dbName = "mp";
 
 	try {
@@ -101,7 +101,7 @@ function doInsert($tblName, $colsAndVals) {
 		$sqlQuery .= $colName . "`, `";
 	}
 
-	// remove final backtick + comman + space
+	// remove final backtick + comma + space
 	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 4);
 	$sqlQuery .= "`) VALUES (";
 
@@ -195,78 +195,64 @@ function readRefTbl($assocTblName){
 	}
 }
 
-function insertToParticipant($values)
+function insertToSignIn($values)
 {
-	$sql = "INSERT INTO `participant`(`email`) values (?)";
+	$sql = "INSERT INTO `sign in`(`email`) values (?)";
 	try
 	{
 		$stmt = connect()->prepare($sql);
 		$stmt->execute(array($values));
 		$result = "Data Addition successful";
-        echo $result;
+    // echo $result;
 
 	}
 	catch(PDOException $e)
 	{
 		echo $e->getMessage();
 	}
-
-
 }
 
-function getParticipant($values)
-{
-	$sql = "SELECT * FROM `participant` WHERE `email` = ?";
-    try {
-        // $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
-        $stmt = connect()->prepare($sql);
-        $stmt->execute($values);
-        $result = $stmt->fetchAll();
-        return $result;
-    } catch (PDOException $e) {
-        // echo $stmt . $e->getMessage();
-        return $e->getMessage();
-    }
-	// $sql = "SELECT * from `drink menus` WHERE `main category` = '$category'";
+function getSignIn($values) {
+	$sql = "SELECT * FROM `sign in` WHERE `email` = ?";
 
-
+	try {
+			// $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
+			$stmt = connect()->prepare($sql);
+			$stmt->execute($values);
+			$result = $stmt->fetchAll();
+			return $result;
+	}
+	catch (PDOException $e) {
+			return $e->getMessage();
+	}
 }
 
-function getParticipantCount($values)
-{
-	$sql = "SELECT COUNT(*) FROM `participant` WHERE `email` = ?";
-    try {
-        // $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
-        $stmt = connect()->prepare($sql);
-        $stmt->execute([$values]);
-        $result = $stmt->fetchColumn();
-        return $result;
-    } catch (PDOException $e) {
-        // echo $stmt . $e->getMessage();
-        return $e->getMessage();
-    }
-	// $sql = "SELECT * from `drink menus` WHERE `main category` = '$category'";
+function getSignInCount($values) {
+	$sql = "SELECT COUNT(*) FROM `sign in` WHERE `email` = ?";
+	try {
+		// $sql = "SELECT * from members WHERE `email` = ? AND `password` = ?";
+		$stmt = connect()->prepare($sql);
+		$stmt->execute([$values]);
+		$result = $stmt->fetchColumn();
+		return $result;
+	}
+	catch (PDOException $e) {
+		return $e->getMessage();
+	}
 }
 
-function updateParticipant($values)
-{
-	$sql = "UPDATE `participant` SET `verification code` = ? WHERE `email` = ? ";
-	try
-	{
+function updateSignIn($values) {
+	$sql = "UPDATE `sign in` SET `verification code` = ? WHERE `email` = ? ";
+	try {
 		$stmt = connect()->prepare($sql);
 		$stmt->execute($values);
-		$result = "Data Update successful";
-        echo $result;
-
 	}
-	catch(PDOException $e)
-	{
+	catch(PDOException $e) {
 		echo $e->getMessage();
 	}
 }
 
-function createVerificationCode()
-{
+function createVerificationCode() {
 	$verificationCode = rand(100000,999999);;
 	return $verificationCode;
 }

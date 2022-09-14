@@ -21,6 +21,15 @@ CREATE TABLE `participant` (
 	PRIMARY KEY (starid)
 );
 
+DROP TABLE IF EXISTS `sign in`;
+CREATE TABLE `sign in` (
+    `email` varchar(50) NOT NULL,
+--     `verified?` tinyint(1) default 0,
+    `verification code` varchar(255),
+    `last signed in at` timestamp default current_timestamp(),
+	PRIMARY KEY (`email`)
+);
+
 
 DROP TABLE IF EXISTS `mentorship`;
 CREATE TABLE `mentorship` (

@@ -14,39 +14,43 @@ if (isset($_POST['verify'])) {
 
     //form-handlers
     if (checkEmpty($verificationCode) == true) {
-        $verifyError['verificationCode'] = "Verification Code Should not be blank";
-        $verifyError['verifyAttempt'] = "Verification failed";
-    } else if (checkEmpty($verificationCode) == false) {
-        $verifySuccess['verificationCode'] = "Valid Verification Code";
-        $verifySuccess['verifyAttempt'] = "Forms are all validated...";
+			$verifyError['verificationCode'] = "Verification Code Should not be blank";
+			$verifyError['verifyAttempt'] = "Verification failed";
+    }
+		else if (checkEmpty($verificationCode) == false) {
+			$verifySuccess['verificationCode'] = "Valid Verification Code";
+			$verifySuccess['verifyAttempt'] = "Forms are all validated...";
     }
 
-    echo $verifyError['verifyAttempt'];
-    echo $verifySuccess['verifyAttempt'];
+    // echo $verifyError['verifyAttempt'];
+    // echo $verifySuccess['verifyAttempt'];
 
     if (($verifySuccess['verifyAttempt'] == 'Forms are all validated...') && ($verifyError['verifyAttempt'] == null)) {
-        //retrieve the login record
-        echo $_SESSION['email'];
-        $rowFound = getParticipant(array($_SESSION['email']));
-        var_dump($rowFound);
+			//retrieve the login record
+			// echo $_SESSION['email'];
+			$rowFound = getSignIn(array($_SESSION['email']));
+			var_dump($rowFound);
 
-        if (count($rowFound) == 1) {
-            if ($rowFound[0]['verification code'] == $verificationCode) {
-                $_SESSION["verification code"] = $verificationCode;
-                $verifySuccess['verifyAttempt'] = "Verification Successful";
-                $_SESSION['logged in'] = true;
-                $otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
-                echo json_encode($otpDetails);
-                header("refresh:3;homepage.php");
-            } else if ($rowFound[0]['verification code'] != $verificationCode) {
-                header("location:emailVerify.php?error=wrongVerificationCode");
-            }
-        } else if (count($rowFound) == 0) {
-            header("location:../login copy.php?error=notloggedIn");
-        }
-    } else {
-        echo "Nothing works";
-    }
+			if (count($rowFound) == 1) {
+				if ($rowFound[0]['verification code'] == $verificationCode) {
+					$_SESSION["verification code"] = $verificationCode;
+					$verifySuccess['verifyAttempt'] = "Verification Successful";
+					$_SESSION['logged in'] = true;
+					$otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
+					// echo json_encode($otpDetails);
+					header("refresh:3;home-page.php");
+				}
+				else if ($rowFound[0]['verification code'] != $verificationCode) {
+					header("location:email-verify.php?error=wrongVerificationCode");
+				}
+			}
+			else if (count($rowFound) == 0) {
+			header("location:../login copy.php?error=notloggedIn");
+			}
+	}
+	else {
+		echo "Nothing works";
+	}
 }
 
 
@@ -67,7 +71,7 @@ if (isset($_POST['verify'])) {
     <script>
         function unsetOTP() {
             $.ajax({
-                url: 'unsetOTP.php',
+                url: 'unset-otp.php',
                 type: 'post',
                 success: function(response) {
                     // // Perform operation on the return value
@@ -81,13 +85,8 @@ if (isset($_POST['verify'])) {
             });
         }
 
-        function directToLogin()
-        {
-            window.location.href = 'login.php';
-        }
-
         $(document).ready(function() {
-            setTimeout(unsetOTP, 12000);
+            setTimeout(unsetOTP, 120000);
         });
 
     </script>
@@ -130,9 +129,7 @@ if (isset($_POST['verify'])) {
     </style>
 
     <head>
-
     <body>
-
         <div class="form-container" id="verification">
             <div class="form-title">
                 <h3>Email Verification</h3>
@@ -146,8 +143,6 @@ if (isset($_POST['verify'])) {
                 <div class="form-field">
                     <label for="verificationCode" class="form-label">Enter Verification Code:</label>
                     <input type="text" name="verificationCode" class="form-input" required></input>
-                    <p class="success verificationCode-success"><?php echo $verifySuccess['verificationCode'] ?></p>
-                    <p class="error verificationCode-error"><?php echo $verifyError['verificationCode'] ?></p>
                 </div>
                 <div class="form-field">
                     <input type="submit" value="Verify" name="verify">
@@ -156,9 +151,8 @@ if (isset($_POST['verify'])) {
                 </div>
             </form>
             <div class="link">
-                <button id="resend" onclick="directToLogin()">Login again to Resend Code?</button>
-                <!-- <span class="heading3"><a href = "login.php">Resend Code?</a></span> -->
-                <a href="signup.php" class="heading3">Sign up here</a>
+              <span class="heading3"><a href = "login.php">Reenter Email</a></span>
+              <!-- <span class="heading3">Resend Code</span> -->
             </div>
         </div>
         </main>
