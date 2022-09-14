@@ -90,6 +90,7 @@ if (isset($_POST['signUp'])) {
     <link rel="stylesheet" href="styles/common.css">
     <link rel="stylesheet" href="styles/login.css">
     <script src="scripts/header-template.js"></script>
+    <script src="scripts/form-validation.js"></script>
     <style>
         
         <?php
@@ -136,15 +137,15 @@ if (isset($_POST['signUp'])) {
                 <div class="form-title">
                     <h3>Log in with StarID@Winona.edu</h3>
                 </div>
-                <form action="" method="post">
+                <form action="" method="post" id = "form">
                     <div class="form-field">
-                        <label for="email" class="form-label">WSU email:</label>
+                        <label for="email" class="form-label" id = "email">WSU email:</label>
                         <input type="text" name="email" class="form-input" value=<?php echo $email?>>
                         <p class="success email-success"><?php echo $signInSuccess['email'] ?></p>
                         <p class="error email-error"><?php echo $signInErrors['email'] ?></p>
                     </div>
                     <div class="form-field">
-                        <input type="submit" value="Login" name="signUp">
+                        <input type="submit" value="Login" name="signUp" id = "submit">
                         <p class="error signIn-error"><?php echo $signInErrors['signIn'] ?></p>
                         <p class="success signIn-success"><?php echo $signInSuccess['signIn'] ?></p>
                     </div>

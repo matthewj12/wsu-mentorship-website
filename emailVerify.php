@@ -37,7 +37,8 @@ if (isset($_POST['verify'])) {
                 $_SESSION['logged in'] = true;
                 $otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
                 echo json_encode($otpDetails);
-                header("refresh:3;homepage.php");
+                $_SESSION['logged in'] = true;
+                header("refresh:3;index.php");
             } else if ($rowFound[0]['verification code'] != $verificationCode) {
                 header("location:emailVerify.php?error=wrongVerificationCode");
             }
