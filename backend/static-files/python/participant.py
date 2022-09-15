@@ -23,19 +23,6 @@ class Participant():
 				self.data_points[col] = col_val
 
 
-	# for testing purposed
-	def debugConstructor(self, is_active, is_mentor, starid, max_matches, ranking):
-		self.data_points = {}
-
-		self.data_points['is mentor'] = is_mentor
-		self.data_points['starid'] = starid
-		self.data_points['is active'] = is_active
-		self.data_points['max matches'] = max_matches
-		self.ranking = ranking
-
-		self.next_proposal_index = 0
-
-
 	def printRanking(self, base_indent):
 		tabs = ''.join(['\t' for indent in range(base_indent)])
 		

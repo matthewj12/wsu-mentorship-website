@@ -1,7 +1,7 @@
 <?php
 
 try {
-	shell_exec('py backend/static-files/python/main.py');
+	echo shell_exec('py ../python/main.py');
 }
 catch (Exception $e) {
 	echo $e;

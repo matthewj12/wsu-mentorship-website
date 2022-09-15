@@ -86,7 +86,7 @@ if (isset($_POST['verify'])) {
         }
 
         $(document).ready(function() {
-            setTimeout(unsetOTP, 120000);
+            setTimeout(unsetOTP, 300000);
         });
 
     </script>
@@ -137,7 +137,7 @@ if (isset($_POST['verify'])) {
             <form action="" method="post" id="verifySignIn">
                 <div class="form-field">
                     <p class="text">
-                        Please enter the Verification code that has been sent to your WSU email.
+                        Please enter the Verification code that has been sent to your WSU email. The code will expire in five minutes.
                     </p>
                 </div>
                 <div class="form-field">

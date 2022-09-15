@@ -128,15 +128,20 @@ if (isset($_POST['signUp'])) {
         <main>
             <div class="form-container" id="registration">
                 <div class="form-title">
-                    <h3>Log in with StarID@Winona.edu</h3>
+                    <h3>Log in with your WSU email.</h3>
+										<br>
+                    <h4>Enter your <span style="font-style: monospace;">firstName.lastName</span>:</h4>
                 </div>
+								<br>
                 <form action="" method="post">
                     <div class="form-field">
-                        <label for="email" class="form-label">WSU email:</label>
-                        <input type="text" name="email" class="form-input" value=<?php echo $email?>>
+                        <!-- <label for="email" class="form-label">WSU email:</label> -->
+                        <input style="display: inline;" type="text" name="email" class="form-input" value=<?php echo $email?>>
+												<span style="font-family: monospace;">@go.winona.edu</span>
                         <p class="success email-success"><?php echo $signInSuccess['email'] ?></p>
                         <p class="error email-error"><?php echo $signInErrors['email'] ?></p>
                     </div>
+										<br>
                     <div class="form-field">
                         <input type="submit" value="Login" name="signUp">
                         <p class="error signIn-error"><?php echo $signInErrors['signIn'] ?></p>

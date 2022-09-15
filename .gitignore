@@ -1,4 +1,5 @@
 /backend/static-files/python/__pycache__
+*.png
 *test*
 *temp*
 *TODO*.txt
