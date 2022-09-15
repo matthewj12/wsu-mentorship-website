@@ -1,6 +1,9 @@
 <?php
+
+session_start();
 require_once('backend/static-files/php/functions.inc.php');
 require_once('backend/static-files/php/classes.inc.php');
+
 
 // Check if the user is logged in, if not then redirect him to landing paget
 if (!isset($_SESSION['logged in']) || $_SESSION['logged in'] != true) {

@@ -1,6 +1,6 @@
 <?php
 
-require 'backend\static-files\php\functions.inc.php';
+require 'functions.inc.php';
 
 session_start();
 
