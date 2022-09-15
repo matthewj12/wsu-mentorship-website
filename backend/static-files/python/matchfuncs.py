@@ -1,6 +1,6 @@
-import participant
+import participant, globvars
 import matching.games.hospital_resident
-import globvars
+import datetime
 
 
 # copies all rows from the participant-related SQL tables into Participant objects. The only table this currently doesn't include is `mentorship`
@@ -157,6 +157,21 @@ def createMatches(cursor, participants):
 	mentor_prefs = {p.data_points['starid'] : p.ranking for p in participants if 
 		int(p.data_points['is active']) and not alreadyPaired(cursor, p) and int(p.data_points['is mentor'])}
 
+	# print('before:')
+	# print(mentor_prefs)
+	# print(mentee_prefs)
+
+	# Remove entries corresponding to participants who aren't currently being considered for matching.
+	for mentor_key in mentor_prefs.keys():
+		mentor_prefs[mentor_key] = [r for r in mentor_prefs[mentor_key] if r in mentee_prefs.keys()]
+
+	for mentee_key in mentee_prefs.keys():
+		mentee_prefs[mentee_key] = [r for r in mentee_prefs[mentee_key] if r in mentor_prefs.keys()]
+
+	mentor_prefs = {key : val for key, val in mentor_prefs.items() if val != []}
+	mentee_prefs = {key : val for key, val in mentee_prefs.items() if val != []}
+
+	# print('after:')
 	# print(mentor_prefs)
 	# print(mentee_prefs)
 
@@ -397,16 +412,49 @@ def isTopRankerForMultipleUms(mentees_for_um_rankings, mentee_starid):
 	return count > 1
 
 
-def addMatchesToDatabase(cursor, matches):
+def addMatchesToDatabase(cursor, matches, start_date, end_date):
 	for match in matches:
+		is_extendable = False
+		earlier_grad_date	= None
+
+		mentor_is_active_query = "SELECT `is active` FROM `participant` WHERE `starid` = 'mentorStarid'";
+		mentee_is_active_query = "SELECT `is active` FROM `participant` WHERE `starid` = 'menteeStarid'";
+		
+		cursor.execute(mentor_is_active_query);
+		mentor_is_active = None
+		for tup in cursor:
+			mentor_is_active = int(tup[0]);
+
+		cursor.execute(mentee_is_active_query);
+		mentee_is_active = None
+		for tup in cursor:
+			mentee_is_active = int(tup[0]);
+
+		if mentor_is_active and mentee_is_active:
+			is_extendable = True
+
+		mentor_grad_date_query = f"SELECT `graduation date` FROM `participant` WHERE `starid` = '{match[0]}'";
+		mentee_grad_date_query = f"SELECT `graduation date` FROM `participant` WHERE `starid` = '{match[1]}'";
+
+		cursor.execute(mentor_grad_date_query)
+		mentor_grad_date = None
+		for tup in cursor:
+			mentor_grad_date = tup[0];
+
+		cursor.execute(mentee_grad_date_query)
+		mentee_grad_date = None
+		for tup in cursor:
+			mentee_grad_date = tup[0];
+
+		earlier_grad_date = min(mentor_grad_date, mentee_grad_date).strftime('%Y-%m-%d');
+
+		is_extendable = earlier_grad_date > end_date
+		
 		insert_str = (
 			'INSERT INTO mentorship'
-			'(`mentor starid`, `mentee starid`, `start date`, `end date`)'
+			'(`mentor starid`, `mentee starid`, `start date`, `end date`, `is extendable`, `earlier grad date`)'
 			' VALUES '
-			"('{}', '{}', '2022-09-01', '2023-05-01');"
-		).format(
-			match[0],
-			match[1]
+			f"('{match[0]}', '{match[1]}', '{start_date}', '{end_date}', '{int(is_extendable)}', '{earlier_grad_date}');"
 		)
 
 		cursor.execute(insert_str)

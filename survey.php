@@ -20,7 +20,7 @@ if (!isset($_SESSION['logged in']) || $_SESSION['logged in'] != true) {
 	<title>Survey</title>
 	<link rel="stylesheet" href="styles/survey.css">
 	<script src="scripts/header-template.js"></script>
-	<script src="scripts/functions.js"></script>
+	<script src="scripts/survey-functions.js"></script>
 </head>
 
 <body>
@@ -36,9 +36,10 @@ if (!isset($_SESSION['logged in']) || $_SESSION['logged in'] != true) {
 
 			$surveyItemGroups = [
 				'textbox' => [
-					['first name', 'First Name:'],
-					['last name',  'Last Name:'],
-					['starid',     'StarID:']
+					['first name',      'First Name:'],
+					['last name',       'Last Name:'],
+					['starid',          'StarID:'],
+					['graduation date', 'Graduation/leaving WSU date']
 				],
 				'radio' => [
 					[
@@ -50,11 +51,6 @@ if (!isset($_SESSION['logged in']) || $_SESSION['logged in'] != true) {
 						'is mentor',
 						'Are you a mentor or mentee?',
 						[new Option('Mentor', 1), new Option('Mentee', 0)]
-					],
-					[
-						'is residually matchable',
-						'Should we consider you for residual matches? In the case that we can\'t find you a mentor/mentee when the primary round of matching occurs, this will allow you to still be matched with mentor/mentee who sign up after the deadline.',
-						[new Option('Consider me for residual matches', 1), new Option('Don\'t consider me for residual matches', 0)]
 					]
 				],
 				'checkbox bool' => [
@@ -76,7 +72,7 @@ if (!isset($_SESSION['logged in']) || $_SESSION['logged in'] != true) {
 					['second language', 'Select any second language(s) that you speak.']
 				],
 				'dropdown' => [
-					['max matches',           'What is the maximum number of mentor/mentee you want to be matched with?'],
+					['max matches',           'What is the maximum number of mentors/mentees you want to be matched with?'],
 					['gender',                'Select your gender.'],
 					['religious affiliation', 'Select your religious affiliation.'],
 					['important quality 1',   'What is the first most important quality you value in a mentor/mentee?'],
