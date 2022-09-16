@@ -54,7 +54,6 @@ if (isset($_POST['verify'])) {
 }
 
 
-
 ?>
 
 <!DOCTYPE html>
