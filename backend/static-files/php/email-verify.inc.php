@@ -6,16 +6,17 @@ session_start();
 
 $email = $_SESSION['email'];
 $verificationCode = $rowFound = $otpDetails = null;
-$verificationCode = htmlspecialchars($_GET["verificationCode"]);
+$verificationCode = htmlspecialchars($_GET["verification"]);
+// $email = htmlspecialchars($_GET["email"]);
+
 
 //retrieve the login record
 echo 'Email:'. $_SESSION['email'];
-$rowFound = getParticipant(array($_SESSION['email']));
+$rowFound = getSignIn(array($_SESSION['email']));
 var_dump($rowFound);
 if (count($rowFound) == 1) {
     echo "User already found";
     if ($rowFound[0]['verification code'] == $verificationCode) {
-
         $_SESSION["verification code"] = $verificationCode;
         $_SESSION['logged in'] = true;
         $otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
@@ -29,7 +30,7 @@ if (count($rowFound) == 1) {
     }
 
 } else if (count($rowFound) == 0) {
-    echo "User not found";
+    echo "User not found. Log in a";
     header("location:login.php?error=notloggedIn");
 }
 

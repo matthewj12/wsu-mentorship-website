@@ -20,7 +20,7 @@ formElement.addEventListener("submit", function (e) {
   if (errorMessages === undefined || errorMessages.length == 0) {
     console.log("There is no errors!");
     setTimeout(function () {
-      window.location.href = "backend/static-files/php/emailVerify.inc.php?verificationCode=" + verificationElement.value;
+      window.location.href = "backend/static-files/php/email-verify.inc.php?verification="+ verificationElement.value;
     }, 5000);
   } else {
     console.log("There are errors!!!!!!!!!!1");

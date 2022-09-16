@@ -18,8 +18,8 @@ echo "<br>";
 if ($rowFound == 0) {
     echo "new participant";
     //add this participant and activation codeto the db \
-    echo "Insertion : " . insertToParticipant($email);
-    echo "Update :" . updateParticipant(array($verificationCode, $email));
+    echo "Insertion : " . insertToSignIn($email);
+    echo "Update :" . updateSignIn(array($verificationCode, $email));
     echo "<br>";
 }
 
@@ -27,7 +27,7 @@ if ($rowFound == 0) {
 else if ($rowFound == 1) {
     echo "signed up already";
     //update the activation code of this participant in db
-    echo "Update: " . updateParticipant(array($verificationCode, $email));
+    echo "Update: " . updateSignIn(array($verificationCode, $email));
     echo "<br>";
 } else {
     echo "Nothing works";
