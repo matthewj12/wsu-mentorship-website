@@ -7,11 +7,12 @@ session_start();
 $email = $_SESSION['email'];
 $verificationCode = $rowFound = $otpDetails = null;
 $verificationCode = htmlspecialchars($_GET["verification"]);
-// $email = htmlspecialchars($_GET["email"]);
 
-
+// echo "Verificaiton code passed:". $verificationCode;
 //retrieve the login record
-echo 'Email:'. $_SESSION['email'];
+// echo "<br>";
+// echo 'Email:'. $_SESSION['email'];
+// echo "<br>";
 $rowFound = getSignIn(array($_SESSION['email']));
 var_dump($rowFound);
 if (count($rowFound) == 1) {
@@ -19,19 +20,19 @@ if (count($rowFound) == 1) {
     if ($rowFound[0]['verification code'] == $verificationCode) {
         $_SESSION["verification code"] = $verificationCode;
         $_SESSION['logged in'] = true;
-        $otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
-        echo json_encode($otpDetails);
+        // $otpDetails = array("email" => $_SESSION["email"], "verification code" => $verificationCode);
+        // echo json_encode($otpDetails);
         $_SESSION['logged in'] = true;
-        echo "verfication code matches";
-        header("location:C:WSU-CoSE-Mentorship-Project/index.php?email=$email&loggedIn=true");
+        // echo "verfication code matches";
+        header("location:/WSU-CoSE-Mentorship-Project/index.php?success=signedIn");
+        // header("index.php?email=$email&loggedIn=true");
     } else if ($rowFound[0]['verification code'] != $verificationCode) {
-        echo "verification code does not match";
-        header("email-Verify.php?error=wrongVerificationCode");
+        // echo "verification code does not match";
+        header("location:/WSU-CoSE-Mentorship-Project/email-verify.php?error=wrongVerificationCode");
     }
 
-} else if (count($rowFound) == 0) {
-    echo "User not found. Log in a";
-    header("location:login.php?error=notloggedIn");
 }
-
-?>
+// } else if (count($rowFound) == 0) {
+//     echo "User not found. Log in a";
+//     header("location:login.php?error=notloggedIn");
+// }

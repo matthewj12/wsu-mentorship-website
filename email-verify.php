@@ -38,7 +38,7 @@
             // window.location.href = 'login.php';
         }
         $(document).ready(function() {
-            setTimeout(unsetOTP, 30000);
+            setTimeout(unsetOTP, 60000);
         });
     </script>
 </head>

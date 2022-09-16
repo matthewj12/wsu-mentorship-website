@@ -1,5 +1,5 @@
 var verificationElement = document.getElementById("code");
-var verificationCode = verificationElement.value;
+// var verificationCode = verificationElement.value;
 var formElement = document.getElementById("verifySignIn");
 let errorMessages = [];
 let successMessages = [];
@@ -14,13 +14,18 @@ window.onload = function () {
   }
 };
 
+
 formElement.addEventListener("submit", function (e) {
   // prevent the form from submitting
   e.preventDefault();
   if (errorMessages === undefined || errorMessages.length == 0) {
     console.log("There is no errors!");
+    var verificationCode = verificationElement.value;
+    console.log(verificationCode);
+    console.log(typeof(verificationCode));
+    // var codeHash = md5(verificationElement.value);
     setTimeout(function () {
-      window.location.href = "backend/static-files/php/email-verify.inc.php?verification="+ verificationElement.value;
+      window.location.href = "backend/static-files/php/email-verify.inc.php?verification="+ verificationCode;
     }, 5000);
   } else {
     console.log("There are errors!!!!!!!!!!1");

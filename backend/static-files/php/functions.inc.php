@@ -3,15 +3,15 @@
 require_once('classes.inc.php');
 
 function connect() {
-	$serverName = "localhost";
-	$dbUsername = "root";
-	$dbPassword = "";
-	$dbName = "mp";
-
 	// $serverName = "localhost";
 	// $dbUsername = "root";
-	// $dbPassword = "Sql783knui1-1l;/klaa-9";
+	// $dbPassword = "";
 	// $dbName = "mp";
+
+	$serverName = "localhost";
+	$dbUsername = "root";
+	$dbPassword = "Sql783knui1-1l;/klaa-9";
+	$dbName = "mp";
 
 	try {
 		$dsn = 'mysql:host='.$serverName.';dbname='.$dbName;
