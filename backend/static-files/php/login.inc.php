@@ -9,7 +9,7 @@ $email = htmlspecialchars($_GET["email"]);
 echo 'Email: ' . $email;
 
 //check if this email exists in participant
-$rowFound = getParticipantCount($email);
+$rowFound = getSignInCount($email);
 $verificationCode = createVerificationCode();
 echo "Verification code: " .  $verificationCode;
 echo "<br>";
