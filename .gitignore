@@ -1,8 +1,0 @@
-/backend/static-files/python/__pycache__
-*.png
-*test*
-*temp*
-*TODO*.txt
-# commit note
-*commit*.txt
-dynamically-generated-files
