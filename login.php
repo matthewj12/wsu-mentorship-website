@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 </style>
 
+<<<<<<< Updated upstream
 <body>
     <script>
         function hideAllStepsExcept(stepToShow) {
@@ -121,6 +122,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div id="admin-login-inputs">
             <!-- <label for="admin-email-addr-inp">Enter your full email address</label>
+=======
+	</script>
+
+		<!-- Enter admin code if admin or starid if participant -->
+		<form class="login" id="login-step-1" method="POST">
+			I am a: <br>
+			<input name="a" id="login-as-participant" value="participant" type="radio" checked>
+			<label for="login-as-participant">Participant</label>
+			<br>
+			<input name="a" id="login-as-admin" value="administrator" type="radio">
+			<label for="login-as-admin">Administrator</label>
+
+			<div id="participant-login-inputs">
+				<label for="participant-starid-inp">Enter your starid</label>
+				<input id="participant-starid-inp" type="text" name="participant-starid">
+			</div>
+
+
+			<div id="admin-login-inputs">
+				<!-- <label for="admin-email-addr-inp">Enter your full email address</label>
+>>>>>>> Stashed changes
 				<input type="text" name="admin-email-addr" id="admin-email-addr-inp"> -->
             <label for="admin-code-inp">Enter the 8-digit-long admin code you've been given, consisting of numbers and lowercase letters.</label>
             <br>
