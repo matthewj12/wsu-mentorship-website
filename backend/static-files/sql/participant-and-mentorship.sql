@@ -36,6 +36,9 @@ CREATE TABLE `mentorship` (
 	FOREIGN KEY(`mentee starid`) references participant(starid) on delete cascade
 );
 
+
+select * from `sign in`;
+
 DROP TABLE IF EXISTS `sign in`;
 CREATE TABLE `sign in` (
 	`email addr` varchar(50) NOT NULL,

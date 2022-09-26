@@ -24,3 +24,13 @@
 	display: none;
 	/* margin-left: 20px; */
 }
+
+#login-step-1
+{
+	display:block;
+}
+
+#login-step-2
+{
+    display: none;
+}

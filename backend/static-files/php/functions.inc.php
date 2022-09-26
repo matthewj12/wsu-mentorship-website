@@ -3,9 +3,14 @@
 require_once('classes.inc.php');
 
 function connect() {
+	// $serverName = "localhost";
+	// $dbUsername = "root";
+	// $dbPassword = "";
+	// $dbName = "mp";
+
 	$serverName = "localhost";
 	$dbUsername = "root";
-	$dbPassword = "";
+	$dbPassword = "Sql783knui1-1l;/klaa-9";
 	$dbName = "mp";
 
 	try {
@@ -551,7 +556,7 @@ function updateSignIn($verificationCode, $emailAddr) {
 }
 
 function isCorrectVerificationCode($enteredVerifyCode, $enteredAddr) {
-	echo 'iscorrect';
+	// echo 'iscorrect';
 	
 	$sql = "select count(*) from `sign in` where `email addr` = '$enteredAddr' and `verification code` = '$enteredVerifyCode';";
 
@@ -564,7 +569,7 @@ function isCorrectVerificationCode($enteredVerifyCode, $enteredAddr) {
 		return $res == '1';
 	}
 	catch(PDOException $e) {
-		echo '3';
+		// echo '3';
 		echo $e->getMessage();
 		return false;
 	}
