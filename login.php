@@ -10,7 +10,7 @@ $pd = $ps = $ac = $destAddr = $emailVerifyCode = null;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_SESSION['post-data'] = $_POST;
     $pd = $_SESSION['post-data'];
-    var_dump($_SESSION['post-data']);
+    // var_dump($_SESSION['post-data']);
 
     if (isset($pd['login-step-1-btn'])) {
         $ac = $pd['admin-code'];
@@ -78,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 </style>
 
-<<<<<<< Updated upstream
 <body>
     <script>
         function hideAllStepsExcept(stepToShow) {
@@ -122,27 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div id="admin-login-inputs">
             <!-- <label for="admin-email-addr-inp">Enter your full email address</label>
-=======
-	</script>
-
-		<!-- Enter admin code if admin or starid if participant -->
-		<form class="login" id="login-step-1" method="POST">
-			I am a: <br>
-			<input name="a" id="login-as-participant" value="participant" type="radio" checked>
-			<label for="login-as-participant">Participant</label>
-			<br>
-			<input name="a" id="login-as-admin" value="administrator" type="radio">
-			<label for="login-as-admin">Administrator</label>
-
-			<div id="participant-login-inputs">
-				<label for="participant-starid-inp">Enter your starid</label>
-				<input id="participant-starid-inp" type="text" name="participant-starid">
-			</div>
-
-
-			<div id="admin-login-inputs">
-				<!-- <label for="admin-email-addr-inp">Enter your full email address</label>
->>>>>>> Stashed changes
 				<input type="text" name="admin-email-addr" id="admin-email-addr-inp"> -->
             <label for="admin-code-inp">Enter the 8-digit-long admin code you've been given, consisting of numbers and lowercase letters.</label>
             <br>
@@ -201,10 +179,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 type: 'post',
                 success: function(response) {
 					$("#error-flag").html(
-                        "Verification code expired."
-                    )
+						"Verification code expired. Sign in again"
+					);
                     $("#login-step-1").css("display", "block");
-                    $("#login-step-2").css("display", "none")
+                    $("#login-step-2").css("display", "none");
                     console.log("OTP Unset");
                 }
             });
