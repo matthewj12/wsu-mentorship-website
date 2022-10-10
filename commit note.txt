@@ -1,0 +1,2 @@
+removed 'select * from `sign in`' from participant-and-mentorship.sql
+removed semicolon from dynfilegen.py

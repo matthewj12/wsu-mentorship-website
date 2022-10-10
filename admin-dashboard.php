@@ -1,7 +1,10 @@
 <?php
+
 	require_once('backend/static-files/php/functions.inc.php');
 
 	session_start();
+	
+	redirectIfNotLoggedIn('admin');
 
 	removeAllGraduatedParticipants();
 
@@ -28,7 +31,7 @@
 			$mentorStarid = $_POST['m-mentor-starid'];
 			$menteeStarid = $_POST['m-mentee-starid'];
 
-			echo shell_exec("py $basePath/create-matches-manual.py $startDate $endDate $mentorStarid $menteeStarid");
+			shell_exec("py $basePath/create-matches-manual.py $startDate $endDate $mentorStarid $menteeStarid");
 		}
 		else if (isset($_POST['create-matches-extend'])) {
 			$endDate   = date('Y-m-d', strtotime($_POST['e-end-date']));
@@ -42,7 +45,7 @@
 			$startDate = date('Y-m-d', strtotime($_POST['a-start-date']));
 			$endDate   = date('Y-m-d', strtotime($_POST['a-end-date']));
 
-			echo shell_exec("py $basePath/create-matches-auto.py $startDate $endDate");
+			shell_exec("py $basePath/create-matches-auto.py $startDate $endDate");
 		}
 
 		echo "</div>";
@@ -82,6 +85,12 @@
 ?>
 
 <div class="main-container">
+
+<div class="navbar">
+	 <span>
+		<a href="index.php">Home</a>
+	 </span>
+</div>
 
 <div id="top-left-container">
 	<div class="fb centering top-row-content-container">
@@ -261,7 +270,7 @@
 
 <div class="confirmation-dialogs">
 	<!-- manual match confirmation -->
-	<div hidden class="fb mc" id="mmc">
+	<div hidden class="mc" id="mmc">
 		<div class="mc-inner horz-centered-content">
 			<div class="mc-grid">
 				<p class="mc-desc">Manually add match via starids</p>
@@ -288,7 +297,7 @@
 	</div>
 
 	<!-- extend matches confirmation -->
-	<div hidden class="fb mc" id="emc">
+	<div hidden class="mc" id="emc">
 		<div class="mc-inner horz-centered-content">
 			<div class="mc-grid">
 				<p class="mc-desc">Extend an existing match where both participants are still at WSU after the end date</p>
@@ -314,7 +323,7 @@
 	</div>
 
 	<!-- automatic matches confirmation -->
-	<div hidden class="fb mc" id="amc">
+	<div hidden class="mc" id="amc">
 		<div class="mc-inner horz-centered-content">
 			<div class="mc-grid">
 				<p class="mc-desc">Automatically match as many available participants as possible according to the important qualities they selected.</p>
@@ -334,7 +343,7 @@
 	</div>
 
 	<!-- delete match confirmation -->
-	<div hidden class="fb dmc" id="dmc">
+	<div hidden class="dmc" id="dmc">
 		<div class="horz-centered-content">
 			<p>Select the participant to unmatch.</p>
 
@@ -342,9 +351,7 @@
 				<?php
 					$participants = getAllParticipantStarids();
 
-					foreach ($participants as $participant) {
-						$starid = $participant[0];
-
+					foreach ($participants as $starid) {
 						echo "<span class=\"dmc-match-set\" id=\"dmc-match-set-$starid\">";
 
 						$matches = getStaridsOfMatches($starid, getParticipantInfo($starid, ['is mentor'])['is mentor'][0]);
@@ -381,15 +388,24 @@
 	</div>
 </div>
 
-<!-- main container -->
+<!-- end of main container -->
 </div>
 
 <script>
 	setSelectedMatchMode("m");
-	setSelectedStarid('');
+	hideDeleteMatchesConfirmation();
+
+	setSelectedMatchMode("a");
+	hideDeleteMatchesConfirmation();
+
+	setSelectedMatchMode("m");
+	hideDeleteMatchesConfirmation();
+
+	setSelectedStarid('e');
 	setMentorsSelected(false);
 	updateButtonHighlighting("match-type-btn");
 	orderParticipantInfo();
+	hideAllParticipantInfoExceptSelected();
 </script>
 
 </body>

@@ -1,7 +1,14 @@
 <?php
 	require_once('backend/static-files/php/functions.inc.php');
 	require_once('backend/static-files/php/classes.inc.php');
+
 	session_start();
+
+	// redirectIfNotLoggedIn('participant');
+
+	if (!isset($_SESSION['participant-starid'])) {
+		$_SESSION['participant-starid'] = 'aaa';
+	}
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +19,11 @@
 	<script src="scripts/header-template.js"></script>
 	<script src="scripts/survey-functions.js"></script>
 </head>
-<body>
+<body>		
+	<div class="navbar">
+		<a href="index.php">Home</a>
+	</div>
+	
 	<div class="welcome-container">
 		<h1 class="welcome">
 			Welcome to the survey

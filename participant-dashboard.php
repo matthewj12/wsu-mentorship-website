@@ -1,47 +1,44 @@
 <?php
 
-require 'backend\static-files\php\functions.inc.php';
+	require_once('backend/static-files/php/functions.inc.php');
 
-session_start();
+	session_start();
 
-print_r($_SESSION);
+	redirectIfNotLoggedIn('participant');
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+	<script src="scripts/header-template.js"></script>
 </head>
 <body>
-    <h1>Participant Dashboard</h1>
-		<br>
-		<br>
-    <?php
-			if (isset($_SESSION['participant-logged-in'])) {
-				$sqlQuery = "SELECT COUNT(*) as 'rows' FROM `participant` WHERE `starid` = '" . $_SESSION['participant-dashboard'] . "';";
-				$stmt = connect()->prepare($sqlQuery);
-				$stmt->execute();
-				$res = $stmt->fetchAll()[0]['rows'];
+	<div class="navbar">
+		<a href="index.php">Home</a>
+	</div>
+	
+		<h1>Participant Dashboard</h1>
 
-				echo "<br>";
+		<?php
+			$sqlQuery = "SELECT COUNT(*) as 'rows' FROM `participant` WHERE `starid` = '" . $_SESSION['participant-starid'] . "';";
+			$stmt = connect()->prepare($sqlQuery);
+			$stmt->execute();
+			$res = $stmt->fetchAll()[0]['rows'];
 
-				if ($res == '1') {
-					echo '<p>You have already completed the survey.</p>';
-				}
-				else {
-					echo '<p>You have not completed the survey yet.</p>';
-				}
+			if ($res == '1') {
+				echo '<p>You have already completed the survey.</p>';
+			}
+			else {
+				echo '<p>You have not completed the survey yet.</p>';
+			}
 
-				echo "<br>";
 
-				echo '<p><a href="survey.php">Start survey.</a> If you\'ve already completed the survey before, your information will be updated.</p>';
+			if (participantExistsInDb($_SESSION['participant-starid'])) {
+				echo '<p><a href="survey.php">Retake survey</a>';
 
-				$isMentor = getParticipantInfo($_SESSION['participant-dashboard'], ['is mentor'])['is mentor'][0];
-				$matches = getStaridsOfMatches($_SESSION['participant-dashboard'], $isMentor);
+				$isMentor = getParticipantInfo($_SESSION['participant-starid'], ['is mentor'])['is mentor'][0];
+				$matches = getStaridsOfMatches($_SESSION['participant-starid'], $isMentor);
 
 				$temp = getGroupStr($isMentor);
 				$group = $temp[0];
@@ -58,8 +55,8 @@ print_r($_SESSION);
 				}
 			}
 			else {
-				echo '<a href="login.php">Log in</a>';
+				echo '<p><a href="survey.php">Take survey</a>';
 			}
-    ?>
+		?>
 </body>
 </html>
