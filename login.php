@@ -129,7 +129,7 @@
 		document.getElementById('admin-code-inp').addEventListener("input", disableOrEnableSubmit);
 
 		<?php
-			echo isset($_GET['participant-starid']) && $_GET['participant-starid'] != '' ? "showEmailVerify();" : "showLoginStep1();";
+			echo isSetAndNotEmptyGET('participant-starid') != '' ? "showEmailVerify();" : "showLoginStep1();";
 		?>
 
 	</script>

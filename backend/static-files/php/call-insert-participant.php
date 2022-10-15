@@ -1,9 +1,9 @@
 <?php
 
-session_start();
-
 require_once('functions.inc.php');
 
-insertParticipant($_SESSION['starid']);
+session_start();
 
-header('Location: ../../../participant-homepage.php');
+insertParticipant($_SESSION['participant-starid']);
+
+header('Location: ../../../participant-dashboard.php');

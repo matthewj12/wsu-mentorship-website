@@ -191,7 +191,7 @@ def genImportSampleDataFile(generate_file, execute_file):
 		import_str += genericLoadStmt('participant', '')
 		# dynamic sql
 		for distinct in assoc_tbl_names_unique_substr.keys():
-			import_str += genericLoadStmt(distinct);
+			import_str += genericLoadStmt(distinct)
 		# remove trailing newlines (I prefer having just one newline at the end of every file)
 		import_str = import_str[:-2]
 

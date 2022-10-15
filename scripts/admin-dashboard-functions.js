@@ -23,7 +23,6 @@ function updateResults() {
 	let results = document.getElementsByClassName('participant-row');
 
 	for (let i = 0; i < results.length; i++) {
-		// id = "participant-row-[starid]"
 		if (results[i].id.split('-')[2].includes(filter)) {
 			results[i].style.visibility = "visible";
 		}
@@ -50,9 +49,6 @@ function showMentorsMentees() {
 
 
 function setMentorsSelected(p_mentorsSelected) {
-	let mentorColor, menteeColor;
-	// let selectedColor = 'rgb(150, 150, 200)';
-	// let unselectedColor = 'rgb(200, 200, 200)';
 	let selectedBtnClass = "btn btn-primary";
 	let unselectedBtnClass = "btn btn-info";
 
@@ -61,22 +57,16 @@ function setMentorsSelected(p_mentorsSelected) {
 	if (mentorsSelected) {
 		replaceXWithY('Mentee', 'Mentor');
 		showMentorsMentees(false);
-		// menteeColor = unselectedColor;
-		// mentorColor = selectedColor;
 		menteeBtnClass = unselectedBtnClass
 		mentorBtnClass = selectedBtnClass;
 	}
 	else {
 		replaceXWithY('Mentor', 'Mentee');
 		showMentorsMentees(true);
-		// menteeColor = selectedColor;
-		// mentorColor = unselectedColor;
 		menteeBtnClass = selectedBtnClass
 		mentorBtnClass = unselectedBtnClass;
 	}
 
-	// document.getElementById('view-mentees').style.backgroundColor = menteeColor;
-	// document.getElementById('view-mentors').style.backgroundColor = mentorColor;
 	document.getElementById('view-mentees').className = menteeBtnClass;
 	document.getElementById('view-mentors').className = mentorBtnClass;
 }
@@ -124,17 +114,17 @@ function hideAllParticipantInfoExceptSelected() {
 	if (selectedStarid == "") {
 		let infoDivs = document.getElementsByClassName('participant-info-values-set');
 		for (let i = 0; i < infoDivs.length; i++) {
-			infoDivs[i].hidden = true;
+			infoDivs[i].visibility = "collapsed";
 		}
 		return;
 	}
 
 	for (let i = 0; i < infoDivs.length; i++) {
 		if (infoDivs[i].id == 'participant-info-' + selectedStarid) {
-			infoDivs[i].hidden = false;
+			infoDivs[i].style.display = "inline-grid";
 		}
 		else {
-			infoDivs[i].hidden = true;
+			infoDivs[i].style.display = "none";
 		}
 	}
 }

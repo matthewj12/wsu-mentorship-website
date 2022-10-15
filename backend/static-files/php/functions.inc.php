@@ -2,15 +2,28 @@
 
 require_once('classes.inc.php');
 
-function connect() {
-	// $serverName = "localhost";
-	// $dbUsername = "root";
-	// $dbPassword = "";
-	// $dbName = "mp";
+function isSetAndNotEmptyGET($key) {
+	return isset($_GET[$key]) && $_GET[$key] != '';
+}
 
+
+function sessionUnsetIfSet($key) {
+	if (isset($_SESSION[$key])) {
+		unset($_SESSION[$key]);
+	}
+}
+
+
+function redirectIfNotLoggedIn($userType) {
+	if (!isset($_SESSION["$userType-logged-in"])) {
+		header('location: login.php');
+	}
+}
+
+function connect() {
 	$serverName = "localhost";
 	$dbUsername = "root";
-	$dbPassword = "Sql783knui1-1l;/klaa-9";
+	$dbPassword = "";
 	$dbName = "mp";
 
 	try {
@@ -67,7 +80,6 @@ function insertParticipant($sessionStarid) {
 			$valToInsert = preg_replace('/[^a-z,0-9, ,\',.,\-]/', '', $valToInsert);
 			
 			$split   = explode('_', $tblAndColName);
-			// $tblName = str_replace('-', ' ', str_replace([' 1 ', ' 2 ', ' 3 '], '', $split[0]));
 			$tblName = str_replace('-', ' ', $split[0]);
 			$colName = str_replace('-', ' ', $split[1]);
 
@@ -139,10 +151,8 @@ function doInsert($tblName, $colsAndVals) {
 	$sqlQuery = substr($sqlQuery, 0, strlen($sqlQuery) - 2);
 	$sqlQuery .= ');';
 	
-	// echo "<p style=\"font-family: monospace;\">$sqlQuery</p><br>";
-
 	try {
-		// echo '<h3 style="font-family: monospace;">' . $sqlQuery . '</h3>';
+		echo '<h3 style="font-family: monospace;">' . $sqlQuery . '</h3>';
 		
 		$stmt = connect()->prepare($sqlQuery);
 		$stmt->execute();
@@ -161,20 +171,17 @@ function wipeParticipant($starid) {
 	$stmt = connect()->prepare($getTblsToWipeQuery);
 	$stmt->execute();
 
-	$tblName = 'n';
+	$tblName = '';
 
 	foreach ($stmt->fetchAll() as $row) {
 		$tblName = $row[array_keys($row)[0]];
 		$deleteQuery = "DELETE FROM `$tblName` WHERE `starid` = '$starid';";
-		// print("$deleteQuery<br>");
 		
 		$stmt = connect()->prepare($deleteQuery);
 		try {
-			// echo $tblName . '<br>';
 			$stmt->execute();
 		}
 		catch (Exception $e)  {
-			// echo $tblName . "<br>";
 			echo $e->getMessage();
 		}
 	}
@@ -331,7 +338,7 @@ function getAllParticipantStarids() {
 	$stmt->execute();
 
 	foreach ($stmt->fetchAll() as $row) {
-		$participants[] = $row[array_keys($row)[0]];
+		$participants[] = $row['starid'];
 	}
 
 	return $participants;
@@ -354,6 +361,14 @@ function getStaridsOfMatches($starid, $isMentor) {
 	}
 
 	return $matches;
+}
+
+function participantExistsInDb($starid) {
+	$sql = "SELECT COUNT(*) FROM `participant` WHERE `starid` = '$starid'";
+	$stmt = connect()->prepare($sql);
+	$stmt->execute();
+
+	return $stmt->fetchColumn() != '0';
 }
 
 function getParticipantInfo($starid, $columns) {
@@ -555,26 +570,6 @@ function updateSignIn($verificationCode, $emailAddr) {
 	}
 }
 
-function isCorrectVerificationCode($enteredVerifyCode, $enteredAddr) {
-	// echo 'iscorrect';
-	
-	$sql = "select count(*) from `sign in` where `email addr` = '$enteredAddr' and `verification code` = '$enteredVerifyCode';";
-
-	// echo "<h4 style=\"font-family: monospace;\">" . $sql . "<h4>";
-
-	try {
-		$stmt = connect()->prepare($sql);
-		$stmt->execute();
-		$res = $stmt->fetchColumn();
-		return $res == '1';
-	}
-	catch(PDOException $e) {
-		// echo '3';
-		echo $e->getMessage();
-		return false;
-	}
-}
-
 function removeAllGraduatedParticipants() {
 	foreach (getAllParticipantStarids() as $starid) {
 		$sql = "select `graduation date` from `participant` where `starid` = '$starid'";
@@ -592,8 +587,6 @@ function removeAllGraduatedParticipants() {
 
 function isValidAdminCode($enteredAdminCode) {
 		$sql = "select count(*) from `admin code` where `admin code` = '$enteredAdminCode';";
-
-		echo $sql . "<br><br>";
 
 		try {
 			$stmt = connect()->prepare($sql);

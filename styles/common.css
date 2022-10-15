@@ -1,3 +1,9 @@
 .monospace {
 	font-family: monospace;
 }
+
+.navbar {
+	margin: 20px;
+	display: block;
+	text-align: right;
+}
