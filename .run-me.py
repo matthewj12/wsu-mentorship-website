@@ -36,4 +36,4 @@ dynfilegen.genImportSampleDataFile(generate_file=True, execute_file=True)
 Run the matching algorithm, adding the results to the `mentorship` table 
 '''
 
-# os.system('py backend/static-files/python/create-matches-auto.py 1-1-1 2-2-2')
+# os.system('python3 backend/static-files/python/create-matches-auto.py 1-1-1 2-2-2')

@@ -18,7 +18,7 @@
 				$code = $_SESSION['ev-code'] = rand(100000, 999999); // email verify
 				$_SESSION['ev-code-ts'] = time(); // timestamp
 
-				shell_exec("python $smtpScriptPath $destAddr $code");
+				shell_exec("python3 $smtpScriptPath $destAddr $code");
 			}
 			elseif (isSetAndNotEmptyGET('admin-code')) {
 				if (isValidAdminCode($_GET['admin-code'])) {
