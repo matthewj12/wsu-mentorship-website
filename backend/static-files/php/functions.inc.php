@@ -22,8 +22,8 @@ function redirectIfNotLoggedIn($userType) {
 
 function connect() {
 	$serverName = "localhost";
-	$dbUsername = "root";
-	$dbPassword = "";
+	$dbUsername = "PHP";
+	$dbPassword = "xBPCeD19z";
 	$dbName = "mp";
 
 	try {

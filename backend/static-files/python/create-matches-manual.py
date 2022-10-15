@@ -8,7 +8,7 @@ if len(sys.argv) != 5:
 
 
 # # mpdb = "mentorship program database"
-mpdb, cursor = miscfuncs.createCursor('localhost', 'root', '', 'mp')
+mpdb, cursor = miscfuncs.createCursor('localhost', 'PHP', 'xBPCeD19z', 'mp')
 
 
 start_date, end_date = sys.argv[1], sys.argv[2]

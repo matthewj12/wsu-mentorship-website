@@ -14,7 +14,7 @@ def createCursor(host, user, password, database):
 
 # currently unused
 def getParticipantColumns():
-	mpdb, cursor = createCursor('localhost', 'root', '', 'mp')
+	mpdb, cursor = createCursor('localhost', 'PHP', 'xBPCeD19z', 'mp')
 	cursor.execute("select group_concat(column_name) as '' from information_schema.columns where table_schema = 'mp' and table_name = 'participant';")
 
 	fields = []
