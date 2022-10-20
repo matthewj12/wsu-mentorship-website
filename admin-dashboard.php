@@ -31,7 +31,7 @@
 			$mentorStarid = $_POST['m-mentor-starid'];
 			$menteeStarid = $_POST['m-mentee-starid'];
 
-			shell_exec("py $basePath/create-matches-manual.py $startDate $endDate $mentorStarid $menteeStarid");
+			shell_exec("python3 $basePath/create-matches-manual.py $startDate $endDate $mentorStarid $menteeStarid");
 		}
 		else if (isset($_POST['create-matches-extend'])) {
 			$endDate   = date('Y-m-d', strtotime($_POST['e-end-date']));
@@ -45,7 +45,7 @@
 			$startDate = date('Y-m-d', strtotime($_POST['a-start-date']));
 			$endDate   = date('Y-m-d', strtotime($_POST['a-end-date']));
 
-			shell_exec("py $basePath/create-matches-auto.py $startDate $endDate");
+			shell_exec("python3 $basePath/create-matches-auto.py $startDate $endDate");
 		}
 
 		echo "</div>";

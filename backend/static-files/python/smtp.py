@@ -2,7 +2,7 @@ import smtplib, sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-# py backend/static-files/python/smtp.py [destination address] [verification code]
+# python3 backend/static-files/python/smtp.py [destination address] [verification code]
 
 smtp_url = 'smtp.gmail.com'
 sender = 'wsuMentorshipVerify@gmail.com'
