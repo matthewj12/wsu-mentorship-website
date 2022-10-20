@@ -2,8 +2,8 @@
 
 mysql_host = 'localhost'
 mysql_database = 'mp'
-mysql_username = 'root'
-mysql_password = 'pass'
+mysql_username = 'PHP'
+mysql_password = 'xBPCeD19z'
 
 # The default MySQL secure_file_privileges directory to import local files
 # + directory for this database's sample data (SampleData)
