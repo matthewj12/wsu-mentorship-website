@@ -1,5 +1,4 @@
-# Calm down; none of these variables are modified after being set in this
-# file (just shut the fuck up, ok? global varbiables are ok in moderation.)
+# None of these variables are modified after being set in this file
 
 mysql_host = 'localhost'
 mysql_database = 'mp'
