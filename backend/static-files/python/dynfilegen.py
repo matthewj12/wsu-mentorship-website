@@ -4,7 +4,7 @@
 import miscfuncs, os, globvars
 
 
-backend = os.getcwd() + '/backend'
+backend = (os.getcwd() + '/backend').replace('\\', '/')
 
 mockaroo_base_url = 'https://api.mockaroo.com/api/'
 mockaroo_key = '1d04b730'
@@ -157,7 +157,12 @@ def genCreateTablesFile(generate_file, execute_file):
 	ensureFolderExists(f"{backend}/dynamically-generated-files/sql")
 	
 	if execute_file:
-		os.system(f"mysql -u PHP < \"{backend}/static-files/sql/drop-db-and-create-empty-db.sql\"")
+		# os.system(f"mysql -u PHP < \"{backend}/static-files/sql/drop-db-and-create-empty-db.sql\"")
+
+		mpdb, cursor = miscfuncs.createCursor()
+		with open(f"{backend}/static-files/sql/drop-db-and-create-empty-db.sql", encoding="utf8") as f:
+			cursor.execute(f.read(), multi=True)
+
 
 	if generate_file:
 		create_str = ''
@@ -176,8 +181,13 @@ def genCreateTablesFile(generate_file, execute_file):
 	if execute_file:
 		to_execute = f"{backend}/dynamically-generated-files/sql/create-tables.sql"
 		assert(os.path.exists(to_execute))
-		return_code = os.system('mysql -u PHP mp < "{}"'.format(to_execute))
-		assert(return_code == 0)
+
+		mpdb, cursor = miscfuncs.createCursor()
+		with open(to_execute, encoding="utf8") as f:
+			cursor.execute(f.read(), multi=True)
+
+		# return_code = os.system('mysql -u PHP mp < "{}"'.format(to_execute))
+		# assert(return_code == 0)
 		print()
 		print('Tables have been sucessfully created in `mp` database.')
 
@@ -201,6 +211,11 @@ def genImportSampleDataFile(generate_file, execute_file):
 	if execute_file:
 		to_execute = f"{backend}/dynamically-generated-files/sql/import-sample-data.sql"
 		assert(os.path.exists(to_execute))
-		return_code = os.system(f"mysql -u PHP --local_infile mp < {to_execute}")
-		assert(return_code == 0)
+
+		mpdb, cursor = miscfuncs.createCursor()
+		with open(to_execute, encoding="utf8") as f:
+			cursor.execute(f.read(), multi=True)
+
+		# return_code = os.system(f"mysql -u PHP --local_infile mp < {to_execute}")
+		# assert(return_code == 0)
 		print('\nSample data has been successfully imported.')

@@ -1,20 +1,15 @@
-import mysql.connector;
+import mysql.connector, globvars
 
 
-def createCursor(host, user, password, database):
-	mpdb = mysql.connector.connect(
-		host=host,
-		user=user,
-		password=password,
-		database=database
-	)
+def createCursor(host=globvars.mysql_host, username=globvars.mysql_username, password=globvars.mysql_password, database=globvars.mysql_database):
+	mpdb = mysql.connector.connect(host=host, user=username, password=password, database=database)
 
 	return mpdb, mpdb.cursor(buffered=True)
 
 
 # currently unused
 def getParticipantColumns():
-	mpdb, cursor = createCursor('localhost', 'PHP', 'xBPCeD19z', 'mp')
+	mpdb, cursor = createCursor()
 	cursor.execute("select group_concat(column_name) as '' from information_schema.columns where table_schema = 'mp' and table_name = 'participant';")
 
 	fields = []

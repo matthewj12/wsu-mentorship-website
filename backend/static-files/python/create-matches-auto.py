@@ -7,7 +7,7 @@ if len(sys.argv) != 3:
 	quit()
 
 # # mpdb = "mentorship program database"
-mpdb, cursor = miscfuncs.createCursor('localhost', 'PHP', 'xBPCeD19z', 'mp')
+mpdb, cursor = miscfuncs.createCursor()
 participants = []
 
 print()

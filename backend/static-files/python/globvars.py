@@ -1,6 +1,10 @@
 # Calm down; none of these variables are modified after being set in this
 # file (just shut the fuck up, ok? global varbiables are ok in moderation.)
 
+mysql_host = 'localhost'
+mysql_database = 'mp'
+mysql_username = 'root'
+mysql_password = 'pass'
 
 # The default MySQL secure_file_privileges directory to import local files
 # + directory for this database's sample data (SampleData)

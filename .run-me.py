@@ -21,15 +21,15 @@ Create all the tables in the new schema via executing the SQL we just
     generated.
 '''
 
-dynfilegen.genCreateTablesFile(generate_file=True, execute_file=True)
+dynfilegen.genCreateTablesFile(generate_file=False, execute_file=True)
 
 # ------------------------------ Download Sample Data ---------------------------
 '''
 Generate and execute the curl requests to download the sample data in CSV format from Mockaroo
 '''
 
-# dynfilegen.genSampleDataCurlRequestsFile(generate_file=True, execute_file=True)
-dynfilegen.genImportSampleDataFile(generate_file=True, execute_file=True)
+dynfilegen.genSampleDataCurlRequestsFile(generate_file=False, execute_file=False)
+dynfilegen.genImportSampleDataFile(generate_file=False, execute_file=False)
 
 # ------------------------------ Run Matching Algorithm -------------------------
 '''
