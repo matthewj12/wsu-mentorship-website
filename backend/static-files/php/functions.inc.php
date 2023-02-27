@@ -2,6 +2,37 @@
 
 require_once('classes.inc.php');
 
+
+// $_SESSION superglobal
+function displayNavbar($ses) {
+	echo '
+		<div id="navbar">
+			<span id="site-title"><div>WSU Mentorship Program</div></span>
+			<a href="index.php"><span class="navbar-item-right btn">Home</span></a>
+	';
+
+	if (array_key_exists('admin-logged-in', $ses)) {
+		echo '
+			<a href="admin-dashboard.php"><span class="navbar-item-right btn">Dashboard</span></a>
+			<a href="logout.php"><span class="navbar-item-right btn">Log Out</span></a>
+		';
+	}
+	elseif (array_key_exists('participant-logged-in', $ses)) {
+		echo '
+			<a href="participant-dashboard.php"><span class="navbar-item-right btn">Dashboard</span></a>
+			<a href="logout.php"><span class="navbar-item-right btn">Log Out</span></a>
+		';
+	}
+	else {
+		echo '
+		<a href="login.php"><span class="navbar-item-right btn">Log In</span></a>
+		';
+	}
+
+	echo '</div>';
+}
+
+
 function isSetAndNotEmptyGET($key) {
 	return isset($_GET[$key]) && $_GET[$key] != '';
 }
@@ -363,12 +394,17 @@ function getStaridsOfMatches($starid, $isMentor) {
 	return $matches;
 }
 
+function isMentor($starid) {
+	$resultStr = getParticipantInfo($starid, ['is mentor'])['is mentor'][0];
+	return $resultStr == '1';
+}
+
 function participantExistsInDb($starid) {
 	$sql = "SELECT COUNT(*) FROM `participant` WHERE `starid` = '$starid'";
 	$stmt = connect()->prepare($sql);
 	$stmt->execute();
 
-	return $stmt->fetchColumn() != '0';
+	return $stmt->fetchColumn() == '1';
 }
 
 function getParticipantInfo($starid, $columns) {

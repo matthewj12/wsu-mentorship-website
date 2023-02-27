@@ -21,19 +21,19 @@ Create all the tables in the new schema via executing the SQL we just
     generated.
 '''
 
-dynfilegen.genCreateTablesFile(generate_file=False, execute_file=True)
+# dynfilegen.genCreateTablesFile(generate_file=True, execute_file=True)
 
 # ------------------------------ Download Sample Data ---------------------------
 '''
 Generate and execute the curl requests to download the sample data in CSV format from Mockaroo
 '''
 
-dynfilegen.genSampleDataCurlRequestsFile(generate_file=False, execute_file=False)
-dynfilegen.genImportSampleDataFile(generate_file=False, execute_file=False)
+# dynfilegen.genSampleDataCurlRequestsFile(generate_file=True, execute_file=True)
+dynfilegen.genImportSampleDataFile(generate_file=False, execute_file=True)
 
 # ------------------------------ Run Matching Algorithm -------------------------
 '''
 Run the matching algorithm, adding the results to the `mentorship` table 
 '''
 
-# os.system('python3 backend/static-files/python/create-matches-auto.py 1-1-1 2-2-2')
+# os.system('python backend/static-files/python/create-matches-auto.py 1-1-1 2-2-2')

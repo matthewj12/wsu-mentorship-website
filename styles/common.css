@@ -1,9 +1,63 @@
+:root {
+	/* border radius for buttons */
+	--btn-rad: 6px;
+	box-sizing: content-box;
+}
+
+a {
+	text-decoration: none;
+}
+
 .monospace {
 	font-family: monospace;
 }
 
-.navbar {
-	margin: 20px;
-	display: block;
-	text-align: right;
+body {
+	margin: 0px;
+}
+
+h1, h2, h3 {
+	text-align: center;
+}
+
+#navbar {
+	height: 50px;
+	margin: 0px;
+	padding-left: 30px;
+	padding-right: 60px;
+	background-color: red;
+}
+
+.navbar-item-right {
+	background-color: aqua;
+	height: 40px;
+	margin-top: 5px;
+	padding: 0px 20px;
+	float: right;
+	margin-right: 5px;
+	border-radius: var(--btn-rad);
+}
+
+#site-title {
+	font-family: sans-serif;
+	font-size: x-large;
+	font-style: italic;
+	float: left;
+	padding-left: 25px;
+	position: relative;
+	top: 50%;
+	transform: translate(0, -60%);
+}
+
+.btn {
+	outline: none;
+	border: none;
+	font-size: medium;
+	user-select: none;
+	cursor: pointer;
+	color: black;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: sans-serif;
 }

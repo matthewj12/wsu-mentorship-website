@@ -14,20 +14,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Survey</title>
-	<link rel="stylesheet" href="styles/survey.css">
 	<script src="scripts/header-template.js"></script>
 	<script src="scripts/survey-functions.js"></script>
+
+	<link rel="stylesheet" href="styles/survey.css">
 </head>
-<body>		
-	<div class="navbar">
-		<a href="index.php">Home</a>
-	</div>
+<body>
+
+	<?php
+		displayNavbar($_SESSION);
+	?>
 	
 	<div class="welcome-container">
-		<h1 class="welcome">
-			Welcome to the survey
-		</h1>
+		<h1 class="welcome">Welcome to the survey</h1>
+		<h2 class="welcome" >Please answer the following questions so we can match you with an optimal mentor/mentee.</h2>
 	</div>
 
 	<div class="form-container">
@@ -114,7 +114,7 @@
 
 			?>
 
-			<input type="submit" value="Submit Survey">
+			<input id="submit-btn" class="btn" type="submit" value="Submit Survey">
 		</form>
 	</div>
 

@@ -1,0 +1,88 @@
+
+h1, h2 {
+	text-align: center;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+.stuff {
+	display: inline-block;
+	position: absolute;
+	left: 50%;
+	top: 30px;
+	width: 60%;
+	transform: translate(-50%, 0);
+}
+
+#main-frame {
+	width: 50vw;
+	left: 50vw;
+	transform: translate(-50%, 0);
+}
+
+#left-half, #right-half {
+	position: absolute;
+	background-color: antiquewhite;
+	width: 450px;
+	height: 600px;
+	margin: 20px;
+}
+
+#left-half {
+	right: 50vw;
+}
+
+#right-half {
+	left: 50vw;
+}
+
+#survey-btn {
+	position: relative;
+	left: 50%;
+	transform: translate(-50%, 0);
+	margin-top: 80px;
+	background-color: rgb(98, 133, 160);
+	border-radius: 10px;
+	width: 140px;
+	height: 50px;
+}
+
+
+#retake-survey-note {
+	font-size: smaller;
+	position: relative;
+	width: 260px;
+	text-align: center;
+	left: 50%;
+	transform: translate(-50%, 0);
+}
+
+table {
+	left: 50%;
+	transform: translate(-50%, 0);
+	position: relative;
+}
+
+table, th, td {
+	border: 2px solid gray;
+}
+
+th, td {
+	padding: 6px 20px;
+	/* the following two lines force the table rows to occupy a single line rather than wrapping onto a second line and taking up two lines. */
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#part-dashboard-box {
+	position: absolute;
+	width: 400px;
+	height: 300px;
+	left: 50%;
+	transform: translate(-50%, 0);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}

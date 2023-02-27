@@ -1,24 +1,21 @@
+<!DOCTYPE html>
+
+
 <?php
 	require_once('backend/static-files/php/functions.inc.php');
-
 	session_start();
-	// echo '<h1 style="font-family: monospace">';
-	// print_r($_GET);
-	// echo '</h1>';
-	// echo '<br>';
-	// echo '<br>';
-
 	$evCodeLs = 5 * 60; // email verify code lifespan = 5 minutes
 
 	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 		if (isSetAndNotEmptyGET('login-step-1')) {
 			if (isSetAndNotEmptyGET('participant-starid')) {
+				$_SESSION['participant-starid'] = $_GET['participant-starid'];
 				$smtpScriptPath = "backend/static-files/python/smtp.py";
 				$destAddr = $_GET['participant-starid'] . '@go.minnstate.edu';
 				$code = $_SESSION['ev-code'] = rand(100000, 999999); // email verify
 				$_SESSION['ev-code-ts'] = time(); // timestamp
 
-				shell_exec("python3 $smtpScriptPath $destAddr $code");
+				shell_exec("python $smtpScriptPath $destAddr $code");
 			}
 			elseif (isSetAndNotEmptyGET('admin-code')) {
 				if (isValidAdminCode($_GET['admin-code'])) {
@@ -48,88 +45,104 @@
 ?>
 
 <html>
-
 <head>
-	<meta charset="utf-8">
-	<title>
-		Login
-	</title>
-
 	<script src="scripts/header-template.js"></script>
+
+	<link rel="stylesheet" href="styles/common.css">
 	<link rel="stylesheet" href="styles/login.css">
-	<script src="scripts/login-functions.js"></script>
-
 </head>
-</styl>
-
 <body>
-	<script>
-	</script>
+	<?php
+		displayNavbar($_SESSION);
+	?>
 
-	<div class="navbar">
-		<a href="index.php">Home</a>
-	</div>
-
+	<h1>Login</h1>
 	<!-- Enter admin code if admin or starid if participant. -->
 	<form class="login" id="lg-step-1-container" method="GET">
-		I am a: <br>
-		<input name="a" id="login-as-participant" value="participant" type="radio" checked>
-		<label for="login-as-participant">Participant</label>
-		<br>
-		<input name="a" id="login-as-admin" value="administrator" type="radio">
-		<label for="login-as-admin">Administrator</label>
+		<h2>I am a(n):</h2>
 
-		<div id="participant-login-inputs">
-			<label for="participant-starid-inp">Enter your starid</label>
-			<input id="participant-starid-inp" type="text" name="participant-starid">
+		<!-- "Login as" flipswitch -->
+		<div id="fpp">
+			<div id="lg-as-toggle">
+				<span class="btn" id="i-am-part">Participant</span>
+				<span class="btn" id="i-am-admin">Administrator</span>
+			</div>
 		</div>
 
-		<div id="admin-login-inputs">
-			<label for="admin-code-inp">Enter the 8-digit-long admin code you've been given, consisting of numbers and lowercase letters.</label>
-			<br>
-			<input id="admin-code-inp" type="text" name="admin-code">
-			<p hidden id="invalid-admin-code">Invalid code.</p>
+		<div id="login-inputs">
+			<div id="participant-login-inputs">
+				<input maxlength="8" minlength="8" id="participant-starid-inp" type="text" name="participant-starid">
+				<br>
+				<label for="participant-starid-inp">Enter your starid</label>
+			</div>
+
+			<div id="admin-login-inputs">
+				<input maxlength="8" minlength="8" id="admin-code-inp" type="text" name="admin-code">
+				<br>
+				<label for="admin-code-inp">Enter your 8-digit-long admin code</label>
+				<p hidden id="invalid-admin-code">Invalid code.</p>
+			</div>
+
 		</div>
 
-		<br>
-		<br>
-		<input disabled id="lg-step-1-submit-btn" type="submit" value="Submit" name="login-step-1">
+		<div class="btn-row">
+			<input disabled class="btn" id="lg-step-1-submit-btn" type="submit" value="Submit" name="login-step-1">
+		</div>
 	</form>
 
 	<!-- Email verification; only for participants; admins don't do this step. -->
 	<form class="login" id="ev-container" method="GET">
 		<div class="form-title">
-			<h3>A verification code has been sent to your email.</h3>
-			<p>This code will expire in 5 minutes.</p>
-			<p>Reload page to resend code.</p>
+			<h2>A verification code has been sent to <?php echo $_SESSION['participant-starid'] . '@go.minnstate.edu' ?>.</h2>
+			<h3>This code will expire in 5 minutes.</h3>
 		</div>
 		<div class="form-field">
-			<label for="email" class="form-label">Enter code:</label>
+			<label for="email">Enter code:</label>
 			<input type="text" name="ev-code" class="form-input" id="code">
 			<p class="success"></p>
 			<p class="error"></p>
 		</div>
-		<div class="form-field">
-			<input type="submit" name="email-verify" value="Submit" id="ev-submit-btn">
-			<p class="error"></p>
-			<p class="success"></p>
+		<div class="btn-row">
+			<div class="link">
+				<a href="login.php/participant-starid=<?php echo $_SESSION['participant-starid'] ?>&login-step-1=Submit"><div class="btn" id="resend">Resend Code</div></a>
+			</div>
+			<div class="form-field">
+				<input class="btn" type="submit" name="email-verify" value="Submit" id="ev-submit-btn">
+				<p class="error"></p>
+				<p class="success"></p>
+			</div>
 		</div>
-		<!-- <div class="link">
-			<button id="resend" onclick="toEmailVerify()">Login again to Resend Code?</button>
-		</div> -->
 	</form>
 
-	<script>
+	<script src="scripts/login-functions.js"></script>
+
+	<script type="module">
 		document.getElementById('admin-login-inputs').hidden = true;
+		document.getElementById('participant-login-inputs').hidden = true;
 
-		document.getElementById('login-as-admin').addEventListener("click", showOnlyAdminInputs);
-		document.getElementById('login-as-participant').addEventListener("click", showOnlyParticipantInputs);
+		partBtn.addEventListener("click", showOnlyPartInputs);
+		partBtn.addEventListener("click", updateSubmitBtn);
 
-		document.getElementById('participant-starid-inp').addEventListener("input", disableOrEnableSubmit);
-		document.getElementById('admin-code-inp').addEventListener("input", disableOrEnableSubmit);
+		adminBtn.addEventListener("click", showOnlyAdminInputs);
+		adminBtn.addEventListener("click", updateSubmitBtn);
+		
+		partBtn.addEventListener("mouseout", mouseoutPart);
+		partBtn.addEventListener("click", selectPart);
+		partBtn.addEventListener("mouseover", mouseoverPart);
 
+		adminBtn.addEventListener("mouseout", mouseoutAdmin);
+		adminBtn.addEventListener("click", selectAdmin);
+		adminBtn.addEventListener("mouseover", mouseoverAdmin);
+
+		document.getElementById('participant-starid-inp').addEventListener("keydown", updateSubmitBtn);
+		document.getElementById('admin-code-inp').addEventListener("keydown", updateSubmitBtn);
+
+		// Without this line, the user has to type an extra character into the text box before the submit button is enabled since "onkeydown" means that the function looks at the length of the input BEFORE the current key's character is registered.
+		setInterval(updateSubmitBtn, 50);
+
+		// Go to login step 2 (the email verificatio part) if the participant user has entered their starid and clicked "submit"
 		<?php
-			echo isSetAndNotEmptyGET('participant-starid') != '' ? "showEmailVerify();" : "showLoginStep1();";
+			echo isSetAndNotEmptyGET('participant-starid') ? "showEmailVerify();" : "showLoginStep1();";
 		?>
 
 	</script>

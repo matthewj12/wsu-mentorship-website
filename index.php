@@ -1,19 +1,20 @@
 <?php
 	session_start();
+	require_once('backend/static-files/php/functions.inc.php');
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Home</title>
+	<script src="scripts/header-template.js"></script>
+
 	<link rel="stylesheet" href="styles/index.css">
-	<!-- <script src="scripts/header-template.js"></script> -->
 <head>
 <body>
-	<button class="login-btn">
-		<a href="login.php">Login</a>
-		
+	<?php
+		displayNavbar($_SESSION);
+	?>
 
-	</button>
+	<h1>hey</h1>
 </body>
 </html>

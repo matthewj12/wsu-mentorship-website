@@ -101,7 +101,7 @@ INSERT INTO `race ref tbl`(`race`) VALUES
 	('hispanic'),
 	('aboriginal/native australian'),
 	('indian/native american'),
-	('polynesia/pacific islander'),
+	('polynesian/pacific islander'),
 	('other'),
 	('prefer not to answer');
 

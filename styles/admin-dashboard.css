@@ -41,14 +41,14 @@ button {
 }
 
 #top-left-container {
-	top: 0;
+	top: 50px;
 	left: 0;
 	height: var(--vert-split-pos);
 	width: var(--horz-split-pos);
 }
 
 #top-right-container {
-	top: 0;
+	top: 50px;
 	left: var(--horz-split-pos);
 	height: var(--vert-split-pos);
 	width: calc(100vw - var(--horz-split-pos));

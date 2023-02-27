@@ -1,5 +1,4 @@
 <?php
-
 	require_once('backend/static-files/php/functions.inc.php');
 
 	session_start();
@@ -31,7 +30,7 @@
 			$mentorStarid = $_POST['m-mentor-starid'];
 			$menteeStarid = $_POST['m-mentee-starid'];
 
-			shell_exec("python3 $basePath/create-matches-manual.py $startDate $endDate $mentorStarid $menteeStarid");
+			shell_exec("python $basePath/create-matches-manual.py $startDate $endDate $mentorStarid $menteeStarid");
 		}
 		else if (isset($_POST['create-matches-extend'])) {
 			$endDate   = date('Y-m-d', strtotime($_POST['e-end-date']));
@@ -45,7 +44,7 @@
 			$startDate = date('Y-m-d', strtotime($_POST['a-start-date']));
 			$endDate   = date('Y-m-d', strtotime($_POST['a-end-date']));
 
-			shell_exec("python3 $basePath/create-matches-auto.py $startDate $endDate");
+			shell_exec("python $basePath/create-matches-auto.py $startDate $endDate");
 		}
 
 		echo "</div>";
@@ -86,11 +85,9 @@
 
 <div class="main-container">
 
-<div class="navbar">
-	 <span>
-		<a href="index.php">Home</a>
-	 </span>
-</div>
+<?php
+	displayNavbar($_SESSION);
+?>
 
 <div id="top-left-container">
 	<div class="fb centering top-row-content-container">
@@ -387,8 +384,6 @@
 		</div>
 	</div>
 </div>
-
-<!-- end of main container -->
 </div>
 
 <script>
