@@ -171,8 +171,8 @@ class Participant():
 
 		query = self.generateCandidateRankingQuery(as_statements, custom_select_as_exprs, join_clause, custom_order_exprs)
 
-		# with open('temp.sql', 'w') as temp_file:
-		# 	temp_file.write(query)
+		with open('temp.sql', 'w') as temp_file:
+			temp_file.write(query)
 		
 		cursor.execute(query)
 

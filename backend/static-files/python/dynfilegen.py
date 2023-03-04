@@ -144,7 +144,7 @@ def genericLoadStmt(distinct, suffix=' assoc tbl'):
 	concat = distinct + suffix
 
 	return (
-		f"load data local infile \"{globvars.sample_data_dir}{miscfuncs.toHyphSnakeCase(concat)}.csv\"\n"
+		f"load data infile \"{globvars.sample_data_dir}{miscfuncs.toHyphSnakeCase(concat)}.csv\"\n"
 		f"into table `{concat}`\n"
 		f"fields terminated by \",\" enclosed by \"'\"\n"
 		f"lines terminated by \"\\n\"\n"

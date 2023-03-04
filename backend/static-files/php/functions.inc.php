@@ -32,7 +32,6 @@ function displayNavbar($ses) {
 	echo '</div>';
 }
 
-
 function isSetAndNotEmptyGET($key) {
 	return isset($_GET[$key]) && $_GET[$key] != '';
 }
@@ -277,16 +276,25 @@ function getGroupStr($isMentor) {
 	return [$group, $groupOpposite];
 }
 
-function echoMatchesRow($starid) {
-	$isMentor = getParticipantInfo($starid, ['is mentor'])['is mentor'][0];
-	$temp = getGroupStr($isMentor);
+
+function getParticipantObjFromListByStarid($participantsList, $starid) {
+	foreach ($participantsList as $p) {
+		if ($p->dataPoints['starid'] == $starid) {
+			return $p;
+		}
+	}
+}
+
+
+// $pObj is a Participant object
+function echoMatchesRow($pObj) {
+	// We need to select the value at index zero because all values are a table to accomodate for the things that have multilple options/values (this is a bad design).
+	$starid = $pObj->dataPoints['starid'][0];
+	$temp = getGroupStr($pObj->dataPoints['is mentor'][0]);
 	$group = $temp[0];
 	$groupOpposite = $temp[1];
-
-	$temp = getParticipantInfo($starid, ['is active', 'max matches']);
-	
-	$maxMatches = $temp['max matches'][0];
-	$isActive = $temp['is active'][0];
+	$maxMatches = $pObj->dataPoints['max matches'][0];
+	$isActive = $pObj->dataPoints['is active'][0];
 
 	echo "
 		<span 
@@ -305,22 +313,19 @@ function echoMatchesRow($starid) {
 
 	// participant starid
 	echo "
-		<span 
+		<div 
 			class=\"starid participant-dashboard $group-container\" 
 			id=\"participant-dashboard-$starid\" onclick=\"setSelectedStarid('$starid');hideAllParticipantInfoExceptSelected();\">
-				<span class=\"participant-dashboard-starid\">
-					<span>$starid</span>
-				</span>
-		</span>";
-
-	$matches = getStaridsOfMatches($starid, $isMentor);
+				<div>$starid</div>
+		</div>";
 
 	// match starids
 	echo '<span class="match-starids">';
-	if (count($matches) > 0) {
-		foreach ($matches as $matchStarid) {
-			$mentorStarid = $isMentor == '1' ? $starid : $matchStarid;
-			$menteeStarid = $isMentor == '0' ? $starid : $matchStarid;
+	if (count($pObj->matchings) > 0) {
+		foreach ($pObj->matchings as $m) {
+			$matchStarid = $m->dataPoints['starid'];
+			$mentorStarid = $pObj->dataPoints['isMentor'] == '1' ? $starid : $matchStarid;
+			$menteeStarid = $pObj->dataPoints['isMentor'] == '0' ? $starid : $matchStarid;
 			
 			$temp = getMatchInfo($mentorStarid, $menteeStarid, ['end date', 'extendable to date']);
 			$endDate = date_create($temp['end date']);
@@ -530,12 +535,10 @@ function getAllParticipantsAsObjs() {
 	$starids = getAllParticipantStarids();
 	$participantObjs = [];
 
-	$n = 1;
 	foreach ($starids as $starid) {
 		$p = new Participant($starid);
 
 		$participantObjs[] = $p;
-		$n++;
 	}
 
 	return $participantObjs;

@@ -1,5 +1,15 @@
 <?php
 
+class Matching {
+	public $mentorStarid;
+	public $menteeStarids;
+
+	public function __construct($mentorStarid, $menteeStarids) {
+		$this->mentorStarid = $mentorStarid;
+		$this->menteeStarids = $menteeStarids;
+	}
+}
+
 class Option {
 	public string $label;
 	public string $value;
@@ -179,6 +189,7 @@ class Participant {
 	public $participantCols;
 	public $assocTblDistinct;
 	public $dataPoints = [];
+	public $matchings = [];
 
 	public function __construct($starid) {
 		$this->participantCols = getParticipantFields();
@@ -202,9 +213,21 @@ class Participant {
 		];
 		
 		$this->dataPoints['starid'] = [$starid];
-
 		$allCols = array_merge($this->participantCols, $this->assocTblDistinct);
 
-		$this->dataPoints = getParticipantInfo($this->dataPoints['starid'][0], $allCols);
+		$this->dataPoints = getParticipantInfo($starid, $allCols);
+
+		// $groupStr = $this->dataPoints['is mentor'] ? 'mentor' : 'mentee';
+		// $groupStrOpposite = $this->dataPoints['is mentor'] ? 'mentee' : 'mentor';
+
+		// $sqlQuery = "SELECT * FROM `mentorship` WHERE `$groupStr starid` = $starid";
+		// $stmt = connect()->prepare($sqlQuery);
+		// $stmt->execute();
+
+		// foreach ($stmt->fetchAll() as $row) {
+		// 	$matchings[] = $row[$groupStrOpposite];
+		// }
+
+		$matchings = ['ffda4562'];
 	}
 }

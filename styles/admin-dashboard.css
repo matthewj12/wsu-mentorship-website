@@ -1,8 +1,12 @@
 *, *:before, *:after {
-	font-size: 1.2rem;
+	/* font-size: 1.2rem; */
 	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+	/* margin: 0;
+	padding: 0; */
+}
+
+body {
+	overflow: hidden;
 }
 
 :root {
@@ -11,65 +15,75 @@
 	--adj-input-margin: 0;
 	--norm-border-color: rgb(197, 212, 194);
 	--selected-border-color: rgb(0, 0, 0);
-	--unselected-border-width: 4px;
-	--selected-border-width: 4px;
+	--border-width: 2px;
 	--text-input-width: 200px;
+
+	--btn-default: rgb(156, 180, 185);
+	--btn-hover: hsl(200, 80%, 70%);
+	--btn-select: rgb(98, 135, 177);
 }
 
-button {
-	cursor: pointer;
+h1 {
+	text-align: center;
 }
 
-.main-container {
-
-}
-
-#top-left-container, #top-right-container, #bottom-left-container, #bottom-right-container {
-	position: absolute;
-}
-
-#top-left-container, #bottom-left-container {
-	border-right: solid 1px gray;
-}
-
-#top-left-container, #top-right-container {
-	border-bottom: solid 1px gray;
+#top-container{
+	width: 100%;
 }
 
 #bottom-left-container, #bottom-right-container {
-	padding: 50px;
-}
-
-#top-left-container {
-	top: 50px;
-	left: 0;
-	height: var(--vert-split-pos);
-	width: var(--horz-split-pos);
-}
-
-#top-right-container {
-	top: 50px;
-	left: var(--horz-split-pos);
-	height: var(--vert-split-pos);
-	width: calc(100vw - var(--horz-split-pos));
+	display: flex;
+	align-items: center;
+	width: 800px;
+	float: left;
+	margin: 50px;
+	padding: 20px 0 50px;
+	background-color: rgb(212, 199, 199);
+	flex-direction: column;
+	position: absolute;
 }
 
 #bottom-left-container {
-	top: var(--vert-split-pos);
-	left: 0;
-	height: calc(100vh - var(--vert-split-pos));
-	width: var(--horz-split-pos);
+	right: calc(50vw - 20px);
 }
 
 #bottom-right-container {
-	top: var(--vert-split-pos);
-	left: var(--horz-split-pos);
-	height: calc(100vh - var(--vert-split-pos));
-	width: calc(100vw - var(--horz-split-pos));
+	left: calc(50vw + 20px);
+}
+
+#participant-search-boxes {
+	margin-left: 45px;
+	display: flex;
+	align-items: center;
+}
+
+#name-search-box {
+	margin-left: 15px;
+}
+
+#starid-search-box {
+	font-family: monospace;
 }
 
 #starid-search-box, #name-search-box {
-	width: 230px;
+	width: 120px;
+	height: 25px;
+}
+
+#matches-btn {
+	width: 125px;
+	height: 35px;
+	background-color: blanchedalmond;
+	border-radius: 5px;
+	outline: 2px solid black;
+}
+
+#participant-filters {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10px 0 40px;
+	width: 100%;
 }
 
 .mc {
@@ -175,18 +189,14 @@ button {
 }
 
 .date-label {
-	font-size: 1rem;
+	width: auto;
 }
 
 .text-input, .date-input {
-	border: solid 1px black;
+	/* border: solid 1px black;
 	border-radius: 5px;
 	margin-top: 7px;
-	width: var(--text-input-width);
-	height: 1.75rem;
-	font-family: monospace;
-	font-size: 1rem;
-	padding-left: 0.5rem;
+	padding-left: 0.5rem; */
 }
 
 .centered-input {
@@ -195,12 +205,12 @@ button {
 }
 
 *::placeholder, .date-input {
-	font-family: monospace;
 	vertical-align: middle;
 }
 
 .date-input {
 }
+
 
 .invalid-input {
 	color: rgb(134, 21, 21);
@@ -230,7 +240,11 @@ button {
 #participant-search-container {
 	display: inline-grid;
 	grid-template-columns: auto;
+	width: 700px;
+}
 
+#participant-search-container-header {
+	margin-bottom: 10px;
 }
 
 .participant-row, #participant-search-container-header {
@@ -238,7 +252,7 @@ button {
 	cursor: pointer;
 	border: solid transparent 2px;
 	display: inline-grid;
-	grid-template-columns: 40px 60px 120px 120px 600px;
+	grid-template-columns: 40px 60px 120px 120px 360px;
 }
 
 .search-results-header-item {
@@ -249,9 +263,6 @@ button {
 
 #max-matches-header {
 	/* font-size: 0.7rem; */
-}
-
-.search-results-header-item {
 }
 
 .delete-icon {
@@ -271,6 +282,7 @@ button {
 	text-align: center;
 	/* vertical-align: middle; */
 	margin: auto;
+	cursor: default;
 }
 
 .is-active-icon {
@@ -286,20 +298,19 @@ button {
 }
 
 .starid {
-	border-radius: 5px;
+	border-radius: var(--border-width);
 	position: relative;
 	cursor: pointer;
-	vertical-align: middle;
-	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	height: 2rem;
-	font-family: monospace;
-	/* position: relative; */
-	/* margin: auto; */
 	border: solid;
-	display: inline-block;
-	/* left: -1px; */
 	width: 100px;
-	/* margin-left: -3px; */
+}
+
+.match-starids {
+	width: 360px;
 }
 
 .match-starid-starid>span, .participant-dashboard-starid>span {
@@ -333,7 +344,7 @@ button {
 }
 
 .search-results-header-item {
-	font-size: 0.85rem;
+	/* font-size: 0.85rem; */
 }
 
 #search-results a:hover:not(.header) {
@@ -347,26 +358,48 @@ form {
 .confirm-create-matches-btn {
 }
 
+#matches-row {
+	display: flex;
+	align-items: center;
+}
+
+#match-btn-m, #match-btn-e, #match-btn-a {
+	background-color: blanchedalmond;
+	width: 230px;
+	height: 35px;
+	margin-right: 20px;
+	border-radius: 5px;
+	outline: 2px solid black;
+}
+
+#vt {
+	height: 35px;
+	width: 250px;
+	float: left;
+	margin-left: 45px;
+}
+
 #view-mentors, #view-mentees {
-	display: inline-block;
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 50%;
+	height: 100%;
 	position: relative;
-	cursor: pointer;
-	width: 200px;
-	height: 3rem;
-	/* margin-top: 50px; */
-	/* margin: 10rem;
-	padding: 1rem; */
-	border: 0;
+	outline: 2px solid black;
+	background-color: var(--btn-default);
 }
 
-/* #participant-info-side-header {
-	width: 20rem;
+#view-mentees {
+	float: left;
+	border-radius: var(--btn-rad) 0 0 var(--btn-rad);
 }
 
-#participant-info-values {
-	margin-right: 0;
-	width: 20rem;
-} */
+#view-mentors {
+	float: right;
+	border-radius: 0 var(--btn-rad) var(--btn-rad) 0;
+}
 
 #participant-info-grid {
 	display: inline-grid;
@@ -379,9 +412,20 @@ form {
 	margin: 0 -1px -1px 0;
 }
 
+th {
+	width: 300px;
+}
+
+td, th {
+	padding: 5px 20px;
+	border: 1px solid black;
+	text-align: left;
+	vertical-align: top;
+}
+
 .participant-info-values-set {
-	display: inline-grid;
-	grid-template-columns: auto;
+	border-collapse: collapse;
+	width: 700px
 }
 
 .fb {
@@ -398,18 +442,9 @@ form {
 	transform: translate(0, -50%);
 }
 
-.top-row-1, .top-row-1 {
-	margin: 10px 0 10px 0;
-}
-
-#create-matches-btn {
-	width: 100%;
-}
-
 .mc-desc {
 	text-align: center;
-	font-size: 1.4rem;
-	font-weight: 600;
+	font-size: 20px;
 	line-height: 1.4rem;
 }
 

@@ -8,10 +8,10 @@
 	removeAllGraduatedParticipants();
 
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		print('<p>yeah</p>');
 		// $_SESSION['postdata'] = $_POST;
 		$basePath = "backend/static-files/python";
 
-		echo "<div style=\"position: absolute; bottom: 10px; left: 10px\">";
 
 		if (isset($_POST['delete-match'])) {
 			$split = explode('-', $_POST['match-to-delete-input']);
@@ -47,7 +47,6 @@
 			shell_exec("python $basePath/create-matches-auto.py $startDate $endDate");
 		}
 
-		echo "</div>";
 		unset($_POST);
 
 		header("Location: admin-dashboard.php");
@@ -59,9 +58,9 @@
 <html lang="en">
 <head>
 	<title>Admin Dashboard</title>
+	<link rel="stylesheet" href="styles/common.css">
 	<link rel="stylesheet" href="styles/admin-dashboard.css">
 	<script src="scripts/header-template.js"></script>
-	<script src="scripts/admin-dashboard-functions.js"></script>
 	<!-- For some reason, Font Awesome icons don't show up unless we have this in the file that uses them. -->
 	<script src="https://kit.fontawesome.com/0a01d33e89.js" crossorigin="anonymous"></script>
 </head>
@@ -69,179 +68,135 @@
 
 <?php
 	$allParticipants = getAllParticipantsAsObjs();
-	$allMatches = [];
-
-	$sqlQuery = 'SELECT * FROM `mentorship`;';
-	$stmt = connect()->prepare($sqlQuery);
-	$stmt->execute();
-	foreach ($stmt->fetchAll() as $row) {
-		$allMatches[] = $row;
-	}
-
-	echo "<div hidden id='invisible-matches-elem'>";
-	echoMatchesAsJson($allMatches);
-	echo '</div>';
-?>
-
-<div class="main-container">
-
-<?php
 	displayNavbar($_SESSION);
 ?>
 
-<div id="top-left-container">
+<div id="top-container">
+	<h1>Administrator Dashboard</h1>
+
 	<div class="fb centering top-row-content-container">
 		<form id="create-matches-form" method="post" action="admin-dashboard.php">
-			<div style="display: flex;">
-				<span>
-					<div class="top-row-1">
-						Matching type:
-						<button type="button" class="match-type-btn" onclick="setSelectedMatchMode('m')" id="m">Manual</button>
-						<button type="button" class="match-type-btn" onclick="setSelectedMatchMode('e')" id="e">Extend</button>
-						<button type="button" class="match-type-btn" onclick="setSelectedMatchMode('a')" id="a">Automatic</button>
-					</div>
-
-					<div class="top-row-2">
-						<button class="btn btn-primary" type="button" onclick="showCreateMatchesConfirmation()" id="create-matches-btn">Create Matches</button>
-					</div>
-				</span>
+			<div id="matches-row">
+				<div class="btn" id="match-btn-m" onclick="setSelectedMatchMode('m');showCreateMatchesConfirmation();" id="m">Create Match Manualy</div>
+				<div class="btn" id="match-btn-e" onclick="setSelectedMatchMode('e');showCreateMatchesConfirmation();" id="e">Extend Existing Match</div>
+				<div class="btn" id="match-btn-a" onclick="setSelectedMatchMode('a');showCreateMatchesConfirmation();" id="a">Create Matches Automatically</div>
 			</div>
 		</form>
+
+
 	</div>
 </div>
 
-<div id="top-right-container">
-	<div class="fb centering top-row-content-container">
-		<div>
-			<div class="top-row-1">
-				<button id="view-mentees" class="btn btn-info" onclick="setMentorsSelected(false)">View Mentees</button>
-				<button id="view-mentors" class="btn btn-primary" onclick="setMentorsSelected(true);">View Mentors</button>
-			</div>
-			<div class="top-row-2">
-				<input 
-					id="starid-search-box"
-					class="text-input participant-search-text-input"
-					type="text"
-					maxlength="8"
-					placeholder="Enter Mentee StarID"
-					onkeyup="updateResults()"
-				>
-
-				<input 
-					id="name-search-box"
-					class="text-input participant-search-text-input"
-					type="text"
-					maxlength="8"
-					placeholder="Enter Mentee name"
-					onkeyup=""
-				>
-			</div>
-		</div>
-	</div>
-</div>
 
 <div id="bottom-left-container">
-	<h1>Participant Info</h1>
+	<h2>Participant Info</h2>
 
-	<div id="participant-info-grid">
-		<?php
-			$participantTblColumns = ['starid', 'first name', 'last name', 'graduation date', 'is active', 'is mentor', 'international student', 'lgbtq+', 'student athlete', 'multilingual', 'not born in this country', 'transfer student', 'first generation college student', 'unsure or undecided about major', 'interested in diversity groups', 'misc info'];
+	<p id="default-part-info">Select a participant by clicking their StarID in the right pane.</p>
 
-			$assocTblColumns = ['major', 'pre program', 'max matches', 'gender', 'second language', 'religious affiliation', 'hobby', 'race', 'important quality'];
+	<?php
+		$participantTblColumns = ['starid', 'first name', 'last name', 'graduation date', 'is active', 'is mentor', 'international student', 'lgbtq+', 'student athlete', 'multilingual', 'not born in this country', 'transfer student', 'first generation college student', 'unsure or undecided about major', 'interested in diversity groups', 'misc info'];
+
+		$assocTblColumns = ['major', 'pre program', 'max matches', 'gender', 'second language', 'religious affiliation', 'hobby', 'race', 'important quality'];
+
+		$cols = str_replace(`graduation date`, "DATE_FORMAT('`graduation date`', '%m-%d-%y')`", join("`, `", $participantTblColumns));
+
+		
+		$sqlQuery = "SELECT `starid` FROM `participant`";
+		$stmt = connect()->prepare($sqlQuery);
+		$stmt->execute();
+
+		foreach ($stmt->fetchAll() as $row) {
+			$starid = $row['starid'];
+			echo "<table id=\"participant-info-$starid\" class=\"participant-info-values-set\">";
+			$sqlQuery = "SELECT `" . $cols . "` FROM `participant` WHERE `starid` = '$starid'";
+			$stmt = connect()->prepare($sqlQuery);
+			$stmt->execute();
+			$res = $stmt->fetchAll()[0];
 			
-			echo "<div style=\"grid-column: 1\">";
+			if (count($res) > 0) {
+				foreach ($res as $colName => $val) {
+					if ($val == "") {
+						$val = "None or N/A";
+					}
+					if (!str_contains($val, '-')) {
+						$val = str_replace("0", "No", str_replace("1", "Yes", $val));
+					}
 
-			// echo '<div id="participant-info-side-header">';
-			$row = 1;
-			foreach ($participantTblColumns as $col) {
-				$idVal = "participant-info-row-name-" . str_replace(' ', '-', $col);
-				echo "<div class=\"participant-info-row-name\" id=\"$idVal\">$col</div>";
-				$row++;
+					echo '<tr>';
+					echo "<th>$colName</th>";
+					echo "<td>$val</td>";
+	
+					echo '</tr>';
+				}
 			}
-			foreach ($assocTblColumns as $col) {
-				$idVal = "participant-info-row-name-" . str_replace(' ', '-', $col);
-				echo "<div class=\"participant-info-row-name\" id=\"$idVal\">$col</div>";
-				$row++;
-			}
 
-			echo '</div>';
-		?>
+			// columns in association tables
+			foreach ($assocTblColumns as $colName) {
+				$sqlQuery = "
+					select `$colName`
+					from `$colName assoc tbl` join `$colName ref tbl`
+						WHERE
+							`$colName assoc tbl`.`starid` = '$starid' and
+							`$colName assoc tbl`.`$colName id` = `$colName ref tbl`.`id`";
 
-		<div style="grid-column: 2" id="participant-info-values">
-			<?php
-				$sqlQuery = "SELECT `starid` FROM `participant`";
 				$stmt = connect()->prepare($sqlQuery);
 				$stmt->execute();
+
+				
 				$results = $stmt->fetchAll();
-				$sqlQuery = "";
-
-				foreach ($results as $row) {
-					$starid = $row['starid'];
-
-					echo "<div hidden style=\"\" id=\"participant-info-$starid\" class=\"participant-info-values-set\">";
-
-					// columns in `participant`
-					unset($participantTblColumns['starid']);
-					$cols = str_replace(`graduation date`, "DATE_FORMAT('`graduation date`', '%m-%d-%y')`", join("`, `", $participantTblColumns));
-					$sqlQuery = "SELECT `" . $cols . "` FROM `participant` WHERE `starid` = '$starid'";
-
-					$stmt = connect()->prepare($sqlQuery);
-					$stmt->execute();
-
-					$rowNum = 1;
-
-					foreach ($stmt->fetchAll()[0] as $colName => $val) {
-						if ($val == "") {
-							$val = "None or N/A";
-						}
-						if (!str_contains($val, '-')) {
-							$val = str_replace("0", "No", str_replace("1", "Yes", $val));
-						}
-
-						$classVal = "participant-info-val participant-info-val-" . str_replace(' ', '-', $colName);
-						echo "<div class=\"$classVal\">" . $val . "</div>";
-						$rowNum++;
-					}
-
-					// columns in association tables
-					foreach ($assocTblColumns as $colName) {
-						$sqlQuery = "
-							select `$colName`
-							from `$colName assoc tbl` join `$colName ref tbl`
-								WHERE
-									`$colName assoc tbl`.`starid` = '$starid' and
-									`$colName assoc tbl`.`$colName id` = `$colName ref tbl`.`id`";
-
-						$stmt = connect()->prepare($sqlQuery);
-						$stmt->execute();
-
-						$classVal = "participant-info-val participant-info-val-" . str_replace(' ', '-', $colName);
-						echo "<div class=\"$classVal\" id=\"$idVal\">";
-
-						$results = $stmt->fetchAll();
-						$valsToEcho = count($results) == 0 ? "None or N/A" : "";
-
-						foreach ($results as $res) {
-							$valsToEcho .= $res[array_keys($res)[0]] . ", ";
-						}
-
-						if (count($results) != 0) {
-							$valsToEcho = substr($valsToEcho, 0, strlen($valsToEcho) - 2);
-						}
-						echo $valsToEcho;
-
-						echo "</div>";
-						$rowNum++;
-					}
-
-					echo "</div>";
+				$valsToEcho = count($results) == 0 ? "None or N/A" : "";
+				
+				foreach ($results as $res) {
+					$valsToEcho .= $res[array_keys($res)[0]] . ", ";
 				}
-			?>
-		</div>
-	</div>
+				
+				if (count($results) != 0) {
+					$valsToEcho = substr($valsToEcho, 0, strlen($valsToEcho) - 2);
+				}
+				echo "<tr>";
+				echo "<th>$colName</th>";
+				echo "<td>$valsToEcho</td>";
+				echo "</tr>";
+			}
+			echo '</table>';
+		}
+
+	?>
+
 </div>
 
 <div id="bottom-right-container">
+	<h2>Participants List</h2>
+
+	<div id="participant-filters">
+		<!-- <div class="btn" id="matches-btn">Edit Matches</div> -->
+
+		<div id="flipswitch">
+			<div id="vt">
+				<div id="view-mentees" class="btn">View Only Mentees</div>
+				<div id="view-mentors" class="btn">View Only Mentors</div>
+			</div>
+		</div>
+
+		<div id="participant-search-boxes">
+			<input 
+				id="starid-search-box"
+				class="text-input participant-search-text-input"
+				type="text"
+				maxlength="8"
+				placeholder="Enter StarID"
+				onkeyup="updateResults()">
+
+			<input 
+				id="name-search-box"
+				class="text-input participant-search-text-input"
+				type="text"
+				placeholder="Enter name">
+		</div>
+
+
+	</div>
+
 	<div id="participant-search-container">
 		<span id="participant-search-container-header">
 			<span></span>
@@ -252,14 +207,8 @@
 		</span>
 
 		<?php
-			$participantStarids = [];
 			foreach ($allParticipants as $p) {
-				$participantStarids[] = $p->dataPoints['starid'];
-			}
-
-			foreach ($participantStarids as $participant) {
-				$starid = $participant[0];
-				echoMatchesRow($starid);
+				echoMatchesRow($p);
 			}
 		?>
 	</div>
@@ -384,9 +333,22 @@
 		</div>
 	</div>
 </div>
-</div>
 
-<script>
+
+<script src="scripts/admin-dashboard-functions.js"></script>
+
+<script type="module">
+	viewMenteesBtn.addEventListener("click", viewMentees);
+	viewMentorsBtn.addEventListener("click", viewMentors);
+	
+	// partBtn.addEventListener("mouseout", mouseoutPart);
+	// partBtn.addEventListener("click", selectPart);
+	// partBtn.addEventListener("mouseover", mouseoverPart);
+
+	// adminBtn.addEventListener("mouseout", mouseoutAdmin);
+	// adminBtn.addEventListener("click", selectAdmin);
+	// adminBtn.addEventListener("mouseover", mouseoverAdmin);
+
 	setSelectedMatchMode("m");
 	hideDeleteMatchesConfirmation();
 
@@ -396,11 +358,14 @@
 	setSelectedMatchMode("m");
 	hideDeleteMatchesConfirmation();
 
-	setSelectedStarid('e');
-	setMentorsSelected(false);
+	viewMentees();
 	updateButtonHighlighting("match-type-btn");
-	orderParticipantInfo();
-	hideAllParticipantInfoExceptSelected();
+	// orderParticipantInfo();
+	
+	let infoDivs = document.getElementsByClassName('participant-info-values-set');
+	for (let i = 0; i < infoDivs.length; i++) {
+		infoDivs[i].style.display = 'none';
+	}
 </script>
 
 </body>

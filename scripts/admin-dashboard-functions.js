@@ -1,6 +1,8 @@
 let mentorsSelected = true;
 // manual match confirmation
 selectedMatchModeIdPrefix = 'mmc';
+let viewMentorsBtn = document.getElementById('view-mentors');
+let viewMenteesBtn = document.getElementById('view-mentees');
 
 function replaceXWithY(X, Y) {
 	let elem = document.getElementById('group-desc');
@@ -24,10 +26,10 @@ function updateResults() {
 
 	for (let i = 0; i < results.length; i++) {
 		if (results[i].id.split('-')[2].includes(filter)) {
-			results[i].style.visibility = "visible";
+			results[i].style.display = "inline-grid";
 		}
 		else {
-			results[i].style.visibility = "hidden";
+			results[i].style.display = "none";
 		}
 	}
 }
@@ -47,6 +49,17 @@ function showMentorsMentees() {
 	}
 }
 
+function viewMentors() {
+	setMentorsSelected(true);
+	viewMentorsBtn.style.backgroundColor = 'var(--btn-select)';
+	viewMenteesBtn.style.backgroundColor = 'var(--btn-default)';
+}
+
+function viewMentees() {
+	setMentorsSelected(false);
+	viewMentorsBtn.style.backgroundColor = 'var(--btn-default)';
+	viewMenteesBtn.style.backgroundColor = 'var(--btn-select)';
+}
 
 function setMentorsSelected(p_mentorsSelected) {
 	let selectedBtnClass = "btn btn-primary";
@@ -82,27 +95,27 @@ function clearStaridBorders() {
 	let toUnselect = document.getElementsByClassName('starid');
 	for (let i = 0; i < toUnselect.length; i++) {
 		toUnselect[i].style.borderColor = "var(--norm-border-color)";
-		toUnselect[i].style.borderWidth = "var(--unselected-border-width)";
+		toUnselect[i].style.borderWidth = "var(--border-width)";
 		toUnselect[i].style.zIndex = "0";
 	}
 }
 
 let selectedStarid = "";
 function setSelectedStarid(newSelectedStarid) {
+	document.getElementById('default-part-info').hidden = true;
+
 	selectedStarid = newSelectedStarid;
 
 	clearStaridBorders();
 	
 	if (selectedStarid != "") {
-		// set border to black
 		let starid = document.getElementById('participant-dashboard-'+selectedStarid);
 		starid.style.borderColor = "var(--selected-border-color)";
-		// starid.style.borderWidth = "var(--selected-border-width)";
 
 		let matchStarids = document.getElementsByClassName('match-starid-'+selectedStarid);
 		for (let i = 0; i < matchStarids.length; i++) {
 			matchStarids[i].style.borderColor = "var(--selected-border-color";
-			matchStarids[i].style.borderWidth = "var(--selected-border-width)";
+			matchStarids[i].style.borderWidth = "var(--border-width)";
 			matchStarids[i].style.zIndex = "1";
 		}
 	}
@@ -114,7 +127,7 @@ function hideAllParticipantInfoExceptSelected() {
 	if (selectedStarid == "") {
 		let infoDivs = document.getElementsByClassName('participant-info-values-set');
 		for (let i = 0; i < infoDivs.length; i++) {
-			infoDivs[i].visibility = "collapsed";
+			infoDivs[i].style.visibility = "collapsed";
 		}
 		return;
 	}
