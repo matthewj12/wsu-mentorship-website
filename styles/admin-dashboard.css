@@ -257,6 +257,7 @@ h1 {
 
 .search-results-header-item {
 	border-bottom: solid black 1px;
+	text-align: center;
 }
 
 
@@ -298,6 +299,8 @@ h1 {
 }
 
 .starid {
+	left: 50%;
+	transform: translate(-50%, 0);
 	border-radius: var(--border-width);
 	position: relative;
 	cursor: pointer;

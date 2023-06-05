@@ -18,13 +18,13 @@ function replaceXWithY(X, Y) {
 	}
 }
 
-function updateResults() {
+function updateResultsByStarid() {
 	let group = mentorsSelected ? 'mentor-row' : 'mentee-row';
-
 	let filter = document.getElementById('starid-search-box').value.toLowerCase();
-	let results = document.getElementsByClassName('participant-row');
+	let results = document.getElementsByClassName('participant-row ' + group);
 
 	for (let i = 0; i < results.length; i++) {
+		// The starid is in the element's ID.
 		if (results[i].id.split('-')[2].includes(filter)) {
 			results[i].style.display = "inline-grid";
 		}
@@ -32,6 +32,28 @@ function updateResults() {
 			results[i].style.display = "none";
 		}
 	}
+}
+
+function updateResultsByName() {
+	let group = mentorsSelected ? 'mentor-row' : 'mentee-row';
+	let filter = document.getElementById('name-search-box').value.toLowerCase();
+	let results = document.getElementsByClassName('participant-row ' + group);
+
+	for (let i = 0; i < results.length; i++) {
+		// The name is in the element's ID.
+		let fname = results[i].id.split('-')[3].toLowerCase();
+		let lname = results[i].id.split('-')[4].toLowerCase();
+
+		console.log("entered: " + filter + ", checking against: " + fname + ' ' + lname);
+		
+		if (fname.startsWith(filter) || lname.startsWith(filter)) {
+			results[i].style.display = "inline-grid";
+		}
+		else {
+			results[i].style.display = "none";
+		}
+	}
+	console.log();
 }
 
 function showMentorsMentees() {

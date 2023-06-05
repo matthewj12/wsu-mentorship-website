@@ -8,10 +8,7 @@
 	removeAllGraduatedParticipants();
 
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		print('<p>yeah</p>');
-		// $_SESSION['postdata'] = $_POST;
 		$basePath = "backend/static-files/python";
-
 
 		if (isset($_POST['delete-match'])) {
 			$split = explode('-', $_POST['match-to-delete-input']);
@@ -61,7 +58,7 @@
 	<link rel="stylesheet" href="styles/common.css">
 	<link rel="stylesheet" href="styles/admin-dashboard.css">
 	<script src="scripts/header-template.js"></script>
-	<!-- For some reason, Font Awesome icons don't show up unless we have this in the file that uses them. -->
+	<!-- For some reason, Font Awesome icons don't show up unless we have this in the file that uses them (e.g. admin-dashboard.php). -->
 	<script src="https://kit.fontawesome.com/0a01d33e89.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -185,13 +182,14 @@
 				type="text"
 				maxlength="8"
 				placeholder="Enter StarID"
-				onkeyup="updateResults()">
+				onkeyup="updateResultsByStarid()">
 
 			<input 
 				id="name-search-box"
 				class="text-input participant-search-text-input"
 				type="text"
-				placeholder="Enter name">
+				placeholder="Enter name"
+				onkeyup="updateResultsByName()">
 		</div>
 
 

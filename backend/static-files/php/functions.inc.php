@@ -295,10 +295,12 @@ function echoMatchesRow($pObj) {
 	$groupOpposite = $temp[1];
 	$maxMatches = $pObj->dataPoints['max matches'][0];
 	$isActive = $pObj->dataPoints['is active'][0];
+	$fname = $pObj->dataPoints['first name'][0];
+	$lname = $pObj->dataPoints['last name'][0];
 
 	echo "
 		<span 
-			id=\"participant-row-$starid\" 
+			id=\"participant-row-$starid-$fname-$lname\" 
 			class=\"participant-row $group-row\" 
 			onclick=\"\">";
 
@@ -321,11 +323,12 @@ function echoMatchesRow($pObj) {
 
 	// match starids
 	echo '<span class="match-starids">';
+
 	if (count($pObj->matchings) > 0) {
-		foreach ($pObj->matchings as $m) {
-			$matchStarid = $m->dataPoints['starid'];
-			$mentorStarid = $pObj->dataPoints['isMentor'] == '1' ? $starid : $matchStarid;
-			$menteeStarid = $pObj->dataPoints['isMentor'] == '0' ? $starid : $matchStarid;
+		foreach ($pObj->matchings as $matchStarid) {
+			$matchObj = new Participant($matchStarid);
+			$mentorStarid = $matchObj->dataPoints['isMentor'] == '1' ? $starid : $matchStarid;
+			$menteeStarid = $matchObj->dataPoints['isMentor'] == '0' ? $starid : $matchStarid;
 			
 			$temp = getMatchInfo($mentorStarid, $menteeStarid, ['end date', 'extendable to date']);
 			$endDate = date_create($temp['end date']);
@@ -359,7 +362,7 @@ function echoMatchesRow($pObj) {
 						</span>
 					</span>
 
-			</span>";
+				</span>";
 		}
 	}
 	echo '</span></span>';
@@ -400,8 +403,10 @@ function getStaridsOfMatches($starid, $isMentor) {
 }
 
 function isMentor($starid) {
-	$resultStr = getParticipantInfo($starid, ['is mentor'])['is mentor'][0];
-	return $resultStr == '1';
+	// $resultStr = getParticipantInfo($starid, ['is mentor'])['is mentor'][0];
+	$resultStr = getParticipantInfo($starid, 'is active');
+	return true;
+	// return $resultStr == '1';
 }
 
 function participantExistsInDb($starid) {
@@ -423,7 +428,7 @@ function getParticipantInfo($starid, $columns) {
 			$stmt = connect()->prepare($sqlQuery);
 			$stmt->execute();
 
-			// value is enclosed in array to be consistent with columns where there are multiple values, although we currently don't use this function for any of those columns
+			// value is enclosed in array to be consistent with columns where there are multiple values, although we currently don't use this function for any of those multi-value columns
 			$results[$colName] = [$stmt->fetchAll()[0][$colName]];
 		}
 		else {
@@ -450,6 +455,7 @@ function getParticipantInfo($starid, $columns) {
 	return $results;
 }
 
+// Infos is a list of things to retrive about the match that includes columns in the mentorship table and more.
 function getMatchInfo($mentorStarid, $menteeStarid, $infos) {
 	$mentorshipTblCols = getMentorshipFields();
 	$results = [];
@@ -537,6 +543,8 @@ function getAllParticipantsAsObjs() {
 
 	foreach ($starids as $starid) {
 		$p = new Participant($starid);
+		$a = count($p->matchings);
+		// echo "<div id=\"yytp\">$a</div>";
 
 		$participantObjs[] = $p;
 	}
