@@ -1,9 +1,7 @@
 .form-container {
-	position: absolute;
 	width: 50vw;
-	left: 50vw;
-	top: 17vh;
-	transform: translate(-50%, 0);
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .welcome-container {

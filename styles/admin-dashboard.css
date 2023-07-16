@@ -33,8 +33,6 @@ h1 {
 
 #bottom-left-container, #bottom-right-container {
 	display: flex;
-	align-items: center;
-	width: 800px;
 	float: left;
 	margin: 50px;
 	padding: 20px 0 50px;
@@ -44,11 +42,15 @@ h1 {
 }
 
 #bottom-left-container {
+	align-items: center;
 	right: calc(50vw - 20px);
+	width: 800px;
 }
 
 #bottom-right-container {
 	left: calc(50vw + 20px);
+	width: 1000px;
+	padding-left: 80px
 }
 
 #participant-search-boxes {
@@ -252,7 +254,7 @@ h1 {
 	cursor: pointer;
 	border: solid transparent 2px;
 	display: inline-grid;
-	grid-template-columns: 40px 60px 120px 120px 360px;
+	grid-template-columns: 40px 60px 120px 120px 500px;
 }
 
 .search-results-header-item {
@@ -299,8 +301,7 @@ h1 {
 }
 
 .starid {
-	left: 50%;
-	transform: translate(-50%, 0);
+	margin: 0 auto;
 	border-radius: var(--border-width);
 	position: relative;
 	cursor: pointer;
@@ -313,7 +314,11 @@ h1 {
 }
 
 .match-starids {
-	width: 360px;
+	width: 500px;
+}
+
+.match-starid-starid {
+	text-align: center;
 }
 
 .match-starid-starid>span, .participant-dashboard-starid>span {
@@ -333,7 +338,7 @@ h1 {
 .end, .end-date, .extendable-to, .extendable-to-date {
 	vertical-align: middle;
 	/* display: none; */
-	font-size: 0.45rem;
+	font-size: 0.55rem;
 	font-family: sans-serif;
 }
 

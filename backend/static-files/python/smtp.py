@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 
 smtp_url = 'smtp.gmail.com'
 sender = 'wsuMentorshipVerify@gmail.com'
-app_specific_password = 'kwsgzcyxynvuetvr'
+app_specific_password = 'cnwvbnuxxgzeozqe'
 recver = sys.argv[1]
 
 msg = MIMEMultipart('alternative')

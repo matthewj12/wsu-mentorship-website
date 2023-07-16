@@ -327,8 +327,9 @@ function echoMatchesRow($pObj) {
 	if (count($pObj->matchings) > 0) {
 		foreach ($pObj->matchings as $matchStarid) {
 			$matchObj = new Participant($matchStarid);
-			$mentorStarid = $matchObj->dataPoints['isMentor'] == '1' ? $starid : $matchStarid;
-			$menteeStarid = $matchObj->dataPoints['isMentor'] == '0' ? $starid : $matchStarid;
+			// You would expect the == '0' and == '1' to be swapped, but for some reason that produces the wrong result.
+			$mentorStarid = $matchObj->dataPoints['is mentor'][0] == '0' ? $starid : $matchStarid;
+			$menteeStarid = $matchObj->dataPoints['is mentor'][0] == '1' ? $starid : $matchStarid;
 			
 			$temp = getMatchInfo($mentorStarid, $menteeStarid, ['end date', 'extendable to date']);
 			$endDate = date_create($temp['end date']);
@@ -403,10 +404,8 @@ function getStaridsOfMatches($starid, $isMentor) {
 }
 
 function isMentor($starid) {
-	// $resultStr = getParticipantInfo($starid, ['is mentor'])['is mentor'][0];
-	$resultStr = getParticipantInfo($starid, 'is active');
-	return true;
-	// return $resultStr == '1';
+	$resultStr = getParticipantInfo($starid, ['is mentor'])['is mentor'][0];
+	return $resultStr == '1';
 }
 
 function participantExistsInDb($starid) {
@@ -507,6 +506,9 @@ function getMatchInfo($mentorStarid, $menteeStarid, $infos) {
 			$stmt->execute();
 
 			$results[$info] = $stmt->fetchAll()[0][$colName];
+
+
+			echo '<script>console.log("'.  $sqlQuery . '")</script>';
 		}
 	}
 

@@ -217,17 +217,21 @@ class Participant {
 
 		$this->dataPoints = getParticipantInfo($starid, $allCols);
 
-		// $groupStr = $this->dataPoints['is mentor'] ? 'mentor' : 'mentee';
-		// $groupStrOpposite = $this->dataPoints['is mentor'] ? 'mentee' : 'mentor';
+		$groupStr = $this->dataPoints['is mentor'][0] == '1' ? 'mentor' : 'mentee';
+		$groupStrOpposite = $this->dataPoints['is mentor'][0] == '1' ? 'mentee' : 'mentor';
 
-		// $sqlQuery = "SELECT * FROM `mentorship` WHERE `$groupStr starid` = $starid";
-		// $stmt = connect()->prepare($sqlQuery);
-		// $stmt->execute();
+		// echo '<script>console.log("' . $this->dataPoints['starid'][0] . '")</script>';
+		// echo '<script>console.log("' . $groupStr . '")</script>';
+		// echo '<script>console.log("' . $groupStrOpposite . '")</script>';
+		// echo '';
 
-		// foreach ($stmt->fetchAll() as $row) {
-		// 	$matchings[] = $row[$groupStrOpposite];
-		// }
 
-		$matchings = ['ffda4562'];
+		$sqlQuery = "SELECT * FROM `mentorship` WHERE `$groupStr starid` = '$starid'";
+		$stmt = connect()->prepare($sqlQuery);
+		$stmt->execute();
+
+		foreach ($stmt->fetchAll() as $row) {
+			$this->matchings[] = $row[$groupStrOpposite . ' starid'];
+		}
 	}
 }

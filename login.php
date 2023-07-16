@@ -48,8 +48,9 @@
 <head>
 	<script src="scripts/header-template.js"></script>
 
-	<link rel="stylesheet" href="styles/common.css">
-	<link rel="stylesheet" href="styles/login.css">
+	<link type="text/css" rel="stylesheet" href="styles/common.css">
+	<link type="text/css" rel="stylesheet" href="styles/login.css">
+	<script src="scripts/login-functions.js"></script>
 </head>
 <body>
 	<?php
@@ -104,7 +105,7 @@
 		</div>
 		<div class="btn-row">
 			<div class="link">
-				<a href="login.php/participant-starid=<?php echo $_SESSION['participant-starid'] ?>&login-step-1=Submit"><div class="btn" id="resend">Resend Code</div></a>
+				<a href="login.php?participant-starid=<?php echo $_SESSION['participant-starid'] ?>&admin-code=&login-step-1=Submit"><div class="btn" id="resend">Resend Code</div></a>
 			</div>
 			<div class="form-field">
 				<input class="btn" type="submit" name="email-verify" value="Submit" id="ev-submit-btn">
@@ -114,9 +115,10 @@
 		</div>
 	</form>
 
-	<script src="scripts/login-functions.js"></script>
+	<script>
+		partBtn = document.getElementById("i-am-part");
+		adminBtn = document.getElementById("i-am-admin");
 
-	<script type="module">
 		document.getElementById('admin-login-inputs').hidden = true;
 		document.getElementById('participant-login-inputs').hidden = true;
 
@@ -140,7 +142,7 @@
 		// Without this line, the user has to type an extra character into the text box before the submit button is enabled since "onkeydown" means that the function looks at the length of the input BEFORE the current key's character is registered.
 		setInterval(updateSubmitBtn, 50);
 
-		// Go to login step 2 (the email verificatio part) if the participant user has entered their starid and clicked "submit"
+		// Go to login step 2 (the email verification part) if the participant user has entered their starid and clicked "submit"
 		<?php
 			echo isSetAndNotEmptyGET('participant-starid') ? "showEmailVerify();" : "showLoginStep1();";
 		?>
