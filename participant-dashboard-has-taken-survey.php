@@ -16,8 +16,8 @@
 	$lName = getParticipantInfo($starid, ['last name'])['last name'][0]; // string
 	$surveyCompleted = participantExistsInDb($starid); // boolean
 	$matchStarids = getStaridsOfMatches($starid, $isMentor);
+	$importantQualities = getParticipantInfo($starid, ['important quality'])['important quality'];
 	$matchInfo = [];
-
 	foreach ($matchStarids as $sid) {
 		$matchInfo[$sid] = getParticipantInfo($sid, ['first name', 'last name']);
 	}
@@ -41,7 +41,7 @@
 	<div id="left-half">
 		<div class="stuff">
 			<h2>Your Information</h2>
-			<table>
+			<table id="left-tbl">
 				<tr>
 					<th style="text-align: left">Name</th>
 					<td><?php
@@ -70,26 +70,58 @@
 		<div class="stuff">
 			<h2>Your <?php echo $groupOpposite ?></h2>
 
-			<table>
-				<tr>
-					<th>Name</th>
-					<th>Email Address</th>
-				</tr>
-				<?php
-					foreach ($matchInfo as $sid => $mi) {
-						echo '<tr>';
-						$mFName = $mi['first name'];
-						$mLName = $mi['last name'];
-						echo "<td>$mFname $mLName</td>";
-						echo "<td>$sid@go.minnstate.edu</td>";
-						echo '</tr>';
-					}
-				?>
-			</table>
+			<?php
+			if (count($matchStarids) == 0) {
+				echo "You are not currently matched with any {$groupOpposite}.";
+			}
+			else {
+				echo '
+				<table id="right-tbl">
+					<tr>
+						<th class="name-col">Name</th>
+						<th>Email Address</th>
+						<th class="match-qualities-col">Info</th>
+						<th class="misc-info-col">Notes</th>
+					</tr>';
 
-			<p>Stuff you have in common: Major, race.</p>
+						$qualitiesInParticipantTbl = ['lgbtq+', 'not born in this country', 'multilingual', 'interested in diversity groups', 'first generation college student', 'international student', 'student athlete', 'transfer student'];
+					
+						foreach ($matchInfo as $sid => $mi) {
+							echo '<tr>';
+							$mFName = $mi['first name'][0];
+							$mLName = $mi['last name'][0];
+							echo "<td class=\"name-col\">$mFName $mLName</td>";
+							echo "<td>$sid@go.minnstate.edu</td>";
 
-			<p>Notes about [selected participant]: I'm looking forward to this, I'm kinda shy, don't ask me about xyz. Go vikings!!!!</p>
+							$matchQualities = "";
+							foreach ($importantQualities as $q) {
+								if ($q == 'unused') {
+									continue;
+								}
+								if (in_array($q, $qualitiesInParticipantTbl)) {
+									$val = getParticipantInfo($sid, [$q])[$q][0];
+									$matchQualities .= "{$q}: {$val}";
+								}
+								else {
+									$vals = getParticipantInfo($sid, [$q])[$q];
+									$matchQualities .= "<b>{$q}:</b> " . implode(', ', $vals);
+								}
+
+								if (array_search($q, $importantQualities) != 2) {
+									$matchQualities .= '<br>';
+								}
+							}
+
+							$miscInfo = getParticipantInfo($sid, ['misc info'])['misc info'][0];
+
+							echo "<td class=\"match-qualities-col\">" . $matchQualities . "</td>";
+							echo "<td class=\"misc-info-col\">" . $miscInfo . "</td>";
+							echo '</tr>';
+						}
+				echo '</table>';
+			}
+			?>
+
 		</div>
 	</div>
 

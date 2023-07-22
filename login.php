@@ -31,7 +31,6 @@
 		elseif (isset($_GET['email-verify'])) {
 			if ($_GET['ev-code'] == $_SESSION['ev-code'] && time() - $_SESSION['ev-code-ts'] < $evCodeLs) {
 				$_SESSION['participant-logged-in'] = true;
-				$_SESSION['participant-starid'] = $_GET['participant-starid'];
 
 				sessionUnsetIfSet('admin-logged-in');
 

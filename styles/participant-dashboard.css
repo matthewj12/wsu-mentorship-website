@@ -25,10 +25,19 @@ table {
 #left-half, #right-half {
 	position: absolute;
 	background-color: antiquewhite;
-	width: 450px;
 	height: 600px;
 	margin: 20px;
 }
+
+
+#left-half {
+	width: 450px
+}
+
+#right-half {
+	width: 800px;
+}
+
 
 #left-half {
 	right: 50vw;
@@ -67,13 +76,38 @@ table {
 
 table, th, td {
 	border: 2px solid gray;
+	white-space: nowrap;
 }
 
-th, td {
+table {
+	table-layout: fixed;
+}
+
+#right-tbl {
+	width: 650px;
+}
+
+#left-tbl th, #left-tbl td {
 	padding: 6px 20px;
-	/* the following two lines force the table rows to occupy a single line rather than wrapping onto a second line and taking up two lines. */
-	white-space: nowrap;
-	overflow: hidden;
+}
+
+
+#right-tbl th, #right-tbl td {
+	padding: 6px 5px;
+}
+
+#right-tbl th, #right-tbl tr {
+	width: auto;
+}
+
+.name-col {
+	/* max-width: 150px;
+	word-wrap: break-word; */
+}
+
+.match-qualities-col, .misc-info-col {
+	width: 400px;
+	white-space: pre-wrap;
 }
 
 #part-dashboard-box {
