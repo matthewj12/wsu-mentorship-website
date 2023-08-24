@@ -220,12 +220,6 @@ class Participant {
 		$groupStr = $this->dataPoints['is mentor'][0] == '1' ? 'mentor' : 'mentee';
 		$groupStrOpposite = $this->dataPoints['is mentor'][0] == '1' ? 'mentee' : 'mentor';
 
-		// echo '<script>console.log("' . $this->dataPoints['starid'][0] . '")</script>';
-		// echo '<script>console.log("' . $groupStr . '")</script>';
-		// echo '<script>console.log("' . $groupStrOpposite . '")</script>';
-		// echo '';
-
-
 		$sqlQuery = "SELECT * FROM `mentorship` WHERE `$groupStr starid` = '$starid'";
 		$stmt = connect()->prepare($sqlQuery);
 		$stmt->execute();

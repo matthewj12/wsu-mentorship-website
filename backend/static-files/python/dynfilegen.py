@@ -1,3 +1,4 @@
+
 # This file contains all the functions/dictionaries/code used in dynamically generating .sql and 
 # .bat files for the entire project (see file-structure.svg for exactly how they are used.)
 
@@ -13,7 +14,7 @@ distinct_part_of_urls = {
 	
 	'gender'                : '7024c370',
 	'hobby'                 : '4ba241f0',
-	'major'                 : '3735e520',
+	'major'                 : 'ca372f90',
 	'pre-program'           : '92987040',
 	'race'                  : 'e78c2170',
 	'religious-affiliation' : '9be133f0',
@@ -21,14 +22,6 @@ distinct_part_of_urls = {
 
 	'important-quality' : '2157a8c0',
 	'max-matches'       : '7d771050',
-
-	'preferred-gender'                : 'c0420be0',
-	'preferred-hobby'                 : 'eae20460',
-	'preferred-major'                 : '3735e520',
-	'preferred-pre-program'           : '6dda7f50',
-	'preferred-race'                  : '77ea45e0',
-	'preferred-religious-affiliation' : '2fb733b0',
-	'preferred-second-language'       : '4d7ce400'
 }
 
 def ensureFolderExists(folder):
@@ -36,27 +29,27 @@ def ensureFolderExists(folder):
 		os.makedirs(folder)
 		print(f"Directory '{folder}' has been created.")
 
-# generates and/or executes the batch file (Windows) that creates all the associative tables plus the `participant` table
+# generates and/or executes the batch file that creates all the associative tables plus the `participant` table
 def genSampleDataCurlRequestsFile(generate_file, execute_file):
 	if generate_file:
 		ensureFolderExists(f"{backend}/dynamically-generated-files/batch")
 
 		out_file = open(f"{backend}/dynamically-generated-files/batch/sample-data-curl-requests.bat", 'w')
-		out_file.write('pushd .\n')
+		out_file.write('dirs\n')
 
 		out_file.write(f"cd {globvars.sample_data_dir}\n")
 
 		for distinct in distinct_part_of_urls.keys():
 			suffix = '-assoc-tbl' if distinct != 'participant' else ''
 
-			curl = 'curl -s "{}{}?key={}" > "{}{}.csv"\n'.format(
+			curl = 'sudo curl -s "{}{}?key={}" -o "{}{}.csv"\n'.format(
 				mockaroo_base_url, distinct_part_of_urls[distinct], mockaroo_key,
 				distinct, suffix
 			)
 
 			out_file.write(curl)
 
-		out_file.write('popd\n')
+		out_file.write('cd -\n')
 		# out_file.write('exit')
 		out_file.close()
 
@@ -64,7 +57,7 @@ def genSampleDataCurlRequestsFile(generate_file, execute_file):
 		ensureFolderExists(globvars.sample_data_dir)
 		to_execute = f"{backend}/dynamically-generated-files/batch/sample-data-curl-requests.bat"
 		assert(os.path.exists(to_execute))
-		return_code = os.system(to_execute)
+		return_code = os.system(f"sudo bash {to_execute}")
 		assert(return_code == 0)
 		print('\nSample data has been successfully downloaded.')
 
@@ -219,3 +212,4 @@ def genImportSampleDataFile(generate_file, execute_file):
 		# return_code = os.system(f"mysql -u PHP --local_infile mp < {to_execute}")
 		# assert(return_code == 0)
 		print('\nSample data has been successfully imported.')
+

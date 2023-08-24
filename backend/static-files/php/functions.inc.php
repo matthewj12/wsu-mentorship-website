@@ -300,8 +300,8 @@ function echoMatchesRow($pObj) {
 
 	echo "
 		<span 
-			id=\"participant-row-$starid-$fname-$lname\" 
-			class=\"participant-row $group-row\" 
+			id=\"participant-row-$starid\" 
+			class=\"participant-row $group-row $fname-$lname\" 
 			onclick=\"\">";
 
 	// delete icon
@@ -338,7 +338,6 @@ function echoMatchesRow($pObj) {
 
 			echo "
 				<span 
-					style=\"display: inline-grid; grid-template-columns: 20% 80%;\"
 					class=\"starid match-starid match-starid-$matchStarid $groupOpposite-container\" 
 					onclick=\"setSelectedStarid('$matchStarid');hideAllParticipantInfoExceptSelected();\">
 
@@ -506,9 +505,6 @@ function getMatchInfo($mentorStarid, $menteeStarid, $infos) {
 			$stmt->execute();
 
 			$results[$info] = $stmt->fetchAll()[0][$colName];
-
-
-			echo '<script>console.log("'.  $sqlQuery . '")</script>';
 		}
 	}
 
@@ -647,4 +643,11 @@ function isValidAdminCode($enteredAdminCode) {
 			echo $e->getMessage();
 			return false;
 		}
+}
+
+function formatParticipantInfo($valArr) {
+	$s = count($valArr) == 0 ? 'None or N/A' : implode(', ', $valArr);
+	$s = str_replace('0', 'No', $s);
+	$s = str_replace('1', 'Yes', $s);
+	return $s;
 }

@@ -3,6 +3,8 @@ let mentorsSelected = true;
 selectedMatchModeIdPrefix = 'mmc';
 let viewMentorsBtn = document.getElementById('view-mentors');
 let viewMenteesBtn = document.getElementById('view-mentees');
+let viewMatchReasonsBtn = document.getElementById('view-match-reasons-btn');
+
 
 function replaceXWithY(X, Y) {
 	let elem = document.getElementById('group-desc');
@@ -41,10 +43,8 @@ function updateResultsByName() {
 
 	for (let i = 0; i < results.length; i++) {
 		// The name is in the element's ID.
-		let fname = results[i].id.split('-')[3].toLowerCase();
-		let lname = results[i].id.split('-')[4].toLowerCase();
-
-		console.log("entered: " + filter + ", checking against: " + fname + ' ' + lname);
+		let fname = results[i].classList[2][0].toLowerCase();
+		let lname = results[i].classList[2][1].toLowerCase();
 		
 		if (fname.startsWith(filter) || lname.startsWith(filter)) {
 			results[i].style.display = "inline-grid";
@@ -53,7 +53,13 @@ function updateResultsByName() {
 			results[i].style.display = "none";
 		}
 	}
-	console.log();
+}
+
+function clearSearchBoxes() {
+	document.getElementById('starid-search-box').value = '';
+	document.getElementById('name-search-box').value = '';
+	updateResultsByName();
+	updateResultsByStarid();
 }
 
 function showMentorsMentees() {
@@ -75,12 +81,14 @@ function viewMentors() {
 	setMentorsSelected(true);
 	viewMentorsBtn.style.backgroundColor = 'var(--btn-select)';
 	viewMenteesBtn.style.backgroundColor = 'var(--btn-default)';
+	clearSearchBoxes();
 }
 
 function viewMentees() {
 	setMentorsSelected(false);
 	viewMentorsBtn.style.backgroundColor = 'var(--btn-default)';
 	viewMenteesBtn.style.backgroundColor = 'var(--btn-select)';
+	clearSearchBoxes();
 }
 
 function setMentorsSelected(p_mentorsSelected) {
@@ -91,13 +99,13 @@ function setMentorsSelected(p_mentorsSelected) {
 
 	if (mentorsSelected) {
 		replaceXWithY('Mentee', 'Mentor');
-		showMentorsMentees(false);
+		showMentorsMentees();
 		menteeBtnClass = unselectedBtnClass
 		mentorBtnClass = selectedBtnClass;
 	}
 	else {
 		replaceXWithY('Mentor', 'Mentee');
-		showMentorsMentees(true);
+		showMentorsMentees();
 		menteeBtnClass = selectedBtnClass
 		mentorBtnClass = unselectedBtnClass;
 	}
@@ -138,7 +146,7 @@ function setSelectedStarid(newSelectedStarid) {
 		for (let i = 0; i < matchStarids.length; i++) {
 			matchStarids[i].style.borderColor = "var(--selected-border-color";
 			matchStarids[i].style.borderWidth = "var(--border-width)";
-			matchStarids[i].style.zIndex = "1";
+			// matchStarids[i].style.zIndex = "1";
 		}
 	}
 }
@@ -198,7 +206,26 @@ function hideInvalidMessages() {
 	}
 }
 
-function hideCreateMatchesConfirmation() {
+function showMatchReasons() {
+	let toShow = document.getElementById("match-reasons")
+	toShow.hidden = false;
+
+	// Make the relevant input tags required.
+	let inputs = toShow.getElementsByTagName('input');
+	for (let i = 0; i < inputs.length; i++) {
+		inputs[i].required = true;
+	}
+	
+}
+
+function hideAllDialogBoxes() {
+	document.getElementById("match-reasons").hidden = true;
+	let inputs = document.getElementById('confirmation-dialogs').getElementsByTagName('input');
+	for (let i = 0; i < inputs.length; i++) {
+		inputs[i].value = '';
+		inputs[i].required = false;
+	}
+
 	enableAllButtons();
 	
 	let toHide = document.getElementsByClassName("mc");
@@ -207,27 +234,30 @@ function hideCreateMatchesConfirmation() {
 		toHide[i].hidden = true
 	}
 
-	let toUnrequire = document.getElementsByTagName('input');
-	for (let i = 0; i < toUnrequire.length; i++) {
-		toUnrequire[i].required = false;
+	toHide = document.getElementsByClassName('invalid-input');
+	for (let i = 0; i < toHide.length; i++) {
+		toHide[i].style.visibility = 'hidden';
 	}
 }
 
 function showCreateMatchesConfirmation() {
-	// hide all version of the confirmation dialog box to start with
-	hideCreateMatchesConfirmation();
+	// hide all versions of the confirmation dialog box to start with
+	hideAllDialogBoxes();
 	hideInvalidMessages();
 	disableAllButtonsExceptConfirmCancel();
 
+	// Reset the mentor and mentee starids from the last time a manual match was created or a match was extended.
 	if (selectedMatchModeIdPrefix != 'a') {
 		document.getElementById(selectedMatchModeIdPrefix + "-mentor-starid").value = "";
 		document.getElementById(selectedMatchModeIdPrefix + "-mentee-starid").value = "";
 	}
 
+	// Show and require the relevant matching confirmation container.
 	let toShow = document.getElementById(selectedMatchModeIdPrefix + 'mc');
 	toShow.hidden = false;
 	toShow.required = true;
 
+	// Make the relevant input tags required.
 	let inputs = toShow.getElementsByTagName('input');
 	for (let i = 0; i < inputs.length; i++) {
 		inputs[i].required = true;
@@ -307,8 +337,7 @@ function updateButtonHighlighting(baseBtnClass, alsoCall=null) {
 	}
 }
 
-function validateStarid(inputToValidate) {
-	// build list of valid starids
+function getParticipants() {
 	let participantRows = document.getElementsByClassName("participant-row");
 	let mentorStarids = [];
 	let menteeStarids = [];
@@ -323,132 +352,207 @@ function validateStarid(inputToValidate) {
 		}
 	}
 
-	let errorMsgElem, starid;
-	// check that starid is in that list
-	errorMsgElem = document.getElementById(selectedMatchModeIdPrefix + '-invalid-' + inputToValidate + '-starid');
+	return [mentorStarids, menteeStarids];
+}
 
-	starid = document.getElementById(selectedMatchModeIdPrefix + '-' + inputToValidate + '-starid').value;
+// returns whether the starid exists in the database and shows/hides the error message for the relevant input accordingly
+function validateStarid(inputToValidate, displayErrorMsg) {
+	let staridElem = document.getElementById(selectedMatchModeIdPrefix + '-' + inputToValidate + '-starid');
+
+	// Don't give the error message until the user is done typing the starid ('cause that's annoying)
+	// build list of valid starids
+	let participants = getParticipants();
+	let mentorStarids = participants[0];
+	let menteeStarids = participants[1];
+
+	// check that starid is in that list
+	let errorMsgElem = document.getElementById(selectedMatchModeIdPrefix + '-invalid-' + inputToValidate + '-starid');
 
 	let starids = inputToValidate == 'mentor' ? mentorStarids : menteeStarids;
 
-	if (!(starids.includes(starid) || starid == '')) {
-		errorMsgElem.style.visibility = "visible";
-		return false;
+	if (displayErrorMsg) {
+		// starids are 8 characters long
+		// don't show error message for partially-typed starid (when input is focused)
+		if ((document.activeElement !== staridElem && !starids.includes(staridElem.value)) || (document.activeElement === staridElem && staridElem.value.length == 8 && !starids.includes(staridElem.value))) {
+			errorMsgElem.style.visibility = "visible";
+		}
+		else {
+			errorMsgElem.style.visibility = "hidden";
+		}
 	}
-	else {
-		errorMsgElem.style.visibility = "hidden";
-		return true;
+	return starids.includes(staridElem.value);
+}
+
+function matchExists(mentorStarid, menteeStarid) {
+	let matches = JSON.parse(document.querySelector('#invisible-matches-elem').innerHTML);
+
+	for (let i = 0; i < matches.length; i++) {
+		if (matches[i]['mentor starid'] == mentorStarid && matches[i]['mentee starid'] == menteeStarid) {
+			return true;
+		}
 	}
+	return false;
 }
 
 function validateExtend(inputToValidate) {
 	let menteeStarid = document.querySelector('#e-mentee-starid').value;
 	let mentorStarid = document.querySelector('#e-mentor-starid').value;
-
 	let confirmBtn = document.querySelector('#e-btn-confirm');
-	confirmBtn.disabled = false;
-	
-	if ((inputToValidate != 'date' && !validateStarid(inputToValidate)) || (menteeStarid == '' || mentorStarid == '')) {
-		confirmBtn.disabled = true;
-		return;
-	}
-
+	let noMatchErrorMsg = document.querySelector('#e-no-match-exists');
+	let cannotExtendErrorMsg = document.querySelector('#invalid-match-to-extend');
 	let matches = JSON.parse(document.querySelector('#invisible-matches-elem').innerHTML);
 	let isExtendable, maxExtendDate;
+	let validMentorStarid = validateStarid('mentor', inputToValidate == 'mentor');
+	let validMenteeStarid = validateStarid('mentee', inputToValidate == 'mentee');
+	let curMatchEndDate;
+	confirmBtn.disabled = true;
 
-	// ensure there is a match between them
-	let matchExists = false;
-	for (let i = 0; i < matches.length; i++) {
-		if (matches[i]['mentor starid'] == mentorStarid && matches[i]['mentee starid'] == menteeStarid) {
-			matchExists = true;
-			isExtendable = matches[i]['is extendable'] == '1' ? true : false;
-			maxExtendDate = matches[i]['earlier grad date']
-		}
+	if (!validMenteeStarid || !validMentorStarid) {
+		noMatchErrorMsg.style.visibility = 'hidden';
+		cannotExtendErrorMsg.style.visibility = 'hidden';
 	}
-
-	if (!matchExists) {
-		document.querySelector('#no-match-exists').style.visibility = "visible";
-		document.querySelector('#invalid-match-to-extend').style.visibility = "hidden";
-		confirmBtn.disabled = true;
-		return;
+	else if (!matchExists(mentorStarid, menteeStarid)) {
+		noMatchErrorMsg.style.visibility = "visible";
+		cannotExtendErrorMsg.style.visibility = 'hidden';
 	}
 	else {
-		document.querySelector('#no-match-exists').style.visibility = "hidden";
+		noMatchErrorMsg.style.visibility = "hidden";
+
+		for (let i = 0; i < matches.length; i++) {
+			if (matches[i]['mentor starid'] == mentorStarid && matches[i]['mentee starid'] == menteeStarid) {
+				isExtendable = matches[i]['is extendable'] == '1' ? true : false;
+				maxExtendDate = matches[i]['earlier grad date'];
+				curMatchEndDate = matches[i]['end date'];
+			}
+		}
 
 		if (!isExtendable) {
-			document.querySelector('#invalid-match-to-extend').style.visibility = "visible";
-			confirmBtn.disabled = true;
+			cannotExtendErrorMsg.style.visibility = "visible";
 		}
 		else {
-			document.querySelector('#invalid-match-to-extend').style.visibility = "hidden";
+			cannotExtendErrorMsg.style.visibility = "hidden";
+			confirmBtn.disabled = false;
 		}
 	}
 
-	let enteredDate = document.querySelector('#e-end-date').value;
-	if (enteredDate == '') {
+	// validate extend-to date
+	let dateErrorMsg1 = document.querySelector('#e-invalid-end-date1');
+	let dateErrorMsg2 = document.querySelector('#e-invalid-end-date2');
+	let dateElem = document.querySelector('#e-end-date');
+	if (dateElem.value == '') {
 		confirmBtn.disabled = true;
 	}
-
-	else if (inputToValidate == 'date') {
-		if (enteredDate > maxExtendDate) {
-			document.querySelector('#e-invalid-end-date').style.visibility = "visible";
+	else if (inputToValidate.includes('date')) {
+		dateErrorMsg1.style.visibility = "hidden";
+		dateErrorMsg2.style.visibility = "hidden";
+		if (dateElem.value > maxExtendDate) {
+			dateErrorMsg1.style.visibility = "visible";
 			confirmBtn.disabled = true;
 		}
-		else {
-			document.querySelector('#e-invalid-end-date').style.visibility = "hidden";
+		else if (dateElem.value <= curMatchEndDate) {
+			dateErrorMsg2.style.visibility = "visible";
+			confirmBtn.disabled = true;
 		}
 	}
 }
 
-function validateDates() {
+function validateViewMatchReasons(inputToValidate) {
+	let menteeStarid = document.querySelector('#r-mentee-starid').value;
+	let mentorStarid = document.querySelector('#r-mentor-starid').value;
+	let errorMsgElem = document.getElementById('r-no-match-exists');
+	let confirmBtn = document.querySelector('#r-btn-confirm');
+	confirmBtn.disabled = false;
+	
+	if (!validateStarid(inputToValidate, true)) {
+		confirmBtn.disabled = true;
+	}
+	// valid starids, but no match between them
+	// don't set the error messages to visible (second parameter = false) because validateViewMatchReasons is only called the display the error messages for one input. The "hooks" that its attached too are also the ones that the "no match exists between these participants" should be attached to, which is why we have the code below.
 
+	errorMsgElem.style.visibility = 'hidden';
+	if (validateStarid('mentor', false) && validateStarid('mentee', false) && !matchExists(mentorStarid, menteeStarid)) {
+		errorMsgElem.style.visibility = 'visible';
+		confirmBtn.disabled = true;
+	}
+}
+
+function isActive(starid) {
+
+}
+
+function isAtMaxMatches(starid) {
+
+}
+
+function getMaxMatches(starid) {
+	return parseInt(document.getElementById('participant-row-' + starid).getElementsByClassName('max-matches')[0].innerHTML);
+}
+
+function countCurMatches(starid) {
+	let matches = JSON.parse(document.querySelector('#invisible-matches-elem').innerHTML);
+
+	return matches.reduce((accumulator, match) => {
+		if (match['mentor starid'] == starid || match['mentee starid'] == starid) {
+			accumulator++;
+		}
+		return accumulator;
+	}, 0);
 }
 
 function validateManual(inputToValidate) {
-	let menteeStarid = document.querySelector('#m-mentee-starid').value;
-	let mentorStarid = document.querySelector('#m-mentor-starid').value;
-
-	let confirmBtn = document.querySelector('#m-btn-confirm');
-	confirmBtn.disabled = false;
-	
-	if ((!inputToValidate.includes('date') && !validateStarid(inputToValidate)) || (menteeStarid == '' || mentorStarid == '')) {
-		confirmBtn.disabled = true;
-		return;
-	}
+	let invalidDateErrorMsg = document.querySelector('#m-invalid-start-end-dates');
+	let mentorStaridErrorMsg = document.querySelector('#m-invalid-mentee-starid');
+	let menteeStaridErrorMsg = document.querySelector('#m-invalid-mentor-starid');
+	let cannotMatchErrorMsg = document.querySelector('#m-cannot-match');
 
 	let enteredStartDate = document.querySelector('#m-start-date').value;
 	let enteredEndDate = document.querySelector('#m-end-date').value;
+	let startOrEnd = inputToValidate.split(' ')[1];
 
-	if (inputToValidate.includes('date')) {
-		let startOrEnd = inputToValidate.split(' ')[1];
-		
-		if (enteredStartDate >= enteredEndDate) {
-			document.querySelector('#m-invalid-start-end-dates').style.visibility = "visible";
-			confirmBtn.disabled = true;
-		}
-		else {
-			document.querySelector('#m-invalid-start-end-dates').style.visibility = "hidden";
-		}
+	let menteeStarid = document.querySelector('#m-mentee-starid').value;
+	let mentorStarid = document.querySelector('#m-mentor-starid').value;
+	let confirmBtn = document.querySelector('#m-btn-confirm');
+	let validMentorStarid = validateStarid('mentor', inputToValidate == 'mentor');
+	let validMenteeStarid = validateStarid('mentee', inputToValidate == 'mentee');
+	confirmBtn.disabled = true;
+
+	if (!validMenteeStarid || !validMentorStarid) {
+		cannotMatchErrorMsg.style.visibility = 'hidden';
+	}
+	// current matches should never be greater than max matches, so we could use == instead of >=
+	else if (countCurMatches(mentorStarid) >= getMaxMatches(mentorStarid) || countCurMatches(menteeStarid) >= getMaxMatches(menteeStarid)) {
+		cannotMatchErrorMsg.style.visibility = 'visible';
+	}
+	else if (enteredStartDate >= enteredEndDate && enteredEndDate != '' && enteredEndDate != '') {
+		invalidDateErrorMsg.style.visibility = "visible";
+		confirmBtn.disabled = true;
+	}
+	else {
+		invalidDateErrorMsg.style.visibility = "hidden";
+		confirmBtn.disabled = false;
 	}
 }
 
 function validateAuto(inputToValidate) {
 	let confirmBtn = document.querySelector('#a-btn-confirm');
-	confirmBtn.disabled = false;
+	let errorMsgElem = document.querySelector('#a-invalid-start-end-dates');
+	confirmBtn.disabled = true;
 	
 	let enteredStartDate = document.querySelector('#a-start-date').value;
 	let enteredEndDate = document.querySelector('#a-end-date').value;
 
-	if (inputToValidate.includes('date')) {
-		let startOrEnd = inputToValidate.split(' ')[1];
+	let startOrEnd = inputToValidate.split(' ')[1];
+	console.log(enteredEndDate);
 
-		if (enteredStartDate >= enteredEndDate) {
-			document.querySelector('#a-invalid-start-end-dates').style.visibility = "visible";
-			confirmBtn.disabled = true;
-		}
-		else {
-			document.querySelector('#a-invalid-start-end-dates').style.visibility = "hidden";
-		}
+	if (enteredEndDate == '' || enteredEndDate == '') {
+		errorMsgElem.style.visibility = "hidden";
+	}
+	else if (enteredStartDate >= enteredEndDate) {
+		errorMsgElem.style.visibility = "visible";
+	}
+	else {
+		errorMsgElem.style.visibility = "hidden";
+		confirmBtn.disabled = false;
 	}
 }
 
@@ -464,4 +568,17 @@ function orderParticipantInfo() {
 		miscInfoValues[i].parentNode.appendChild(miscInfoValues[i]);
 		miscInfoValues[i].style.gridRow = "25";
 	}
+}
+
+let selectedMatch = "";
+
+function hideAllMatchReasonsExceptSelected() {
+	document.getElementById('match-reasons').style.height = '300px';
+	Array.from(document.getElementsByClassName('match-reasons-tbl')).forEach(tbl => {
+		tbl.style.visibility = "hidden";
+		if (tbl.id == selectedMatch) {
+			tbl.style.visibility = "visible";
+			document.getElementById('match-reasons').style.height = '600px';
+		}
+	});
 }

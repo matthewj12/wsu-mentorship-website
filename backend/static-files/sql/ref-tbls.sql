@@ -182,7 +182,6 @@ insert into `religious affiliation ref tbl`(`religious affiliation`) values
 	('spiritual but not religious'),
 	('agnostic'),
 	('atheist'),
-	('pastafarian'),
 	('other'),
 	('prefer not to answer'),
 	("doesn't matter");

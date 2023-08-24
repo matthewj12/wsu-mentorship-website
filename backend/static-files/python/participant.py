@@ -5,7 +5,6 @@ class Participant():
 
 	def __init__(self, starid=None, cursor=None):
 		if starid != None and cursor != None:
-			# atomized data points within `participant` table
 			self.data_points = {}
 			self.ranking = []
 			# the index in 'ranking' of the participant we will propose to next (if we need too)
@@ -19,6 +18,19 @@ class Participant():
 				col_val = ''
 				for tup in cursor:
 					col_val = str(tup[0])
+				
+				self.data_points[col] = col_val
+
+			non_participant_cols = ['religious affiliation', 'major']
+
+			for col in non_participant_cols:
+				sql_query = f"SELECT `{col} id` FROM `{col} assoc tbl` WHERE `{col} assoc tbl`.`starid` = '{starid}'"
+
+				cursor.execute(sql_query)
+
+				col_val = []
+				for tup in cursor:
+					col_val.append(str(tup[0]))
 				
 				self.data_points[col] = col_val
 
@@ -95,40 +107,64 @@ class Participant():
 
 
 		return important_qualities
-
 			
+
 	# returns a query that will generate a table with:
 	# column 1) starid of every other participant that is in the opposite group to self (for example, if self is mentor, only query mentees)
 	# column 2) The number of X in common self has with the participant with that starid
 	def generateCountMatchingXQuery(self, x, base_indent_str):
 		bi = base_indent_str
 		starid = self.data_points['starid']
+		x_no_spaces = x.replace(' ', '_')
 		
-		if x in  self.rankable_non_ref_tbl_dp:
+		if x in self.rankable_non_ref_tbl_dp:
 			# count(*) will evaluate to either 0 or 1
 			return (
 				f"{bi}with\n"
-				f"{bi}\t`p1 {x}` as (select `starid`, `{x}` from `participant` where `participant`.`starid` = '{starid}'),\n"
-				f"{bi}\t`p2 {x}` as (select `starid`, `{x}` from `participant`)\n"
-				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
-				f"{bi}from `p1 {x}`, `p2 {x}`\n"
-				f"{bi}where `p1 {x}`.`{x}` = `p2 {x}`.`{x}`\n"
-				f"{bi}group by `p2 {x}`.`starid`\n"
+				f"{bi}\t`p1_{x_no_spaces}` as (select `starid`, `{x}` from `participant` where `participant`.`starid` = '{starid}'),\n"
+				f"{bi}\t`p2_{x_no_spaces}` as (select `starid`, `{x}` from `participant`)\n"
+				f"{bi}select `p2_{x_no_spaces}`.`starid` as `candidate starid`, count(*) as `matching_{x_no_spaces}_count`\n"
+				f"{bi}from `p1_{x_no_spaces}`, `p2_{x_no_spaces}`\n"
+				f"{bi}group by `p2_{x_no_spaces}`.`starid`\n"
+			)
+		if x in ('religious affiliation'):
+			# rankings.py
+			# this participant's own value for this data point
+			x_value = miscfuncs.idToName(self.data_points[x][0], x, cursor)
+			cases = rankings.rankings[x][x_value]
+
+			# the column name "matching ___ count" doesn't really make sense when we're summing the score based on the rankings of the value(s) a participant has for the relevant columns, but we're keeping it for simplicities sake so there's only one column to order by
+			case_expr = 'case '
+			i = len(cases) # higher = better to be consistent with when we're just counting matching values and sorting by descending
+			for r in cases:
+				id = miscfuncs.nameToId(r, x, cursor)
+				case_expr += f"when `p2_{x_no_spaces}`.`{x} id` = '{id}' then {i} "
+				i -= 1
+
+			case_expr += 'else 0 '
+
+			case_expr += f"end"
+
+			return (
+				f"{bi}with\n"
+				f"{bi}\t`p1_{x_no_spaces}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
+				f"{bi}\t`p2_{x_no_spaces}` as (select * from `{x} assoc tbl`)\n"
+				f"{bi}select `p2_{x_no_spaces}`.`starid` as `candidate starid`, sum({case_expr}) as `matching_{x_no_spaces}_count`\n"
+				f"{bi}from `p1_{x_no_spaces}`, `p2_{x_no_spaces}`\n"
+				f"{bi}where `p1_{x_no_spaces}`.`{x} id` = `p2_{x_no_spaces}`.`{x} id`\n"
+				f"{bi}group by `p2_{x_no_spaces}`.`starid`\n"
 			)
 		else:
 			return (
 				f"{bi}with\n"
-				f"{bi}\t`p1 {x}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
-				f"{bi}\t`p2 {x}` as (select * from `{x} assoc tbl`)\n"
-				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
-				f"{bi}from `p1 {x}`, `p2 {x}`\n"
-				f"{bi}where `p1 {x}`.`{x} id` = `p2 {x}`.`{x} id`\n"
-				f"{bi}group by `p2 {x}`.`starid`\n"
+				f"{bi}\t`p1_{x}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
+				f"{bi}\t`p2_{x}` as (select * from `{x} assoc tbl`)\n"
+				f"{bi}select `p2_{x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
+				f"{bi}from `p1_{x}`, `p2_{x}`\n"
+				f"{bi}where `p1_{x}`.`{x} id` = `p2_{x}`.`{x} id`\n"
+				f"{bi}group by `p2_{x}`.`starid`\n"
 			)
 	
-		pass
-		# So VSCode will not exclude the ")" from the function's automatic fold
-
 
 	def generateCandidateRankingQuery(self, as_statements, custom_select_as_exprs, join_clause, custom_order_exprs):
 		return (
@@ -150,8 +186,9 @@ class Participant():
 		as_statements = [
 			f"\t`matching {iqs} tbl` AS (\n"
 			f"{self.generateCountMatchingXQuery(iqs, doubleTab)}\t),\n" for iqs in important_qualities
-		# So VSCode will not exclude the ")" from the function's automatic fold
 		]
+
+		t = self.generateCountMatchingXQuery('religious affiliation', doubleTab)
 
 		join_clause = '`available participants tbl`'
 		for iqs in important_qualities:
@@ -190,3 +227,11 @@ class Participant():
 
 		if am_debug_participant:
 			self.printRanking(base_indent=1)
+
+
+if __name__ == '__main__':
+	db, cursor = miscfuncs.createCursor()
+	p = Participant('aaa', cursor)
+	p.generateRanking(cursor, 1)
+	print(p.ranking)
+	

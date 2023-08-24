@@ -18,7 +18,32 @@ def getParticipantColumns():
 
 	return fields
 
+
 # hyphenated-snake-case
 def toHyphSnakeCase(s):
 	l = s.split(' ')
 	return l[0] + ''.join([f"-{word}" for word in l[1:]])
+
+
+def idToName(id, col, cursor):
+	query = (
+		f"SELECT `{col}`"
+		f"FROM `{col} ref tbl`"
+		f"WHERE `id` = '{id}'"
+	)
+	cursor.execute(query)
+
+	for tup in cursor:
+		return tup[0]
+
+
+def nameToId(name, col, cursor):
+	query = (
+		f"SELECT `id`"
+		f"FROM `{col} ref tbl`"
+		f"WHERE `{col}` = '{name}'"
+	)
+	cursor.execute(query)
+
+	for tup in cursor:
+		return tup[0]
