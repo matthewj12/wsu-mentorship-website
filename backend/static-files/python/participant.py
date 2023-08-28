@@ -107,7 +107,7 @@ class Participant():
 
 
 		return important_qualities
-			
+
 
 	# returns a query that will generate a table with:
 	# column 1) starid of every other participant that is in the opposite group to self (for example, if self is mentor, only query mentees)
@@ -115,54 +115,66 @@ class Participant():
 	def generateCountMatchingXQuery(self, x, base_indent_str):
 		bi = base_indent_str
 		starid = self.data_points['starid']
-		x_no_spaces = x.replace(' ', '_')
+		# x_no_spaces = x.replace(' ', '_')
 		
+		# participant data points that are stored in the "participant" table (each participant can only have one value boolean value)
 		if x in self.rankable_non_ref_tbl_dp:
-			# count(*) will evaluate to either 0 or 1
+			# count(*) will return 1 for matching participants, and there will be no rows for non-matching participants. Their rows will exist in the final query's result with a default value of 0 for this "matching ... count" column
 			return (
 				f"{bi}with\n"
-				f"{bi}\t`p1_{x_no_spaces}` as (select `starid`, `{x}` from `participant` where `participant`.`starid` = '{starid}'),\n"
-				f"{bi}\t`p2_{x_no_spaces}` as (select `starid`, `{x}` from `participant`)\n"
-				f"{bi}select `p2_{x_no_spaces}`.`starid` as `candidate starid`, count(*) as `matching_{x_no_spaces}_count`\n"
-				f"{bi}from `p1_{x_no_spaces}`, `p2_{x_no_spaces}`\n"
-				f"{bi}group by `p2_{x_no_spaces}`.`starid`\n"
+				f"{bi}\t`p1 {x}` as (select `starid`, `{x}` from `participant` where `participant`.`starid` = '{starid}'),\n"
+				f"{bi}\t`p2 {x}` as (select `starid`, `{x}` from `participant`)\n"
+				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
+				f"{bi}from `p1 {x}`, `p2 {x}`\n"
+				f"{bi}where `p1 {x}`.`{x}` = `p2 {x}`.`{x}`\n"
+				f"{bi}group by `p2 {x}`.`starid`\n"
 			)
-		if x in ('religious affiliation'):
-			# rankings.py
-			# this participant's own value for this data point
-			x_value = miscfuncs.idToName(self.data_points[x][0], x, cursor)
-			cases = rankings.rankings[x][x_value]
+
+		# participant data points that are stored in associative tables (ending in "assoc tbl") where each participant can have any number of values (less than or equal to the number of options available, of course)
+		if x in rankings.rankings.keys():
+			def generateCasesSQL(cases, col):
+				case_expr = 'case '
+				i = 1 # higher = better to be consistent with when we're just counting matching values and sorting by descending
+				for id in cases:
+					case_expr += f"when `p2 {col}`.`{col} id` = '{id}' then {i}\n"
+					# We divide by 10 so that values are "aligned" across different rankings (first is 1, second is 0.5, etc.) since that makes sense because the first one is always itself, which is equally good for all matches. This isn't that case for the last place. The reason its 5 is so that, assuming no one has 10 majors, matching one major exactly is always better than having several similar majors (math vs. statistics, data science, and computer science)
+					i /= 10
+
+				case_expr += 'else 0 end '
+
+				return case_expr
+				
+			# this participant's own value(s) for this data point
+			vals = [miscfuncs.idToName(a, x, cursor) for a in self.data_points[x]]
+
+			final_expr = 'case '
+			for id in self.data_points[x]:
+				# this would all be a lot simpler if we used ids instead of names (for example, "11" instead of "math")
+				order = [miscfuncs.nameToId(a, x, cursor) for a in rankings.rankings[x][miscfuncs.idToName(id, x, cursor)]]
+				case_stmt = generateCasesSQL(order, x)
+				final_expr += f"when `p1 {x}`.`{x} id` = '{id}' then {case_stmt}\n"
+			final_expr += ' end'
 
 			# the column name "matching ___ count" doesn't really make sense when we're summing the score based on the rankings of the value(s) a participant has for the relevant columns, but we're keeping it for simplicities sake so there's only one column to order by
-			case_expr = 'case '
-			i = len(cases) # higher = better to be consistent with when we're just counting matching values and sorting by descending
-			for r in cases:
-				id = miscfuncs.nameToId(r, x, cursor)
-				case_expr += f"when `p2_{x_no_spaces}`.`{x} id` = '{id}' then {i} "
-				i -= 1
-
-			case_expr += 'else 0 '
-
-			case_expr += f"end"
-
 			return (
 				f"{bi}with\n"
-				f"{bi}\t`p1_{x_no_spaces}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
-				f"{bi}\t`p2_{x_no_spaces}` as (select * from `{x} assoc tbl`)\n"
-				f"{bi}select `p2_{x_no_spaces}`.`starid` as `candidate starid`, sum({case_expr}) as `matching_{x_no_spaces}_count`\n"
-				f"{bi}from `p1_{x_no_spaces}`, `p2_{x_no_spaces}`\n"
-				f"{bi}where `p1_{x_no_spaces}`.`{x} id` = `p2_{x_no_spaces}`.`{x} id`\n"
-				f"{bi}group by `p2_{x_no_spaces}`.`starid`\n"
+				f"{bi}\t`p1 {x}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
+				f"{bi}\t`p2 {x}` as (select * from `{x} assoc tbl`)\n"
+				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, sum({final_expr}) as `matching {x} count`\n"
+				f"{bi}from `p1 {x}`, `p2 {x}`\n"
+				f"{bi}group by `candidate starid`\n"
 			)
+
+		# participant data points that are stored in associative tables (ending in "assoc tbl") where each participant can only have one value
 		else:
 			return (
 				f"{bi}with\n"
-				f"{bi}\t`p1_{x}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
-				f"{bi}\t`p2_{x}` as (select * from `{x} assoc tbl`)\n"
-				f"{bi}select `p2_{x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
-				f"{bi}from `p1_{x}`, `p2_{x}`\n"
-				f"{bi}where `p1_{x}`.`{x} id` = `p2_{x}`.`{x} id`\n"
-				f"{bi}group by `p2_{x}`.`starid`\n"
+				f"{bi}\t`p1 {x}` as (select * from `{x} assoc tbl` where `starid` = '{starid}'),\n"
+				f"{bi}\t`p2 {x}` as (select * from `{x} assoc tbl`)\n"
+				f"{bi}select `p2 {x}`.`starid` as `candidate starid`, count(*) as `matching {x} count`\n"
+				f"{bi}from `p1 {x}`, `p2 {x}`\n"
+				f"{bi}where `p1 {x}`.`{x} id` = `p2 {x}`.`{x} id`\n"
+				f"{bi}group by `p2 {x}`.`starid`\n"
 			)
 	
 
@@ -187,8 +199,6 @@ class Participant():
 			f"\t`matching {iqs} tbl` AS (\n"
 			f"{self.generateCountMatchingXQuery(iqs, doubleTab)}\t),\n" for iqs in important_qualities
 		]
-
-		t = self.generateCountMatchingXQuery('religious affiliation', doubleTab)
 
 		join_clause = '`available participants tbl`'
 		for iqs in important_qualities:
@@ -231,7 +241,6 @@ class Participant():
 
 if __name__ == '__main__':
 	db, cursor = miscfuncs.createCursor()
-	p = Participant('aaa', cursor)
+	p = Participant('aaaaaaaa', cursor)
 	p.generateRanking(cursor, 1)
-	print(p.ranking)
 	

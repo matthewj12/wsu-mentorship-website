@@ -1,5 +1,5 @@
 
-# All unlisted pairings share last place.
+# All unlisted options share last place.
 
 rankings = {
 	'major' : {
@@ -27,7 +27,7 @@ rankings = {
 			'data science', 
 			'computer science', 
 			'general engineering', 
-			'composite material engineering', 
+			'composite materials engineering', 
 			'physics'
 		),
 

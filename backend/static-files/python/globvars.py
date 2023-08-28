@@ -27,4 +27,4 @@ get_available_participants_query = (
 
 get_available_participant_starids_query = f"SELECT `starid` FROM ({get_available_participants_query}) as temp;"
 
-# `max matches`.`max matches id` is identical to `max matches`.`max matches`
+# `max matches`.`max matches id` is identical to CAST(`max matches`.`max matches` AS INT)
