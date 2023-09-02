@@ -60,8 +60,9 @@
 	<script src="scripts/header-template.js"></script>
 	<!-- For some reason, Font Awesome icons don't show up unless we have this in the file that uses them (e.g. admin-dashboard.php). -->
 	<script src="https://kit.fontawesome.com/0a01d33e89.js" crossorigin="anonymous"></script>
+	<script src="scripts/admin-dashboard-functions.js"></script>
 	<style>
-		#loading-overlay {
+		/* #loading-overlay {
 			display: block;
 			position: fixed;
 			top: 0;
@@ -74,7 +75,7 @@
 			font-size: 24px;
 			text-align: center;
 			padding-top: 50vh;
-		}
+		} */
 	</style>
 <body>
 
@@ -96,24 +97,20 @@
 	displayNavbar($_SESSION);
 ?>
 
-<div id="loading-overlay">Loading...</div>
+<!-- <div id="loading-overlay">Loading...</div> -->
 
 <div id="main-container">
 <div id="top-container">
-	<h1>Administrator Dashboard</h1>
-
 	<div class="fb centering top-row-content-container">
 		<form id="create-matches-form" method="post" action="admin-dashboard.php">
 			<div id="matches-row">
 				<div class="btn" id="match-btn-m" id="m">Create Match Manualy</div>
 				<div class="btn" id="match-btn-e" id="e">Extend Existing Match</div>
 				<div class="btn" id="match-btn-a" id="a">Create Matches Automatically</div>
+				<div class="btn" id="view-match-reasons-btn">View Why Two Participants Were Matched</div>
 			</div>
 		</form>
 
-		<div class="btn" id="view-match-reasons-btn">
-			View Why Two Participants Were Matched
-		</div>
 
 	</div>
 </div>
@@ -124,6 +121,7 @@
 
 	<p id="default-part-info">Select a participant by clicking their StarID in the right pane.</p>
 
+	<div class="scroll-box">
 	<?php
 		$participantTblColumns = ['starid', 'first name', 'last name', 'graduation date', 'is active', 'is mentor', 'international student', 'lgbtq+', 'student athlete', 'multilingual', 'not born in this country', 'transfer student', 'first generation college student', 'unsure or undecided about major', 'interested in diversity groups', 'misc info'];
 
@@ -138,7 +136,12 @@
 
 		foreach ($stmt->fetchAll() as $row) {
 			$starid = $row['starid'];
-			echo "<table id=\"participant-info-$starid\" class=\"participant-info-values-set\">";
+			echo "<table id=\"participant-info-$starid\" class=\"participant-info-values-set\">
+				<colgroup>
+					<col class=\"participant-label\">
+					<col class=\"participant-value\">
+				</colgroup>
+			";
 			$sqlQuery = "SELECT `" . $cols . "` FROM `participant` WHERE `starid` = '$starid'";
 			$stmt = connect()->prepare($sqlQuery);
 			$stmt->execute();
@@ -154,7 +157,7 @@
 					}
 
 					echo '<tr>';
-					echo "<th>$colName</th>";
+					echo "<td>$colName</td>";
 					echo "<td>$val</td>";
 	
 					echo '</tr>';
@@ -185,7 +188,7 @@
 					$valsToEcho = substr($valsToEcho, 0, strlen($valsToEcho) - 2);
 				}
 				echo "<tr>";
-				echo "<th>$colName</th>";
+				echo "<td>$colName</td>";
 				echo "<td>$valsToEcho</td>";
 				echo "</tr>";
 			}
@@ -193,6 +196,7 @@
 		}
 
 	?>
+	</div>
 
 </div>
 
@@ -234,11 +238,13 @@
 			<span class="search-results-header-item">Match StarIDs</span>
 		</span>
 
+		<div class="scroll-box">
 		<?php
 			foreach ($allParticipants as $p) {
 				echoMatchesRow($p);
 			}
 		?>
+		</div>
 	</div>
 
 </div>
@@ -444,9 +450,8 @@
 </div>
 
 
-<script src="scripts/admin-dashboard-functions.js"></script>
 
-<script type="module">
+<script>
 	viewMentorsBtn.addEventListener("click", viewMentors);
 	viewMenteesBtn.addEventListener("click", viewMentees);
 	document.getElementById('starid-search-box').addEventListener('focus', clearSearchBoxes);
@@ -522,19 +527,17 @@
 	viewMentees();
 	updateButtonHighlighting("match-type-btn");
 	// orderParticipantInfo();
-	
-	let infoDivs = document.getElementsByClassName('participant-info-values-set');
-	for (let i = 0; i < infoDivs.length; i++) {
-		infoDivs[i].style.display = 'none';
-	}
 
 	setSelectedStarid('');
 
-	function hideLoadingOverlay() {
-		const loadingOverlay = document.querySelector('#loading-overlay');
-		loadingOverlay.style.display = 'none';
-	}
-	window.addEventListener('load', hideLoadingOverlay);
+	// function hideLoadingOverlay() {
+	// 	console.log('h');
+	// 	const loadingOverlay = document.querySelector('#loading-overlay');
+	// 	loadingOverlay.style.display = 'none';
+	// }
+	// window.addEventListener('load', hideLoadingOverlay);
+
+	document.getElementById('default-part-info').hidden = false;
 </script>
 
 </body>

@@ -130,7 +130,7 @@ function clearStaridBorders() {
 	}
 }
 
-let selectedStarid = "";
+let selectedStarid = '';
 function setSelectedStarid(newSelectedStarid) {
 	document.getElementById('default-part-info').hidden = true;
 
@@ -138,7 +138,7 @@ function setSelectedStarid(newSelectedStarid) {
 
 	clearStaridBorders();
 	
-	if (selectedStarid != "") {
+	if (selectedStarid != '') {
 		let starid = document.getElementById('participant-dashboard-'+selectedStarid);
 		starid.style.borderColor = "var(--selected-border-color)";
 
@@ -164,7 +164,7 @@ function hideAllParticipantInfoExceptSelected() {
 
 	for (let i = 0; i < infoDivs.length; i++) {
 		if (infoDivs[i].id == 'participant-info-' + selectedStarid) {
-			infoDivs[i].style.display = "inline-grid";
+			infoDivs[i].style.display = "table"; // "initial" should be identical here but produces different results... *shrug emoji*
 		}
 		else {
 			infoDivs[i].style.display = "none";

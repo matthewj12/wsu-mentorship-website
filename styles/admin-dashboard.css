@@ -1,12 +1,13 @@
 *, *:before, *:after {
-	/* font-size: 1.2rem; */
 	box-sizing: border-box;
-	/* margin: 0;
-	padding: 0; */
 }
 
-body {
-	overflow: hidden;
+table {
+	margin: 0 auto;
+}
+
+h2 {
+	margin: -5px 0 15px;
 }
 
 :root {
@@ -32,11 +33,12 @@ h1 {
 }
 
 #bottom-left-container, #bottom-right-container {
+	height: 750px;
 	display: flex;
 	float: left;
-	margin: 50px;
+	margin: 0 15px 0;
 	padding: 20px 0 50px;
-	background-color: rgb(212, 199, 199);
+	background-color: lavender;
 	flex-direction: column;
 	position: absolute;
 }
@@ -44,13 +46,13 @@ h1 {
 #bottom-left-container {
 	align-items: center;
 	right: calc(60vw - 20px);
-	width: 800px;
+	width: 750px;
 }
 
 #bottom-right-container {
 	left: calc(40vw + 20px);
-	width: 1200px;
-	padding-left: 80px
+	width: 1000px;
+	padding-left: 30px
 }
 
 #participant-search-boxes {
@@ -84,7 +86,7 @@ h1 {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin: 10px 0 40px;
+	margin-bottom: 15px;
 	width: 100%;
 }
 
@@ -95,10 +97,11 @@ h1 {
 }
 
 .mc {
-	width: 900px;
+	outline: 1px solid black;
+	width: 920px;
 	height: 350px;
-	background-color: gray;
-	border-radius: 10px;
+	background-color: lightblue;
+	border-radius: 25px;
 	position: absolute;
 	left: 50vw;
 	top: 50vh;
@@ -187,12 +190,10 @@ h1 {
 	margin-right: var(--adj-input-margin);
 }
 
-#r-invalid-mentee-starid, #m-invalid-mentee-starid, #e-invalid-mentee-starid, #a-invalid-mentee-starid, #invalid-end-date {
-	margin-left: var(--adj-input-margin);
-}
-
-#r-invalid-mentor-starid, #m-invalid-mentor-starid, #e-invalid-mentor-starid, #a-invalid-mentor-starid, #invalid-start-date {
-	margin-right: var(--adj-input-margin);
+#m-invalid-mentor-starid, #e-invalid-mentor-starid, #a-invalid-mentor-starid,
+#m-invalid-mentee-starid, #e-invalid-mentee-starid, #a-invalid-mentee-starid {
+	position: relative;
+	bottom: 8px;
 }
 
 #m-cannot-match {
@@ -205,6 +206,9 @@ h1 {
 }
 
 .date-label {
+	height: 30px;
+	position: relative;
+	text-align: center;
 	width: auto;
 }
 
@@ -229,7 +233,6 @@ h1 {
 
 .invalid-input {
 	color: rgb(134, 21, 21);
-	font-size: 0.9rem;
 	text-align: center;
 	visibility: hidden;
 }
@@ -249,7 +252,6 @@ h1 {
 #participant-search-container {
 	display: inline-grid;
 	grid-template-columns: auto;
-	width: 700px;
 }
 
 #participant-search-container-header {
@@ -267,12 +269,6 @@ h1 {
 .search-results-header-item {
 	border-bottom: solid black 1px;
 	text-align: center;
-}
-
-
-
-#max-matches-header {
-	/* font-size: 0.7rem; */
 }
 
 .delete-icon {
@@ -304,10 +300,13 @@ h1 {
 }
 
 .max-matches {
+	font-size: 1.1rem;;
 	text-align: center;
 }
 
 .starid {
+	font-family: monospace;
+	font-size: 1.025rem;
 	margin: 0 auto;
 	border-radius: var(--border-width);
 	position: relative;
@@ -378,10 +377,11 @@ form {
 #matches-row {
 	display: flex;
 	align-items: center;
+	margin: 20px 0;
 }
 
 #match-btn-m, #match-btn-e, #match-btn-a, #view-match-reasons-btn {
-	background-color: blanchedalmond;
+	background-color: #fffbce;
 	width: 230px;
 	height: 35px;
 	margin-right: 20px;
@@ -434,19 +434,10 @@ form {
 	border-radius: 0 var(--btn-rad) var(--btn-rad) 0;
 }
 
-#participant-info-grid {
-	display: inline-grid;
-	grid-template-columns: 20rem auto;
-}
-
 .participant-info-row-name, .participant-info-val {
 	padding: 0px 10px;
 	border: solid black 1px;
 	margin: 0 -1px -1px 0;
-}
-
-th {
-	width: 300px;
 }
 
 td, th {
@@ -458,7 +449,7 @@ td, th {
 
 .participant-info-values-set {
 	border-collapse: collapse;
-	width: 700px
+	display: none;
 }
 
 .fb {
@@ -468,11 +459,6 @@ td, th {
 .centering {
 	justify-content: center;
 	align-content: center;
-}
-
-.top-row-content-container {
-	margin-top: calc(var(--vert-split-pos) / 2);
-	transform: translate(0, -50%);
 }
 
 .mc-desc {
@@ -515,4 +501,25 @@ td, th {
 
 #mmc {
 	height: 400px;
+}
+
+.participant-label {
+	width: 180px;
+}
+
+.participant-value {
+	width: 480px;
+}
+
+.scroll-box {
+	height: 600px;
+	width: 100%;
+}
+
+#bottom-left-container .scroll-box {
+	overflow-y: scroll;
+}
+
+#bottom-right-container .scroll-box {
+	overflow-y: scroll;
 }

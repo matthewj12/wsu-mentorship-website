@@ -3,7 +3,6 @@
 require_once('classes.inc.php');
 
 
-// $_SESSION superglobal
 function displayNavbar($ses) {
 	echo '
 		<div id="navbar">
@@ -182,8 +181,6 @@ function doInsert($tblName, $colsAndVals) {
 	$sqlQuery .= ');';
 	
 	try {
-		echo '<h3 style="font-family: monospace;">' . $sqlQuery . '</h3>';
-		
 		$stmt = connect()->prepare($sqlQuery);
 		$stmt->execute();
 	}
@@ -212,7 +209,7 @@ function wipeParticipant($starid) {
 			$stmt->execute();
 		}
 		catch (Exception $e)  {
-			echo $e->getMessage();
+			// There's no participant to remove because they haven't taken the survey yet.
 		}
 	}
 }
@@ -231,12 +228,10 @@ function forRefTbl($distinct) {
 		$distinct = str_replace($to_remove, '', $distinct);
 	}
 
-	// $distinct = str_replace(' ', '-', $distinct);
-
 	return $distinct;
 }
 
-// returne an array that maps option id => option label
+// return an array of Option objects
 function readRefTbl($assocTblName){
 	$tblNameNoSuffix = forRefTbl($assocTblName);
 	$refTblName = "$tblNameNoSuffix ref tbl";
@@ -512,26 +507,24 @@ function getMatchInfo($mentorStarid, $menteeStarid, $infos) {
 }
 
 function echoMatchesAsJson($matches) {
-	$toEcho = '';
-	
-	$toEcho .= '[';
-	
-	foreach ($matches as $match) {
-		$toEcho .= '{';
+	$toEcho = '[';
 
-		foreach ($match as $col => $val) {
-			$toEcho .= "\"$col\" : \"$val\", ";
-				
+	if (count($matches) > 0) {
+		foreach ($matches as $match) {
+			$toEcho .= '{';
+
+			foreach ($match as $col => $val) {
+				$toEcho .= "\"$col\" : \"$val\", ";
+			}
+
+			$toEcho = substr($toEcho, 0, strlen($toEcho) - 2);
+			$toEcho .= '}, ';
 		}
 
 		$toEcho = substr($toEcho, 0, strlen($toEcho) - 2);
-		$toEcho .= '}, ';
 	}
 
-	$toEcho = substr($toEcho, 0, strlen($toEcho) - 2);
-
 	$toEcho .= ']';
-
 	echo $toEcho;
 }
 
@@ -542,7 +535,6 @@ function getAllParticipantsAsObjs() {
 	foreach ($starids as $starid) {
 		$p = new Participant($starid);
 		$a = count($p->matchings);
-		// echo "<div id=\"yytp\">$a</div>";
 
 		$participantObjs[] = $p;
 	}

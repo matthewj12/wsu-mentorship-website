@@ -36,8 +36,6 @@ class SurveyItem {
 			$colName .= ' id';
 		}
 
-		// $this->tblName = str_replace(' ', '-', $this->tblName);
-		// $this->colName = str_replace(' ', '-', $colName);
 		$this->colName = $colName;
 
 		$this->desc = $desc;
@@ -101,7 +99,28 @@ class SurveyItem {
 				break;
 
 			case "dropdown":
-				$this->options = readRefTbl($this->tblName);
+				if (substr($this->colName, 0, 17) == 'important quality') {
+					// it makes more sense for it to read "same major as me" instead of "major", etc.
+					$keys = readRefTbl($this->tblName);
+					$this->options = [
+						new Option("same gender as me", $keys[0]->value),
+						new Option("same major(s) as me", $keys[1]->value),
+						new Option("same pre program(s) as me", $keys[2]->value),
+						new Option("same religiuos affiliation as me", $keys[3]->value),
+						new Option("same hobbies as me", $keys[4]->value),
+						new Option("has same value as me for international student question", $keys[5]->value),
+						new Option("has same value as me for lgbtq+ question", $keys[6]->value),
+						new Option("has same value as me for student athlete question", $keys[7]->value),
+						new Option("has same value as me for multilingual question", $keys[8]->value),
+						new Option("has same value as me for not born in this country question", $keys[9]->value),
+						new Option("has same value as me for transfer student question", $keys[10]->value),
+						new Option("has same value as me for first generation college student question", $keys[11]->value),
+						new Option("has same value as me for interested in diversity groups question", $keys[12]->value)
+					];
+				}
+				else {
+					$this->options = readRefTbl($this->tblName);
+				}
 				$name = "name = \"$nameVal\"";
 				$html .= "<select $name id=\"$nameVal\">";
 

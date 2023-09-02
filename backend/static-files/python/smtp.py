@@ -10,7 +10,7 @@ app_specific_password = 'cnwvbnuxxgzeozqe'
 recver = sys.argv[1]
 
 msg = MIMEMultipart('alternative')
-msg['Subject'] = 'verify'
+msg['Subject'] = 'WSU Mentorship Verification Code'
 text = 'Your verification code is: ' + sys.argv[2]
 
 

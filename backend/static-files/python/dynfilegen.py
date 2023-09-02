@@ -82,9 +82,6 @@ has_no_corresponding_preferred_table = [
 ]
 
 to_remove_for_ref_tbl_names = [
-	'primary ',
-	'secondary ',
-	'preferred ',
 	' assoc tbl'
 ]
 def forRefTbl(distinct):
@@ -95,12 +92,6 @@ def forRefTbl(distinct):
 
 # so we can add to the dictionary while iterating through the original keys
 assoc_tbl_names_unique_substr_keys = [key for key in assoc_tbl_names_unique_substr.keys()]
-for unique in assoc_tbl_names_unique_substr_keys:
-	if not unique in has_no_corresponding_preferred_table:
-		# Some data points (for example, religious affiliation) only allow 
-		# participants to select one option, but they can still select 
-		# multiple options for the corresponding preference table
-		assoc_tbl_names_unique_substr['preferred ' + unique] = 2
 
 # only used internally (in this file)
 def genericCreateStmt(distinct, suffix=' assoc tbl'):
@@ -213,3 +204,5 @@ def genImportSampleDataFile(generate_file, execute_file):
 		# assert(return_code == 0)
 		print('\nSample data has been successfully imported.')
 
+if __name__ == '__main__':
+	genImportSampleDataFile(0, 1)

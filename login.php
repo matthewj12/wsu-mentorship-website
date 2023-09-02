@@ -99,8 +99,8 @@
 		<div class="form-field">
 			<label for="email">Enter code:</label>
 			<input type="text" name="ev-code" class="form-input" id="code">
-			<p class="success"></p>
-			<p class="error"></p>
+			<!-- <p class="success"></p>
+			<p class="error"></p> -->
 		</div>
 		<div class="btn-row">
 			<div class="link">
@@ -108,8 +108,8 @@
 			</div>
 			<div class="form-field">
 				<input class="btn" type="submit" name="email-verify" value="Submit" id="ev-submit-btn">
-				<p class="error"></p>
-				<p class="success"></p>
+				<!-- <p class="error"></p>
+				<p class="success"></p> -->
 			</div>
 		</div>
 	</form>

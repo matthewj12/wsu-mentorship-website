@@ -39,7 +39,6 @@
 					// column name in database, text to display in survey webpage
 					['first name', 'First Name:'],
 					['last name',  'Last Name:']
-					// ['starid',     'StarID:']
 				],
 
 				'date' => [
@@ -76,7 +75,7 @@
 					['major',           'What are your major(s)?'],
 					['pre program',     'What are your pre program(s)?'],
 					['race',            'What race(s) are you?'],
-					['second language', 'Select any second language(s) that you speak.']
+					['second language', 'Select any second language(s) that you 	speak.']
 				],
 
 				'dropdown' => [
@@ -96,10 +95,6 @@
 			foreach ($surveyItemGroups as $type => $argsLists) {
 				foreach ($argsLists as $args) {
 					$colName = $args[0];
-					// if ($type == 'dropdown' || $type == 'checkbox assoc tbl') {
-					// 	$colName .= ' assoc tbl';
-					// }
-
 					$desc = $args[1];
 
 					$options = null;

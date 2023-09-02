@@ -7,57 +7,41 @@ table {
 	border-collapse: collapse;
 }
 
-.stuff {
-	display: inline-block;
-	position: absolute;
-	left: 50%;
-	top: 30px;
-	width: 60%;
-	transform: translate(-50%, 0);
-}
-
-#main-frame {
-	width: 50vw;
-	left: 50vw;
-	transform: translate(-50%, 0);
+#left-and-right-halves {
+	margin: 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
 }
 
 #left-half, #right-half {
-	position: absolute;
 	background-color: antiquewhite;
 	height: 600px;
 	margin: 20px;
 }
 
-
 #left-half {
-	width: 450px
+	width: 450px;
 }
 
 #right-half {
 	width: 800px;
 }
 
-
-#left-half {
-	right: 50vw;
-}
-
-#right-half {
-	left: 50vw;
+.stuff {
+	display: inline-block;
+	top: 30px;
 }
 
 #survey-btn {
 	position: relative;
-	left: 50%;
-	transform: translate(-50%, 0);
 	margin-top: 80px;
 	background-color: rgb(98, 133, 160);
 	border-radius: 10px;
 	width: 140px;
 	height: 50px;
 }
-
 
 #retake-survey-note {
 	font-size: smaller;
@@ -68,15 +52,8 @@ table {
 	transform: translate(-50%, 0);
 }
 
-table {
-	left: 50%;
-	transform: translate(-50%, 0);
-	position: relative;
-}
-
 table, th, td {
 	border: 2px solid gray;
-	white-space: nowrap;
 }
 
 table {
@@ -87,10 +64,25 @@ table {
 	width: 650px;
 }
 
+.col1 {
+	width: 100px;
+}
+
+.col2 {
+	width: 100px;
+}
+
+.col3 {
+	width: 100px;
+}
+
+.col4 {
+	width: 100px;
+}
+
 #left-tbl th, #left-tbl td {
 	padding: 6px 20px;
 }
-
 
 #right-tbl th, #right-tbl td {
 	padding: 6px 5px;
@@ -98,11 +90,6 @@ table {
 
 #right-tbl th, #right-tbl tr {
 	width: auto;
-}
-
-.name-col {
-	/* max-width: 150px;
-	word-wrap: break-word; */
 }
 
 .match-qualities-col, .misc-info-col {
@@ -119,4 +106,8 @@ table {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+}
+
+#no-matches {
+	text-align: center;
 }

@@ -112,7 +112,7 @@ class Participant():
 	# returns a query that will generate a table with:
 	# column 1) starid of every other participant that is in the opposite group to self (for example, if self is mentor, only query mentees)
 	# column 2) The number of X in common self has with the participant with that starid
-	def generateCountMatchingXQuery(self, x, base_indent_str):
+	def generateCountMatchingXQuery(self, x, base_indent_str, cursor):
 		bi = base_indent_str
 		starid = self.data_points['starid']
 		# x_no_spaces = x.replace(' ', '_')
@@ -197,7 +197,7 @@ class Participant():
 		doubleTab = '\t\t'
 		as_statements = [
 			f"\t`matching {iqs} tbl` AS (\n"
-			f"{self.generateCountMatchingXQuery(iqs, doubleTab)}\t),\n" for iqs in important_qualities
+			f"{self.generateCountMatchingXQuery(iqs, doubleTab, cursor)}\t),\n" for iqs in important_qualities
 		]
 
 		join_clause = '`available participants tbl`'

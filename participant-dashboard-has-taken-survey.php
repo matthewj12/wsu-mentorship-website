@@ -28,7 +28,6 @@
 <head>
 	<script src="scripts/header-template.js"></script>
 
-	<link rel="stylesheet" href="styles/common.css">
 	<link rel="stylesheet" href="styles/participant-dashboard.css">
 </head>
 <body>
@@ -38,6 +37,7 @@
 		
 	<h1>Participant Dashboard</h1>
 
+	<div id="left-and-right-halves">
 	<div id="left-half">
 		<div class="stuff">
 			<h2>Your Information</h2>
@@ -60,7 +60,7 @@
 				</tr>
 			</table>
 
-			<a href="survey.php"><div class="btn" id="survey-btn">Retake Survey</div></a>
+			<a href="survey.php"><div class="btn" id="survey-btn">Start Survey</div></a>
 
 			<p id="retake-survey-note">Retaking the survey after you have already completed it will overwrite the information you entered in your previous submission.</p>
 		</div>
@@ -72,15 +72,21 @@
 
 			<?php
 			if (count($matchStarids) == 0) {
-				echo "You are not currently matched with any {$groupOpposite}.";
+				echo "<p id=\"no-matches\">You are not currently matched with any {$groupOpposite}.";
 			}
 			else {
 				echo '
 				<table id="right-tbl">
+					<colgroup>
+						<col class="col1">
+						<col class="col2">
+						<col class="col3">
+						<col class="col4">
+					</colgroup>
 					<tr>
 						<th class="name-col">Name</th>
 						<th>Email Address</th>
-						<th class="match-qualities-col">Info</th>
+						<th class="match-qualities-col">Info (their values for your important qualities)</th>
 						<th class="misc-info-col">Notes</th>
 					</tr>';
 
@@ -123,6 +129,7 @@
 			?>
 
 		</div>
+	</div>
 	</div>
 
 </body>

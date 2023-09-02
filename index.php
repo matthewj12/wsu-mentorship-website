@@ -15,6 +15,7 @@
 		displayNavbar($_SESSION);
 	?>
 
-	<h1>hey</h1>
+	<h1>Welcome!</h1>
+	<p id="instructions">Select "Login" to begin.</p>
 </body>
 </html>
