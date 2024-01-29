@@ -1,9 +1,9 @@
 let mentorsSelected = true;
 // manual match confirmation
 selectedMatchModeIdPrefix = 'mmc';
-let viewMentorsBtn = document.getElementById('view-mentors');
-let viewMenteesBtn = document.getElementById('view-mentees');
-let viewMatchReasonsBtn = document.getElementById('view-match-reasons-btn');
+let viewMentorsBtn;
+let viewMenteesBtn;
+let viewMatchReasonsBtn;
 
 
 function replaceXWithY(X, Y) {
@@ -582,3 +582,99 @@ function hideAllMatchReasonsExceptSelected() {
 		}
 	});
 }
+
+function executeOnPageLoad() {
+	viewMentorsBtn = document.getElementById('view-mentors');
+	viewMenteesBtn = document.getElementById('view-mentees');
+	viewMatchReasonsBtn = document.getElementById('view-match-reasons-btn');
+	
+	// TODO: put id, event, and callback func in an array of objects and then call "document.getElementById..." on each object
+	viewMentorsBtn.addEventListener("click", viewMentors);
+	viewMenteesBtn.addEventListener("click", viewMentees);
+	document.getElementById('starid-search-box').addEventListener('focus', clearSearchBoxes);
+	document.getElementById('name-search-box').addEventListener('focus', clearSearchBoxes);
+
+	document.getElementById('m-mentor-starid').addEventListener('input', () => {validateManual('mentor')}); // mentor starid
+	document.getElementById('m-mentee-starid').addEventListener('input', () => {validateManual('mentee')}); // mentee starid
+	document.getElementById('m-mentor-starid').addEventListener('blur', () => {validateManual('mentor')});
+	document.getElementById('m-mentee-starid').addEventListener('blur', () => {validateManual('mentee')});
+	document.getElementById('m-start-date').addEventListener('input', () => {validateManual('start date')});
+	document.getElementById('m-end-date').addEventListener('input', () => {validateManual('end date')});
+
+	document.getElementById('e-mentor-starid').addEventListener('input', () => {validateExtend('mentor')});
+	document.getElementById('e-mentee-starid').addEventListener('input', () => {validateExtend('mentee')});
+	document.getElementById('e-mentor-starid').addEventListener('blur', () => {validateExtend('mentor')});
+	document.getElementById('e-mentee-starid').addEventListener('blur', () => {validateExtend('mentee')});
+	document.getElementById('e-end-date').addEventListener('input', () => {validateExtend('end date')});
+	document.getElementById('e-end-date').addEventListener('blur', () => {validateExtend('end date')});
+
+	document.getElementById('a-start-date').addEventListener('input', () => {validateAuto('start date')});
+	document.getElementById('a-end-date').addEventListener('input', () => {validateAuto('end date')});
+	document.getElementById('a-start-date').addEventListener('blur', () => {validateAuto('start date')});
+	document.getElementById('a-end-date').addEventListener('blur', () => {validateAuto('end date')});
+
+	document.getElementById('r-mentor-starid').addEventListener('input', () => {validateViewMatchReasons('mentor')});
+	document.getElementById('r-mentee-starid').addEventListener('input', () => {validateViewMatchReasons('mentee')});
+	document.getElementById('r-mentor-starid').addEventListener('blur', () => {validateViewMatchReasons('mentor')});
+	document.getElementById('r-mentee-starid').addEventListener('blur', () => {validateViewMatchReasons('mentee')});
+	document.getElementById('r-btn-confirm').addEventListener('click', () => {
+		selectedMatch = document.getElementById('r-mentor-starid').value + '-' + document.getElementById('r-mentee-starid').value;
+		hideAllMatchReasonsExceptSelected();
+	});
+
+	document.getElementById("match-btn-m").addEventListener("click", () => {
+		setSelectedMatchMode('m');
+		showCreateMatchesConfirmation();
+	});
+
+	document.getElementById("match-btn-e").addEventListener("click", () => {
+		setSelectedMatchMode('e');
+		showCreateMatchesConfirmation();
+	});
+
+	document.getElementById("match-btn-a").addEventListener("click", () => {
+		setSelectedMatchMode('a');
+		showCreateMatchesConfirmation();
+	});
+
+	document.getElementById("view-match-reasons-btn").addEventListener("click", () => {
+		setSelectedMatchMode('r');
+		showMatchReasons();
+	});
+
+	// partBtn.addEventListener("mouseout", mouseoutPart);
+	// partBtn.addEventListener("click", selectPart);
+	// partBtn.addEventListener("mouseover", mouseoverPart);
+
+	// adminBtn.addEventListener("mouseout", mouseoutAdmin);
+	// adminBtn.addEventListener("click", selectAdmin);
+	// adminBtn.addEventListener("mouseover", mouseoverAdmin);
+
+	setSelectedMatchMode("m");
+	hideDeleteMatchesConfirmation();
+
+	setSelectedMatchMode("a");
+	hideDeleteMatchesConfirmation();
+
+	setSelectedMatchMode("m");
+	hideDeleteMatchesConfirmation();
+
+	hideAllMatchReasonsExceptSelected();
+
+	viewMentees();
+	updateButtonHighlighting("match-type-btn");
+	// orderParticipantInfo();
+
+	setSelectedStarid('');
+
+	// function hideLoadingOverlay() {
+	// 	console.log('h');
+	// 	const loadingOverlay = document.querySelector('#loading-overlay');
+	// 	loadingOverlay.style.display = 'none';
+	// }
+	// window.addEventListener('load', hideLoadingOverlay);
+
+	document.getElementById('default-part-info').hidden = false;
+}
+
+executeOnPageLoad();

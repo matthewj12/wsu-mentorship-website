@@ -60,9 +60,10 @@
 	<script src="scripts/header-template.js"></script>
 	<!-- For some reason, Font Awesome icons don't show up unless we have this in the file that uses them (e.g. admin-dashboard.php). -->
 	<script src="https://kit.fontawesome.com/0a01d33e89.js" crossorigin="anonymous"></script>
-	<script src="scripts/admin-dashboard-functions.js"></script>
+	<script defer src="scripts/admin-dashboard-functions.js"></script>
+
 	<style>
-		/* #loading-overlay {
+		#loading-overlay {
 			display: block;
 			position: fixed;
 			top: 0;
@@ -75,7 +76,7 @@
 			font-size: 24px;
 			text-align: center;
 			padding-top: 50vh;
-		} */
+		}
 	</style>
 <body>
 
@@ -104,9 +105,9 @@
 	<div class="fb centering top-row-content-container">
 		<form id="create-matches-form" method="post" action="admin-dashboard.php">
 			<div id="matches-row">
-				<div class="btn" id="match-btn-m" id="m">Create Match Manualy</div>
-				<div class="btn" id="match-btn-e" id="e">Extend Existing Match</div>
-				<div class="btn" id="match-btn-a" id="a">Create Matches Automatically</div>
+				<div class="btn" id="match-btn-m">Create Match Manualy</div>
+				<div class="btn" id="match-btn-e">Extend Existing Match</div>
+				<div class="btn" id="match-btn-a">Create Matches Automatically</div>
 				<div class="btn" id="view-match-reasons-btn">View Why Two Participants Were Matched</div>
 			</div>
 		</form>
@@ -448,97 +449,5 @@
 		</div>
 	</div>
 </div>
-
-
-
-<script>
-	viewMentorsBtn.addEventListener("click", viewMentors);
-	viewMenteesBtn.addEventListener("click", viewMentees);
-	document.getElementById('starid-search-box').addEventListener('focus', clearSearchBoxes);
-	document.getElementById('name-search-box').addEventListener('focus', clearSearchBoxes);
-
-	document.getElementById('m-mentor-starid').addEventListener('input', () => {validateManual('mentor')}); // mentor starid
-	document.getElementById('m-mentee-starid').addEventListener('input', () => {validateManual('mentee')}); // mentee starid
-	document.getElementById('m-mentor-starid').addEventListener('blur', () => {validateManual('mentor')});
-	document.getElementById('m-mentee-starid').addEventListener('blur', () => {validateManual('mentee')});
-	document.getElementById('m-start-date').addEventListener('input', () => {validateManual('start date')});
-	document.getElementById('m-end-date').addEventListener('input', () => {validateManual('end date')});
-
-	document.getElementById('e-mentor-starid').addEventListener('input', () => {validateExtend('mentor')});
-	document.getElementById('e-mentee-starid').addEventListener('input', () => {validateExtend('mentee')});
-	document.getElementById('e-mentor-starid').addEventListener('blur', () => {validateExtend('mentor')});
-	document.getElementById('e-mentee-starid').addEventListener('blur', () => {validateExtend('mentee')});
-	document.getElementById('e-end-date').addEventListener('input', () => {validateExtend('end date')});
-	document.getElementById('e-end-date').addEventListener('blur', () => {validateExtend('end date')});
-
-	document.getElementById('a-start-date').addEventListener('input', () => {validateAuto('start date')});
-	document.getElementById('a-end-date').addEventListener('input', () => {validateAuto('end date')});
-	document.getElementById('a-start-date').addEventListener('blur', () => {validateAuto('start date')});
-	document.getElementById('a-end-date').addEventListener('blur', () => {validateAuto('end date')});
-
-	document.getElementById('r-mentor-starid').addEventListener('input', () => {validateViewMatchReasons('mentor')});
-	document.getElementById('r-mentee-starid').addEventListener('input', () => {validateViewMatchReasons('mentee')});
-	document.getElementById('r-mentor-starid').addEventListener('blur', () => {validateViewMatchReasons('mentor')});
-	document.getElementById('r-mentee-starid').addEventListener('blur', () => {validateViewMatchReasons('mentee')});
-	document.getElementById('r-btn-confirm').addEventListener('click', () => {
-		selectedMatch = document.getElementById('r-mentor-starid').value + '-' + document.getElementById('r-mentee-starid').value;
-		hideAllMatchReasonsExceptSelected();
-	});
-
-	document.getElementById("match-btn-m").addEventListener("click", () => {
-		setSelectedMatchMode('m');
-		showCreateMatchesConfirmation();
-	});
-
-	document.getElementById("match-btn-e").addEventListener("click", () => {
-		setSelectedMatchMode('e');
-		showCreateMatchesConfirmation();
-	});
-
-	document.getElementById("match-btn-a").addEventListener("click", () => {
-		setSelectedMatchMode('a');
-		showCreateMatchesConfirmation();
-	});
-
-	document.getElementById("view-match-reasons-btn").addEventListener("click", () => {
-		setSelectedMatchMode('r');
-		showMatchReasons();
-	});
-
-	// partBtn.addEventListener("mouseout", mouseoutPart);
-	// partBtn.addEventListener("click", selectPart);
-	// partBtn.addEventListener("mouseover", mouseoverPart);
-
-	// adminBtn.addEventListener("mouseout", mouseoutAdmin);
-	// adminBtn.addEventListener("click", selectAdmin);
-	// adminBtn.addEventListener("mouseover", mouseoverAdmin);
-
-	setSelectedMatchMode("m");
-	hideDeleteMatchesConfirmation();
-
-	setSelectedMatchMode("a");
-	hideDeleteMatchesConfirmation();
-
-	setSelectedMatchMode("m");
-	hideDeleteMatchesConfirmation();
-
-	hideAllMatchReasonsExceptSelected();
-
-	viewMentees();
-	updateButtonHighlighting("match-type-btn");
-	// orderParticipantInfo();
-
-	setSelectedStarid('');
-
-	// function hideLoadingOverlay() {
-	// 	console.log('h');
-	// 	const loadingOverlay = document.querySelector('#loading-overlay');
-	// 	loadingOverlay.style.display = 'none';
-	// }
-	// window.addEventListener('load', hideLoadingOverlay);
-
-	document.getElementById('default-part-info').hidden = false;
-</script>
-
 </body>
 </html>
